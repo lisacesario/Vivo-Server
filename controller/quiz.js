@@ -76,22 +76,6 @@ exports.createQuiz = function (req, res, next) {
                     isAuth.quizzes.push(newQuiz)
                     isAuth.save();
                     newQuiz.save();
-
-                    if (newQuiz.activities.length != 0) {
-                        if (newQuiz.activities !== null || newQuiz.activities.length > 0) {
-                            QuizActivity.findById(newQuiz.activities[0], function (err, foundActivity) {
-                                if (err) {
-                                    return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
-                                }
-                                console.log(foundActivity)
-                                foundActivity.quiz.push(newQuiz)
-                                foundActivity.save()
-                            })
-            
-            
-                        }
-                    }
-
                     return res.status(200).send(newQuiz)
                 })
             }
@@ -99,32 +83,6 @@ exports.createQuiz = function (req, res, next) {
         .catch(err=>{
             return res.status(400).send(err)
         })
-
-    /*Quiz.create(quiz, function (err, newQuiz) {
-        if (err) {
-            return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
-        }
-
-        console.log("activity:", newQuiz.activities.length);
-        if (newQuiz.activities.length != 0) {
-            if (newQuiz.activities !== null || newQuiz.activities.length > 0) {
-                QuizActivity.findById(newQuiz.activities[0], function (err, foundActivity) {
-                    if (err) {
-                        return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
-                    }
-                    console.log(foundActivity)
-                    foundActivity.quiz.push(newQuiz)
-                    foundActivity.save()
-                })
-
-
-            }
-        }
-
-
-
-    })*/
-
 
 }
 

@@ -46,17 +46,14 @@ const BaseActivitySchema = new Schema({
 
 
 const SelfManagementActivitySchema = new Schema({
-    steps: [
-        {
+    steps: [{
             _id:false,
             position: {type: Number},
             step: {
                 type: Schema.Types.ObjectId,
                 ref: 'Steps',
             }
-        }
-           
-    ],
+        }],
     tools: [{
         type: Schema.Types.ObjectId,
         ref: 'Tool',

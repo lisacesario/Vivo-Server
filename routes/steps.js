@@ -20,7 +20,7 @@ router.delete('/:id', StepController.deleteStep);
 
 router.patch('/add-to/:id', StepController.addStepToActivity)
 router.patch('/changes/:id', StepController.changeOrder)
-router.patch('/remove-from/:id', StepController.removeToolFromActivity)
+router.patch('/remove-from/:id', StepController.removeStepFromActivity)
 
 
 

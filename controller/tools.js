@@ -14,7 +14,7 @@ exports.getTools = function (req, res, next) {
         if (err) {
             console.log(err);
         }
-       // console.log(foundElement)
+        // console.log(foundElement)
         return res.json(foundElement);
     })
 }
@@ -23,7 +23,7 @@ exports.getTools = function (req, res, next) {
 exports.getToolsById = function (req, res, next) {
     console.log("GET TOOL BY ID")
     const toolID = req.params.id
-   // console.log(toolID)
+    // console.log(toolID)
     Tool.findById(toolID, function (err, foundElement) {
         if (err) {
             return res.status(422).send({ errors: normalizeErrors(err.errors) });
@@ -37,74 +37,54 @@ exports.createTool = function (req, res, next) {
     const { name, imgUrl, description, shared, created_by, activities, warning } = req.body;
     //console.log(req.file);
 
-    console.log("my body" ,req.body);
+    console.log("my body", req.body);
 
     const tool = new Tool({
         'name': name,
         'description': description,
-        'imgUrl': imgUrl,  
+        'imgUrl': imgUrl,
         'warning': warning,
-        'shared': shared
-        // 'activities' : activities
+        'shared': shared,
+        'activities': activities
     });
 
-    Tool.create(tool, function (err, newElement) {
-        if (err) {
-            return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
-        }
 
-        UserProfile.findOne({ uid: created_by })
-                    .exec()
-                    .then(foundUser =>{
-                        foundUser.tools.push(newElement)
-                        foundUser.save()
-                        newElement.created_by = foundUser[0]
-                        newElement.save()
-                        console.log("activity:", newElement.activities.length);
-                        if (newElement.activities.length != 0) {
-                            if (newElement.activities !== null || newElement.activities.length > 0) {
-                                SelfManagementActivity.findById(newElement.activities[0])
-                                                    .exec()
-                                                    .then(foundActivity =>{
-                                                        foundActivity.tools.push(newElement)
-                                                        foundActivity.save().then(newElement =>{
-                                                            return res.status(200).send(newElement)
-                                                        })
-                                                    })
-                                                    .catch(err =>{
-                                                        return res.status(422).send(
-                                                            {
-                                                                "action": "Create Tool",
-                                                                "success": false,
-                                                                "status": 400,
-                                                                "error": {
-                                                                    "code": err.errors,
-                                                                    "message": "Error in create Tool"
-                                                                },
-                                                            })
-                                                    })
-                                
-                            }
-                        }
-                        else{
-                            return res.status(200).send(newElement)
-                        }
-                    })
-                    .catch(err =>{
-                        return res.status(400).send(
-                            {
-                                "action": "Create Tool",
-                                "success": false,
-                                "status": 400,
-                                "error": {
-                                    "code": err.errors,
-                                    "message": "Error in create Tool"
-                                },
-                            })
-                    })
-                    
-            
-    })
+    headers = req.headers;
+    checkIsAuthenticated(headers)
+        .then((isAuth) => {
+            console.log("is Auth;", isAuth)
+            if (isAuth === false) {
+                return res.status(403).send("You are not authorized")
+            }
+            else {
+                Tool.create(tool, function (err, newElement) {
+                    if (err) {
+                        return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
+                    }
+
+                    newElement.created_by = isAuth;
+                    isAuth.tools.push(newElement);
+                    isAuth.save()
+                    newElement.save()
+
+                    return res.status(200).send(newElement)
+
+                })
+            }
+        })
+        .catch(err => {
+            return res.status(422).send(
+                {
+                    "action": "Create Tool",
+                    "success": false,
+                    "status": 400,
+                    "error": {
+                        "code": err.errors,
+                        "message": "Error in create Tool"
+                    },
+                })
+        })
+
 }
 
 
@@ -121,210 +101,171 @@ exports.updateTool = function (req, res, next) {
     //Object.keys(req.params).forEach(e => console.log(` req.params DATA key=${e}  value=${req.params[e]}`));
     //Object.keys(req.body).forEach(e => console.log(` req.body DATA key=${e}  value=${req.body[e]}`));
 
-    Tool.findById(req.params.id).populate().exec(function (err, foundElement) {
-        // .populate()
-        // .exec(function(err, foundElement){
-        console.log("FOUND ELEMENT:  ", foundElement)
-        if (err) {
-            console.log("sono bloccato in quetsto errore");
-            console.log("i miei errori sono qui:", err.errors);
-            return res.status(422).send({ errors: normalizeErrors(err.errors) });
-        }
-        else {
-            /* if(foundElement[0].created_by != user){
-                 console.log("created by ", foundElement.uid );
-                 console.log("hser ",search_id);
-                 console.log("sono bloccato");
-                 //return res.status(422).send({errors: normalizeErrors(err.errors)});
-                 return res.status(422).send({errors: [{title:'Invalid user', detail:'you are not the owner'}]});
-             } */
+    headers = req.headers;
+    checkIsAuthenticated(headers)
+        .then((isAuth) => {
+            console.log("is Auth;", isAuth)
+            if (isAuth === false) {
+                return res.status(403).send("You are not authorized")
+            }
+            else {
+                Tool.findById(req.params.id).exec(function (err, foundElement) {
+                    if (err) {
+                        return res.status(422).send({ errors: normalizeErrors(err.errors) });
+                    }
+                    if (foundElement.created_by != isAuth.id) {
+                        return res.status(403).json("You are not the owner")
+                    }
+                    foundElement.set(data);
+                    foundElement.save(function (err) {
+                        if (err) {
+                            console.log("sono solo  qui ");
 
-            foundElement.set(data);
-            foundElement.save(function (err) {
-                if (err) {
-                    console.log("sono solo  qui ");
+                            return res.status(422).send({ errors: [{ title: 'Error in save  activity', detail: err.errors }] });
+                        }
+                        else {
+                            console.log("NUOVO", foundElement)
+                            return res.status(200).json(foundElement);
+                        }
 
-                    return res.status(422).send({ errors: [{ title: 'Error in save  activity', detail: err.errors }] });
-                }
-                else {
-                    console.log("NUOVO", foundElement)
-                    return res.status(200).json(foundElement);
-                }
 
-                //return res.json({"activity" : foundActivity});
+                    });
+                })
+            }
+        })
+        .catch(err => {
+            return res.status(400).send(err)
+        })
 
-            });
-        }
-    })
 }
+
 
 
 
 exports.deleteTool = function (req, res, next) {
     console.log("AUTH", req.headers)
     console.log("ID ", req.params.id)
-    Tool.findById(req.params.id,
-        function (err, foundElement) {
-            if (err) {
-                console.log(err);
+    headers = req.headers;
+    checkIsAuthenticated(headers)
+        .then((isAuth) => {
+            console.log("is Auth;", isAuth)
+            if (isAuth === false) {
+                return res.status(403).send("You are not authorized")
+            }
+            else {
+                Tool.findById(req.params.id,
+                    function (err, foundElement) {
+                        if (err) {
+                            console.log(err);
+                        }
+
+                        if (foundElement.created_by != isAuth.id) {
+                            return res.status(403).send("You are not authorized")
+                        }
+                        foundElement.remove(function (err) {
+                            if (err) {
+                                // Delete from teachers
+                                return res.status(422).send({ errors: [{ title: 'Error Remove', detail: 'there was an error removing' }] });
+
+                            }
+                            foundElement.activities.forEach(element => {
+                                SelfManagementActivity.findById(element, function (err, foundActivity) {
+                                    if (err) {
+                                        return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
+                                    }
+                                    foundActivity.tool.pull(foundElement);
+                                    foundActivity.save()
+                                })
+                            });
+                            isAuth.tools.pull(foundElement)
+                            isAuth.save()
+                            return res.json({ "status": "deleted" });
+                        })
+                    })
             }
 
-            firebase.auth().verifyIdToken(req.headers.authorization).then(function (decodedToken) {
-                let uid = decodedToken.uid
-                console.log("UDI", uid)
+        })
+        .catch(err => {
 
-                UserProfile.find({ uid: uid }, function (err, foundUser) {
-                    if (err) {
-                        return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
-                    }
-                    console.log(foundUser[0].id)
+        })
 
-                    if (foundUser[0].id != foundElement.created_by) {
-                        return res.status(422).send({ errors: [{ title: 'Invalid user', detail: 'you are not the owner' }] });
-                    }
-
-
-                    foundElement.remove(function (err) {
-                        if (err) {
-                            // Delete from teachers
-                            return res.status(422).send({ errors: [{ title: 'Error Remove', detail: 'there was an error removing' }] });
-
-                        }
-                        foundElement.activities.forEach(element => {
-                            BaseActivity.findById(element, function (err, foundActivity) {
-                                if (err) {
-                                    return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
-                                }
-                                foundActivity.tool.pull(foundElement);
-                                foundActivity.save()
-                            })
-                        });
-                        foundUser[0].tools.pull(foundElement)
-                        foundUser[0].save()
-                        return res.json({ "status": "deleted" });
-                    });
-                })
-
-            })
-            .catch(err =>{
-                return res.status(422).send(
-                    {
-                        "action": "Create Tool",
-                        "success": false,
-                        "status": 400,
-                        "error": {
-                            "code": err,
-                            "message": "Error in create Tool"
-                        },
-                    })
-            })
-
-        });
 }
 
-
-
 exports.addToolToActivity = function (req, res, next) {
-    console.log("Add Tool from Activity")
-    const user = res.locals.user;
+    console.log("AUTH", req.headers)
+    console.log("PATCH")
+    // const user = res.locals.user;
     const data = req.body;
     const search_id = req.params.id
     console.log('activity_id :' + search_id);
-    console.log('user', user)
+    //console.log('user', user)
     console.log("data", req.body)
+    headers = req.headers;
+    checkIsAuthenticated(headers)
+        .then((isAuth) => {
+            console.log("is Auth;", isAuth)
+            if (isAuth === false) {
+                return res.status(403).send("You are not authorized")
+            }
+            else {
 
+                SelfManagementActivity.findById(search_id).exec()
+                    .then(foundElement => {
+                        console.log("Found Element: \n", foundElement);
+                        if (foundElement.created_by != isAuth.id) {
+                            return res.status(403).send({
+                                "action": "Add Quiz to Activity",
+                                "success": false,
+                                "status": 422,
+                                "error": {
+                                    "message": "You can't add elements in Activity. You are not the owner"
+                                }
+                            })
+                        }
+                        Tool.findById(data._id).exec()
+                            .then(tool => {
+                                console.log(tool)
+                                tool.activities.push(foundElement);
+                                tool.save()
 
-    SelfManagementActivity.findById(search_id)
-                        .exec()
-                        .then(foundElement=>{
-                            console.log("Found Element: \n", foundElement);
-                            Tool.findById(data._id)
-                                .exec()
-                                .then(foundTool =>{
-                                    console.log("Tool",foundTool)
-                                    foundTool.activities.push(foundElement);
-                                    foundTool.save()
-                                    foundElement.tools.push(foundTool);
-                                    foundElement.save()
-                                                .then(foundElement=>{
-                                                    return res.status(200).send(foundElement)
-                                                })
-                                                .catch(err =>{
-                                                    return res.status(400).send(
-                                                        {
-                                                            "action": "Insert Tool In activity",
-                                                            "success": false,
-                                                            "status": 400,
-                                                            "error": {
-                                                                "code": err,
-                                                                "message": "Error in adding Tool"
-                                                            },
-                                                        })
-                                                })
-                                   
-                                   
-                                })
-                                .catch(err =>{
-                                    return res.status(400).send(
-                                        {
-                                            "action": "Insert Tool In activity",
-                                            "success": false,
-                                            "status": 400,
-                                            "error": {
-                                                "code": err.errors,
-                                                "message": "Error in adding Tool"
-                                            },
-                                        })
-                                })
-                        })
-                        .catch(err =>{
-                            return res.status(400).send(
-                                {
-                                    "action": "Insert Tool In activity",
+                                foundElement.tools.push(tool);
+                                foundElement.save()
+                                console.log("FoundActivity saved")
+                                return res.status(200).send(foundElement)
+
+                            })
+                            .catch(err => {
+                                return res.status(422).send({
+                                    "action": "Add Quiz to Activity ",
                                     "success": false,
-                                    "status": 400,
+                                    "status": 422,
                                     "error": {
-                                        "code": err.errors,
-                                        "message": "Error in adding Tool"
-                                    },
+                                        "code": err,
+                                        "message": "Error adding in quiz in activity"
+                                    }
                                 })
+                            })
+
+                    })
+                    .catch(err => {
+                        return res.status(422).send({
+                            "action": "Add Quiz to Activity ",
+                            "success": false,
+                            "status": 422,
+                            "error": {
+                                "code": err,
+                                "message": "Delete in quiz by ID"
+                            }
                         })
-/*
-    SelfManagementActivity.findById(search_id).exec(function (err, foundElement) {
+                    })
+            }
 
-        if (err) {
-            console.log("sono bloccato in quetsto errore");
-            console.log("i miei errori sono qui:", err.errors);
-            return res.status(422).send({ errors: normalizeErrors(err.errors) });
-        }
-
-
-        Tool.findById(data._id)
-            .populate()
-            .exec(function (err, foundTool) {
-                if (err) {
-                    console.log("sono bloccato in quetsto errore");
-                    console.log("i miei errori sono qui:", err.errors);
-                    return res.status(422).send({ errors: normalizeErrors(err.errors) });
-                }
-                else {
-
-                    foundTool.activities.push(foundElement);
-                    foundTool.save()
-                    foundElement.tools.push(foundTool);
-                    foundElement.save();
-                    return res.status(200).send({ "message": "Quiz inserito correttamente" })
-                }
-            })
-
-    })
-*/
+        })
+        .catch(err => {
+            console.log(err)
+        })
 
 
-
-    /* }).then(foundElement =>{
-         
-     })*/
 
 
 }
@@ -349,7 +290,6 @@ exports.removeToolFromActivity = function (req, res, next) {
         }
         console.log("Found Element: /n", foundElement);
         Tool.findById(data._id)
-            .populate()
             .exec(function (err, foundTool) {
                 if (err) {
                     console.log("sono bloccato in quetsto errore");
@@ -372,5 +312,31 @@ exports.removeToolFromActivity = function (req, res, next) {
          
      })*/
 
+
+}
+
+
+
+function checkIsAuthenticated(headers) {
+
+    return new Promise((resolve, reject) => {
+        firebase.auth().verifyIdToken(headers.authorization)
+            .then(function (decodedToken) {
+                let uid = decodedToken.uid
+                console.log("UDI", uid)
+                UserProfile.findOne({ uid: uid })
+                    .exec()
+                    .then(foundUser => {
+                        console.log(foundUser)
+                        resolve(foundUser)
+                    })
+                    .catch(err => {
+                        reject()
+                    })
+            })
+            .catch(err => {
+                reject()
+            })
+    })
 
 }
