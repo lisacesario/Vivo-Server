@@ -450,9 +450,77 @@ exports.removeStepFromActivity = function (req, res, next) {
 
 
 exports.changeOrder = function(req,res,next){
-    console.log('activity_id :' + search_id);
-    console.log('user', user)
+    console.log("Change order of Step from Activity")
+    const user = res.locals.user;
+    const data = req.body;
+    const search_id = req.params.id
+   // console.log('activity_id :' + search_id);
+    //console.log('user', user)
     console.log("data", req.body)
+
+
+    headers = req.headers;
+    checkIsAuthenticated(headers)
+        .then((isAuth) => {
+           // console.log("is Auth;", isAuth)
+            if (isAuth === false) {
+                return res.status(403).send("You are not authorized")
+            }
+            else {
+                SelfManagementActivity.findById(search_id).exec(function (err, activity) {
+
+                    if (err) {
+                        return res.status(422).send({
+                            "action": "Change order Step from Activity",
+                            "success": false,
+                            "status": 422,
+                            "error": {
+                                "code": err,
+                                "message": "Remove Step from Activity"
+                            }
+                        })
+                    }
+
+                    if(activity.created_by != isAuth.id){
+                        return res.status(403).send({
+                            "action": "Change order Step from Activity ",
+                            "success": false,
+                            "status": 403,
+                            "error": {
+                                "message": "You are not the owner"
+                            }
+                        })
+                    }
+                    
+                    console.log("Previous", activity.steps)
+                    activity.steps.forEach( current_step =>{
+                        data.forEach(actual_step =>{
+                            if(current_step.step == actual_step.step._id){
+                                if(current_step.position != actual_step.position){
+                                    current_step.position = actual_step.position
+                                }
+                            }
+                        })
+                    });
+                    console.log("After", activity.steps)
+
+                    activity.save();
+                    return res.status(200).send()
+
+                })
+            }
+        })
+        .catch(err => {
+            return res.status(422).send({
+                "action": "Change order Step from Activity ",
+                "success": false,
+                "status": 422,
+                "error": {
+                    "code": err,
+                    "message": "Change order Step from Activity",
+                }
+            })
+        })
 }
 
 
@@ -463,7 +531,7 @@ function checkIsAuthenticated(headers) {
         firebase.auth().verifyIdToken(headers.authorization)
             .then(function (decodedToken) {
                 let uid = decodedToken.uid
-                console.log("UDI :", uid)
+               // console.log("UDI :", uid)
                 UserProfile.findOne({ uid: uid })
                     .exec()
                     .then(foundUser => {
