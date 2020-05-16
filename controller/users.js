@@ -17,8 +17,16 @@ exports.createUser = function (req, res, next) {
     UserProfile.create(userProfile, function (error, newProfile) {
         if (error) {
 
-            return res.status(422).send({ errors: [{ title: 'Errore nella creazione del Profilo', detail: error.errors }] });
-        }
+            return res.status(400).send(
+                {
+                    "action": "Create User Profile",
+                    "success": false,
+                    "status": 400,
+                    "error": {
+                        "code": error,
+                        "message": "Error in create user profile"
+                    },
+                })        }
 
         newProfile.save().then(
             () => {
@@ -31,7 +39,7 @@ exports.createUser = function (req, res, next) {
                         "success": false,
                         "status": 400,
                         "error": {
-                            "code": err.errors,
+                            "code": err,
                             "message": "Error in create user profile"
                         },
                     })

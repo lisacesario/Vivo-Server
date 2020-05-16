@@ -41,8 +41,9 @@ exports.getStepById = function (req, res, next) {
 }
 
 
+
 exports.createStep = function (req, res, next) {
-    console.log("CREATE Step")
+    console.log("CREATE STEP")
     const { name, description, shared, imgUrl, imgSym, created_by, activity, subject } = req.body;
     //console.log(req.file);
 
@@ -59,53 +60,71 @@ exports.createStep = function (req, res, next) {
         // 'activities' : activities
     });
 
-
     Step.create(step, function (err, newElement) {
         if (err) {
             return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
         }
-        console.log("Elemento: ", newElement)
 
-        UserProfile.find({ uid: created_by }, function (err, foundUser) {
-            if (err) {
-                return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
-            }
-            console.log(foundUser[0])
-
-        }).then((foundUser) => {
-            foundUser[0].tools.push(newElement)
-            foundUser[0].save()
-            newElement.created_by = foundUser[0]
-            newElement.save()
-        })
-            .catch(err => { console.log(err) })
-
-        console.log("activity:", newElement.activities.length);
-        if (newElement.activities.length != 0) {
-            if (newElement.activities !== null || newElement.activities.length > 0) {
-                SelfManagementActivity.findById(newElement.activities[0], function (err, foundActivity) {
-                    if (err) {
-                        return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
-                    }
-                    console.log(foundActivity)
-                    let just_a_step = {
-                        'position': 0,
-                        'step': newElement
-                    }
-                    foundActivity.steps.push(just_a_step)
-                    foundActivity.save()
-                })
-
-
-            }
-        }
-
-
-
+        UserProfile.findOne({ uid: created_by })
+                    .exec()
+                    .then(foundUser =>{
+                        foundUser.tools.push(newElement)
+                        foundUser.save()
+                        newElement.created_by = foundUser[0]
+                        newElement.save()
+                        console.log("activity:", newElement.activities.length);
+                        if (newElement.activities.length != 0) {
+                            if (newElement.activities !== null || newElement.activities.length > 0) {
+                                SelfManagementActivity.findById(newElement.activities[0])
+                                                    .exec()
+                                                    .then(foundActivity =>{
+                                                        console.log(foundActivity)
+                                                        let new_step = {
+                                                            'position': foundActivity.steps.length + 1,
+                                                            'step': newElement
+                                                        }
+                                                        foundActivity.steps.push(new_step)
+                                                        foundActivity.save().then(newElement =>{
+                                                            return res.status(200).send(newElement)
+                                                        })
+                                                    })
+                                                    .catch(err =>{
+                                                        return res.status(422).send(
+                                                            {
+                                                                "action": "Create Step",
+                                                                "success": false,
+                                                                "status": 400,
+                                                                "error": {
+                                                                    "code": err.errors,
+                                                                    "message": "Error in create Step"
+                                                                },
+                                                            })
+                                                    })
+                                
+                            }
+                        }
+                        else{
+                            return res.status(200).send(newElement)
+                        }
+                    })
+                    .catch(err =>{
+                        return res.status(400).send(
+                            {
+                                "action": "Create Step",
+                                "success": false,
+                                "status": 400,
+                                "error": {
+                                    "code": err.errors,
+                                    "message": "Error in create Step"
+                                },
+                            })
+                    })
+                    
+            
     })
-
-
 }
+
+
 
 
 exports.updateStep = function (req, res, next) {
@@ -242,7 +261,7 @@ exports.addStepToActivity = function (req, res, next) {
 
                     foundStep.activities.push(foundElement);
                     foundStep.save()
-                    foundElement.tools.push(foundTool);
+                    foundElement.tools.push(foundStep);
                     foundElement.save();
                     return res.status(200).send({ "message": "Step inserito correttamente" })
                 }

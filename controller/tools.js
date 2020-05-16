@@ -14,7 +14,7 @@ exports.getTools = function (req, res, next) {
         if (err) {
             console.log(err);
         }
-        console.log(foundElement)
+       // console.log(foundElement)
         return res.json(foundElement);
     })
 }
@@ -23,7 +23,7 @@ exports.getTools = function (req, res, next) {
 exports.getToolsById = function (req, res, next) {
     console.log("GET TOOL BY ID")
     const toolID = req.params.id
-    console.log(toolID)
+   // console.log(toolID)
     Tool.findById(toolID, function (err, foundElement) {
         if (err) {
             return res.status(422).send({ errors: normalizeErrors(err.errors) });
@@ -37,59 +37,74 @@ exports.createTool = function (req, res, next) {
     const { name, imgUrl, description, shared, created_by, activities, warning } = req.body;
     //console.log(req.file);
 
-    console.log(req.body);
+    console.log("my body" ,req.body);
 
     const tool = new Tool({
         'name': name,
-        'imgUrl': imgUrl,
         'description': description,
-        'shared': shared,
-        'warning': warning
+        'imgUrl': imgUrl,  
+        'warning': warning,
+        'shared': shared
         // 'activities' : activities
     });
-
 
     Tool.create(tool, function (err, newElement) {
         if (err) {
             return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
         }
-        console.log("Elemento: ", newElement)
 
-        UserProfile.find({ uid: created_by }, function (err, foundUser) {
-            if (err) {
-                return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
-            }
-            console.log(foundUser[0])
-
-        }).then((foundUser) => {
-            foundUser[0].tools.push(newElement)
-            foundUser[0].save()
-            newElement.created_by = foundUser[0]
-            newElement.save()
-        })
-            .catch(err => { console.log(err) })
-
-        console.log("activity:", newElement.activities.length);
-        if (newElement.activities.length != 0) {
-            if (newElement.activities !== null || newElement.activities.length > 0) {
-                SelfManagementActivity.findById(newElement.activities[0], function (err, foundActivity) {
-                    if (err) {
-                        return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
-                    }
-                    console.log(foundActivity)
-                    foundActivity.tools.push(newElement)
-                    foundActivity.save()
-                })
-
-
-            }
-        }
-
-
-
+        UserProfile.findOne({ uid: created_by })
+                    .exec()
+                    .then(foundUser =>{
+                        foundUser.tools.push(newElement)
+                        foundUser.save()
+                        newElement.created_by = foundUser[0]
+                        newElement.save()
+                        console.log("activity:", newElement.activities.length);
+                        if (newElement.activities.length != 0) {
+                            if (newElement.activities !== null || newElement.activities.length > 0) {
+                                SelfManagementActivity.findById(newElement.activities[0])
+                                                    .exec()
+                                                    .then(foundActivity =>{
+                                                        foundActivity.tools.push(newElement)
+                                                        foundActivity.save().then(newElement =>{
+                                                            return res.status(200).send(newElement)
+                                                        })
+                                                    })
+                                                    .catch(err =>{
+                                                        return res.status(422).send(
+                                                            {
+                                                                "action": "Create Tool",
+                                                                "success": false,
+                                                                "status": 400,
+                                                                "error": {
+                                                                    "code": err.errors,
+                                                                    "message": "Error in create Tool"
+                                                                },
+                                                            })
+                                                    })
+                                
+                            }
+                        }
+                        else{
+                            return res.status(200).send(newElement)
+                        }
+                    })
+                    .catch(err =>{
+                        return res.status(400).send(
+                            {
+                                "action": "Create Tool",
+                                "success": false,
+                                "status": 400,
+                                "error": {
+                                    "code": err.errors,
+                                    "message": "Error in create Tool"
+                                },
+                            })
+                    })
+                    
+            
     })
-
-
 }
 
 
@@ -191,7 +206,18 @@ exports.deleteTool = function (req, res, next) {
                 })
 
             })
-                .catch(err => console.log(err))
+            .catch(err =>{
+                return res.status(422).send(
+                    {
+                        "action": "Create Tool",
+                        "success": false,
+                        "status": 400,
+                        "error": {
+                            "code": err,
+                            "message": "Error in create Tool"
+                        },
+                    })
+            })
 
         });
 }
@@ -208,14 +234,69 @@ exports.addToolToActivity = function (req, res, next) {
     console.log("data", req.body)
 
 
-    SelfManagementActivity.findById(search_id).populate().exec(function (err, foundElement) {
+    SelfManagementActivity.findById(search_id)
+                        .exec()
+                        .then(foundElement=>{
+                            console.log("Found Element: \n", foundElement);
+                            Tool.findById(data._id)
+                                .exec()
+                                .then(foundTool =>{
+                                    console.log("Tool",foundTool)
+                                    foundTool.activities.push(foundElement);
+                                    foundTool.save()
+                                    foundElement.tools.push(foundTool);
+                                    foundElement.save()
+                                                .then(foundElement=>{
+                                                    return res.status(200).send(foundElement)
+                                                })
+                                                .catch(err =>{
+                                                    return res.status(400).send(
+                                                        {
+                                                            "action": "Insert Tool In activity",
+                                                            "success": false,
+                                                            "status": 400,
+                                                            "error": {
+                                                                "code": err,
+                                                                "message": "Error in adding Tool"
+                                                            },
+                                                        })
+                                                })
+                                   
+                                   
+                                })
+                                .catch(err =>{
+                                    return res.status(400).send(
+                                        {
+                                            "action": "Insert Tool In activity",
+                                            "success": false,
+                                            "status": 400,
+                                            "error": {
+                                                "code": err.errors,
+                                                "message": "Error in adding Tool"
+                                            },
+                                        })
+                                })
+                        })
+                        .catch(err =>{
+                            return res.status(400).send(
+                                {
+                                    "action": "Insert Tool In activity",
+                                    "success": false,
+                                    "status": 400,
+                                    "error": {
+                                        "code": err.errors,
+                                        "message": "Error in adding Tool"
+                                    },
+                                })
+                        })
+/*
+    SelfManagementActivity.findById(search_id).exec(function (err, foundElement) {
 
         if (err) {
             console.log("sono bloccato in quetsto errore");
             console.log("i miei errori sono qui:", err.errors);
             return res.status(422).send({ errors: normalizeErrors(err.errors) });
         }
-        console.log("Found Element: /n", foundElement);
 
 
         Tool.findById(data._id)
@@ -237,7 +318,7 @@ exports.addToolToActivity = function (req, res, next) {
             })
 
     })
-
+*/
 
 
 

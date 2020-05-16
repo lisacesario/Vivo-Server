@@ -12,7 +12,7 @@ const ToolSchema = new Schema({
         type:String,
         required:false,
     },
-    imgURL: {
+    imgUrl: {
         type: String,
         required: false,
     },

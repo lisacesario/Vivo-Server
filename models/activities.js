@@ -57,17 +57,16 @@ const SelfManagementActivitySchema = new Schema({
         }
            
     ],
-
     tools: [{
         type: Schema.Types.ObjectId,
-        ref: 'Quiz',
+        ref: 'Tool',
         required: false
     }],
 }, options)
 
 
 const QuizActivitySchema = new Schema({
-    quizzes: [{
+    quiz: [{
         type: Schema.Types.ObjectId,
         ref: 'Quiz',
         required: false
