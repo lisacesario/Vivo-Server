@@ -5,7 +5,7 @@ const { UserProfile } = require('../models/user_profile');
 const { BaseActivity, QuizActivity } = require('../models/activities');
 const firebase = require('firebase-admin');
 const normalizeErrors = require('../helpers/mongoose');
-
+const createLog = require('./log')
 
 // da modificare col parametro shared
 exports.getQuiz = function (req, res, next) {
@@ -28,6 +28,7 @@ exports.getQuizById = function (req, res, next) {
             return res.status(200).send(foundQuiz)
         })
         .catch(err => {
+           
             return res.status(422).send({
                 "action": "Get Quiz by ID ",
                 "success": false,
@@ -78,6 +79,7 @@ exports.createQuiz = function (req, res, next) {
                     newQuiz.save();
                     return res.status(200).send(newQuiz)
                 })
+                
             }
         })
         .catch(err=>{

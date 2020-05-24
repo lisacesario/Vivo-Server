@@ -123,6 +123,12 @@ const UserProfileSchema = new Schema({
 
 
 const TeacherProfileSchema = new Schema({
+    groups: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Group',
+        required: false
+    }],
+
     activities: [{
         type: Schema.Types.ObjectId,
         ref: 'BaseActivity',
