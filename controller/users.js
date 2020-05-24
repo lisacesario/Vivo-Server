@@ -897,3 +897,29 @@ function notAuthorized(res) {
 
   */
 
+
+
+
+function checkIsAuthenticated(headers) {
+
+    return new Promise((resolve, reject) => {
+        firebase.auth().verifyIdToken(headers.authorization)
+            .then(function (decodedToken) {
+                let uid = decodedToken.uid
+                console.log("UDI", uid)
+                UserProfile.findOne({ uid: uid })
+                    .exec()
+                    .then(foundUser => {
+                        console.log(foundUser)
+                        resolve(foundUser)
+                    })
+                    .catch(err => {
+                        reject()
+                    })
+            })
+            .catch(err => {
+                reject()
+            })
+    })
+
+}
