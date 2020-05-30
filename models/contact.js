@@ -19,6 +19,11 @@ const ContactSchema = new Schema({
         ref: 'UserProfile',
         required: true
     },
+    groups: [{
+        type: ObjectId,
+        ref: 'Group',
+        required: true
+    }],
     createdAt: {
         type: Date,
         default: Date.now()

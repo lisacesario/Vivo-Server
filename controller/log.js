@@ -1,21 +1,24 @@
-const { Log } = require('../models/analysis/log')
+const VivoLog = require('../models/analysis/log');
 
 
-exports.createLog = function(action,category, createdBy,message,createdAt) {
+ module.exports = {
 
-        const log = new Log({
+    createLog: function(action,category,createdBy,message) {
+
+        const alog = new VivoLog({
             'action':action,
             'category':category,
             'createdBy':createdBy,
             'message':message,
-            'createdAt':createdAt
+            'createdAt':Date().now
         });
 
-        Log.create(log, function(err, newLog){
+        VivoLog.create(alog, function(err, newLog){
             if(err){
-                return console.err(err)
+                return console.log(err)
             }
+            console.log(newLog)
             newLog.save()
-            return
         } )
     }
+ }

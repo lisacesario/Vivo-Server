@@ -1,8 +1,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
-const { ObjectId } = Schema
 
-const LogSchema = new Schema({
+const VivoLogSchema = new Schema({
     action: {
         type: String,
         required: true
@@ -12,7 +11,7 @@ const LogSchema = new Schema({
         required: true
     },
     createdBy: {
-        type: ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'UserProfile',
         required: true
     },
@@ -27,6 +26,6 @@ const LogSchema = new Schema({
 
 })
 
-LogSchema.index({ action: 1, category: 1 })
+VivoLogSchema.index({ action: 1, category: 1 })
 
-module.exports = mongoose.model('Log', LogSchema)
+module.exports = mongoose.model('VivoLog', VivoLogSchema)

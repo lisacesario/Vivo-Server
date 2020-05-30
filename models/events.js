@@ -50,7 +50,7 @@ const EventSchema = new Schema({
         },
         execution_date: {
             type: Date,
-            default: false
+            required: false
         },
     }
 

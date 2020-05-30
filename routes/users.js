@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const UserController = require('../controller/users')
-
+const EventController = require('../controller/events')
 
 // POST /api/v1/users/auth
 /*
@@ -28,8 +28,12 @@ router.post('/create', UserController.createUser);
 router.patch('/:id', UserController.patchUser);
 
 
+router.post('/:id/events/new', EventController.createEvent)
+router.patch(':id/events/update', EventController.updateEvent)
+router.patch(':id/events/delete', EventController.deleteEvent)
+router.patch('/events', EventController.getEventById)
 
-router.post('/:id/agenda/add-to', UserController.addEventToAgenda);
+//router.post('/:id/agenda/add-to', UserController.addEventToAgenda);
 //router.patch('/:id/agenda/update', UserController.addEventToAgenda);
 //router.patch('/:id/agenda/remove-from', UserController.addEventToAgenda);
 

@@ -4,13 +4,14 @@ const { UserProfile } = require('../models/user_profile');
 const { BaseActivity, QuizActivity } = require('../models/activities');
 const firebase = require('firebase-admin');
 const normalizeErrors = require('../helpers/mongoose');
+const logs =  require('../controller/log');
 
 const { Event } = require('../models/events');
 
 exports.getEventById = function (req, res, next) {
     console.log("GET BY ID QUIZ")
     const search_id = req.params.id
-    console.log(quizId)
+    console.log(search_id)
     headers = req.headers
     checkIsAuthenticated(headers)
         .then((isAuth) => {
@@ -42,6 +43,9 @@ exports.getEventById = function (req, res, next) {
 }
 
 exports.createEvent = function (req, res, next) {
+    const action = "Create Event"
+    const category = "Agenda Events"
+
     const { day, start_time, end_time, repeat_weekly, repeat_daily, repeat_monthly, activity, added_by, added_for, added_at } = req.body;
     //console.log(req.file);
 
@@ -61,6 +65,7 @@ exports.createEvent = function (req, res, next) {
     headers = req.headers
     checkIsAuthenticated(headers)
         .then((isAuth) => {
+            console.log("isauth?")
             if (isAuth === false) {
                 return res.status(403).send("You are not authorized")
             }
@@ -68,10 +73,12 @@ exports.createEvent = function (req, res, next) {
                 if(isAuth.role == "Teacher"){
                     Event.create(event, function (err, new_event) {
                         if (err) {
+                            message = err
+                            logs.createLog(action,category,isAuth,message)
                             return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
                         }
                         new_event.added_by = isAuth
-                        isAuth.event.push(new_event)
+                        isAuth.events.push(new_event)
                         isAuth.save();
     
                         BaseActivity.findById(activity).exec()
@@ -80,29 +87,83 @@ exports.createEvent = function (req, res, next) {
     
                                         UserProfile.findById(added_for).exec()
                                                     .then( student =>{
+                                                        console.log("student")
                                                         new_event.added_for = student
-                                                        student.push(new_event)
+                                                        student.agenda.push(new_event)
+
                                                         student.save()
-                                                        new_event.save()
-                                                        return res.status(200).send(new_event)
+
+                                                        new_event.save(function(err,newEvent){
+                                                            if(err){
+                                                                return res.status(422).send({
+                                                                    "action": "Create new Event ",
+                                                                    "success": false,
+                                                                    "status": 422,
+                                                                    "error": {
+                                                                        "code": err,
+                                                                        "message": "Error in create event "
+                                                                    }
+                                                                })
+                                                            }
+                                                            else{
+                                                                console.log("Crea il mio Log")
+                                                                message = "New Event created with ID " + new_event.id
+                                                                logs.createLog(action,category,isAuth,message)
+                                                                return res.status(200).send(new_event)
+                                                            }
+                                                        })
+
+                                                       
                                                     })
                                                     .catch( err =>{
-    
+                                                        message = err
+                                                        logs.createLog(action,category,isAuth,message)
+                                                        return res.status(422).send({
+                                                            "action": "Create new Event ",
+                                                            "success": false,
+                                                            "status": 422,
+                                                            "error": {
+                                                                "code": err,
+                                                                "message": "Error in create event "
+                                                            }
+                                                        })
                                                     })
                                     })
-                                    .catch(err ={
-    
+                                    .catch(err =>{
+                                        message = err
+                                        logs.createLog(action,category,isAuth,message)
+                                        return res.status(422).send({
+                                            "action": "Create new Event ",
+                                            "success": false,
+                                            "status": 422,
+                                            "error": {
+                                                "code": err,
+                                                "message": "Error in create event "
+                                            }
+                                        })
                                     })                    
                     })
                 }
                 else{
+                    message = "You are not authorized. Your role not allows to create new event"
+                    logs.createLog(action,category,isAuth,message)
                     return res.status(403).send("You are not authorized. Your role not allows to create new event")
                 }
                
             }
         })
         .catch(err=>{
-            return res.status(400).send(err)
+            message = err
+            logs.createLog(action,category,isAuth,message)
+            return res.status(422).send({
+                "action": "Create new Event ",
+                "success": false,
+                "status": 422,
+                "error": {
+                    "code": err,
+                    "message": "Error in create event "
+                }
+            })
         })
 
 }
@@ -139,7 +200,6 @@ exports.deleteEvent = function (req, res, next) {
         .catch(err=>{
             return res.status(400).send(err)
         })
-
 }
 
 

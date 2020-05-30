@@ -5,7 +5,7 @@ const { UserProfile } = require('../models/user_profile');
 const { BaseActivity, QuizActivity } = require('../models/activities');
 const firebase = require('firebase-admin');
 const normalizeErrors = require('../helpers/mongoose');
-const createLog = require('./log')
+const logs = require('./log')
 
 // da modificare col parametro shared
 exports.getQuiz = function (req, res, next) {
