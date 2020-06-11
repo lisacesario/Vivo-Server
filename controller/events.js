@@ -4,43 +4,34 @@ const { UserProfile } = require('../models/user_profile');
 const { BaseActivity, QuizActivity } = require('../models/activities');
 const firebase = require('firebase-admin');
 const normalizeErrors = require('../helpers/mongoose');
-const logs =  require('../controller/log');
+const logs = require('../controller/log');
 
 const { Event } = require('../models/events');
 
 exports.getEventById = function (req, res, next) {
-    console.log("GET BY ID QUIZ")
+    console.log("Get Event from Id")
     const search_id = req.params.id
     console.log(search_id)
-    headers = req.headers
-    checkIsAuthenticated(headers)
-        .then((isAuth) => {
-            if (isAuth === false) {
-                return res.status(403).send("You are not authorized")
-            }
-            else{
-                Event.findById(search_id)
-                    .exec()
-                    .then(event => {
-                        return res.status(200).send(event)
-                    })
-                    .catch(err => {
-                        return res.status(422).send({
-                            "action": "Get Event by ID ",
-                            "success": false,
-                            "status": 422,
-                            "error": {
-                                "code": err,
-                                "message": "Error in retrieving event by ID"
-                            }
-                        })
-                    })
-            }
+
+    Event.findById(search_id)
+        .exec()
+        .then(event => {
+            return res.status(200).send(event)
         })
-        .catch(err=>{
-            return res.status(400).send(err)
+        .catch(err => {
+            return res.status(422).send({
+                "action": "Get Event by ID ",
+                "success": false,
+                "status": 422,
+                "error": {
+                    "code": err,
+                    "message": "Error in retrieving event by ID"
+                }
+            })
         })
 }
+    
+
 
 exports.createEvent = function (req, res, next) {
     const action = "Create Event"
@@ -69,69 +60,54 @@ exports.createEvent = function (req, res, next) {
             if (isAuth === false) {
                 return res.status(403).send("You are not authorized")
             }
-            else{
-                if(isAuth.role == "Teacher"){
+            else {
+                if (isAuth.role == "Teacher") {
                     Event.create(event, function (err, new_event) {
                         if (err) {
                             message = err
-                            logs.createLog(action,category,isAuth,message)
+                            logs.createLog(action, category, isAuth, message)
                             return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
                         }
                         new_event.added_by = isAuth
                         isAuth.events.push(new_event)
                         isAuth.save();
-    
+
                         BaseActivity.findById(activity).exec()
-                                    .then( foundActivity=>{
-                                        new_event.activity = foundActivity;
-    
-                                        UserProfile.findById(added_for).exec()
-                                                    .then( student =>{
-                                                        console.log("student")
-                                                        new_event.added_for = student
-                                                        student.agenda.push(new_event)
+                            .then(foundActivity => {
+                                new_event.activity = foundActivity;
 
-                                                        student.save()
+                                UserProfile.findById(added_for).exec()
+                                    .then(student => {
+                                        console.log("student")
+                                        new_event.added_for = student
+                                        student.agenda.push(new_event)
 
-                                                        new_event.save(function(err,newEvent){
-                                                            if(err){
-                                                                return res.status(422).send({
-                                                                    "action": "Create new Event ",
-                                                                    "success": false,
-                                                                    "status": 422,
-                                                                    "error": {
-                                                                        "code": err,
-                                                                        "message": "Error in create event "
-                                                                    }
-                                                                })
-                                                            }
-                                                            else{
-                                                                console.log("Crea il mio Log")
-                                                                message = "New Event created with ID " + new_event.id
-                                                                logs.createLog(action,category,isAuth,message)
-                                                                return res.status(200).send(new_event)
-                                                            }
-                                                        })
+                                        student.save()
 
-                                                       
-                                                    })
-                                                    .catch( err =>{
-                                                        message = err
-                                                        logs.createLog(action,category,isAuth,message)
-                                                        return res.status(422).send({
-                                                            "action": "Create new Event ",
-                                                            "success": false,
-                                                            "status": 422,
-                                                            "error": {
-                                                                "code": err,
-                                                                "message": "Error in create event "
-                                                            }
-                                                        })
-                                                    })
+                                        new_event.save(function (err, newEvent) {
+                                            if (err) {
+                                                return res.status(422).send({
+                                                    "action": "Create new Event ",
+                                                    "success": false,
+                                                    "status": 422,
+                                                    "error": {
+                                                        "code": err,
+                                                        "message": "Error in create event "
+                                                    }
+                                                })
+                                            }
+                                            else {
+                                             
+                                                
+                                                return res.status(200).send(new_event)
+                                            }
+                                        })
+
+
                                     })
-                                    .catch(err =>{
+                                    .catch(err => {
                                         message = err
-                                        logs.createLog(action,category,isAuth,message)
+                                        logs.createLog(action, category, isAuth, message)
                                         return res.status(422).send({
                                             "action": "Create new Event ",
                                             "success": false,
@@ -141,20 +117,39 @@ exports.createEvent = function (req, res, next) {
                                                 "message": "Error in create event "
                                             }
                                         })
-                                    })                    
+                                    })
+                                    .then(()=>{
+                                        console.log("Crea il mio Log")
+                                        message = "New Event created with ID " + new_event.id
+                                        logs.createLog(action, category, isAuth, message)
+                                    })
+                            })
+                            .catch(err => {
+                                message = err
+                                logs.createLog(action, category, isAuth, message)
+                                return res.status(422).send({
+                                    "action": "Create new Event ",
+                                    "success": false,
+                                    "status": 422,
+                                    "error": {
+                                        "code": err,
+                                        "message": "Error in create event "
+                                    }
+                                })
+                            })
                     })
                 }
-                else{
+                else {
                     message = "You are not authorized. Your role not allows to create new event"
-                    logs.createLog(action,category,isAuth,message)
+                    logs.createLog(action, category, isAuth, message)
                     return res.status(403).send("You are not authorized. Your role not allows to create new event")
                 }
-               
+
             }
         })
-        .catch(err=>{
+        .catch(err => {
             message = err
-            logs.createLog(action,category,isAuth,message)
+            logs.createLog(action, category, isAuth, message)
             return res.status(422).send({
                 "action": "Create new Event ",
                 "success": false,
@@ -175,11 +170,11 @@ exports.updateEvent = function (req, res, next) {
             if (isAuth === false) {
                 return res.status(403).send("You are not authorized")
             }
-            else{
-               
+            else {
+
             }
         })
-        .catch(err=>{
+        .catch(err => {
             return res.status(400).send(err)
         })
 }
@@ -187,17 +182,49 @@ exports.updateEvent = function (req, res, next) {
 
 
 exports.deleteEvent = function (req, res, next) {
+    const action = "Delete Event"
+    const category = "Agenda Events"
     headers = req.headers
     checkIsAuthenticated(headers)
         .then((isAuth) => {
             if (isAuth === false) {
                 return res.status(403).send("You are not authorized")
             }
-            else{
-              
+            else {
+                Event.findById(req.params.id, function(err, foundEvent){
+                    if(err){
+                        return res.status(400).send(err)
+                    }
+                    if(foundEvent.added_by != isAuth.id){
+                        return res.status(403).send("You are not the owner")
+                    }
+                    foundEvent.remove(function(err){
+                        if(err){
+                            return res.status(422).send("You are not the owner")
+                        }
+                        isAuth.events.pull(foundEvent)
+                        isAuth.save()
+
+                        UserProfile.findById(foundEvent.added_for, function(err,foundUser){
+                            if(err){
+
+                            }
+                            foundUser.agenda.pull(foundEvent)
+                            foundUser.save()
+                        }).then(
+                            ()=>{
+                                return res.status(200).send("Deleted")
+                            }
+                        ).then(()=>{
+                            console.log("Crea il mio Log")
+                            message = "Event with ID " + foundEvent.id + "was deleted"
+                            logs.createLog(action, category, isAuth, message)
+                        })
+                    })
+                })
             }
         })
-        .catch(err=>{
+        .catch(err => {
             return res.status(400).send(err)
         })
 }

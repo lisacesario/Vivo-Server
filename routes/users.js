@@ -29,9 +29,9 @@ router.patch('/:id', UserController.patchUser);
 
 
 router.post('/:id/events/new', EventController.createEvent)
-router.patch(':id/events/update', EventController.updateEvent)
-router.patch(':id/events/delete', EventController.deleteEvent)
-router.patch('/events', EventController.getEventById)
+router.patch('/:id/events/update', EventController.updateEvent)
+router.delete('/events/:id/delete', EventController.deleteEvent)
+router.get('/events/:id', EventController.getEventById)
 
 //router.post('/:id/agenda/add-to', UserController.addEventToAgenda);
 //router.patch('/:id/agenda/update', UserController.addEventToAgenda);

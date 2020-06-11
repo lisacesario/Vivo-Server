@@ -71,6 +71,9 @@ const stepRoutes = require('./routes/steps');
 app.use('/api/v1/steps', stepRoutes);
 const toolRoutes = require('./routes/tools');
 app.use('/api/v1/tools', toolRoutes);
+
+const groupRoutes = require('./routes/groups');
+app.use('/api/v1/groups', groupRoutes);
 /*
 const levelsRoutes = require('./routes/admin-tool/level');
 app.use('/api/v1/admin-tools/levels', levelsRoutes);

@@ -7,14 +7,12 @@ const GroupSchema = new Schema({
         required: true
     },
     owner: {
-        type: ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'UserProfile',
-        required: true
     },
     partecipants:[{
-            type: ObjectId,
+            type: Schema.Types.ObjectId,
             ref: 'UserProfile',
-            required: true
     }],
     createdAt: {
         type: Date,
@@ -23,5 +21,7 @@ const GroupSchema = new Schema({
 
 })
 
+var Group = mongoose.model('Group', GroupSchema)
 
-module.exports = mongoose.model('Group', GroupSchema)
+
+module.exports = { Group };

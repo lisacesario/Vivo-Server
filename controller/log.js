@@ -18,7 +18,12 @@ const VivoLog = require('../models/analysis/log');
                 return console.log(err)
             }
             console.log(newLog)
-            newLog.save()
-        } )
+            newLog.save(function(err){
+                if(err){
+                    return err
+                }
+                return true
+        })
+    })
     }
  }
