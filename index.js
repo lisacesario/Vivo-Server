@@ -74,6 +74,8 @@ app.use('/api/v1/tools', toolRoutes);
 
 const groupRoutes = require('./routes/groups');
 app.use('/api/v1/groups', groupRoutes);
+const messagesRoutes = require('./routes/messages');
+app.use('/api/v1/messages', messagesRoutes);
 /*
 const levelsRoutes = require('./routes/admin-tool/level');
 app.use('/api/v1/admin-tools/levels', levelsRoutes);
