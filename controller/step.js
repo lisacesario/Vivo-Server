@@ -7,6 +7,7 @@ const { BaseActivity, SelfManagementActivity } = require('../models/activities')
 const normalizeErrors = require('../helpers/mongoose');
 const firebase = require('firebase-admin');
 
+const logs = require('../controller/log');
 
 // da modificare col parametro shared
 exports.getStep = function (req, res, next) {
@@ -44,7 +45,9 @@ exports.getStepById = function (req, res, next) {
 
 
 exports.createStep = function (req, res, next) {
-    console.log("CREATE STEP")
+    const action = "Create"
+    const category = "Step"
+
     const { name, description, shared, imgUrl, imgSym, created_by, activities, subject } = req.body;
     //console.log(req.file);
 
@@ -71,13 +74,28 @@ exports.createStep = function (req, res, next) {
                     if (err) {
                         return res.status(400).send(err)
                     }
-                    console.log("sono qui")
                     newElement.created_by = isAuth;
                     isAuth.steps.push(newElement);
-                    isAuth.save()
-                    console.log("anche qui. isauth saved")
-                    newElement.save();
-                    return res.status(200).send(newElement)
+                    isAuth.save(function(err, isAuth){
+                        if(err){
+                            return console.log(err)
+                        }
+                        else{ 
+                            newElement.save(function(err, newElement){
+                                if(err){
+                                    return res.status(422).send(err);
+                                }
+                                else{
+                                    message = "New Step was created with ID " + newElement._id
+                                    logs.createLog(action, category, isAuth, message)
+                
+                                    return res.status(200).send(newElement)
+                                }
+                            })
+                        }
+
+                    })
+                  
                 })
             }
         })
@@ -98,6 +116,9 @@ exports.createStep = function (req, res, next) {
 
 
 exports.updateStep = function (req, res, next) {
+    const action = "Update"
+    const category = "Step"
+
     console.log("PATCH")
     const user = res.locals.user;
     const data = req.body;
@@ -142,6 +163,8 @@ exports.updateStep = function (req, res, next) {
                                 return res.status(422).send({ errors: [{ title: 'Error in save  step', detail: err.errors }] });
                             }
                             else {
+                                message = "New Step was created with ID " + foundElement._id
+                                logs.createLog(action, category, isAuth, message)
                                 console.log("NUOVO", foundElement)
                                 return res.status(200).json(foundElement);
                             }
@@ -173,6 +196,8 @@ exports.deleteStep = function (req, res, next) {
     console.log("AUTH", req.headers)
     console.log("ID ", req.params.id)
 
+    const action = "Delete"
+    const category = "Step"
 
     headers = req.headers;
     checkIsAuthenticated(headers)
@@ -216,6 +241,9 @@ exports.deleteStep = function (req, res, next) {
                            
                             isAuth.steps.pull(foundStep)
                             isAuth.save()
+
+                            message =  foundStep._id + " Was Deleted successfully"
+                            logs.createLog(action, category, isAuth, message)
                             return res.json({ "status": "deleted" });
                         });
             
@@ -240,6 +268,9 @@ exports.deleteStep = function (req, res, next) {
 
 
 exports.addStepToActivity = function (req, res, next) {
+    const action = "Add"
+    const category = "Step"
+
     console.log("AUTH", req.headers)
     console.log("PATCH")
     // const user = res.locals.user;
@@ -285,6 +316,9 @@ exports.addStepToActivity = function (req, res, next) {
                                             foundElement.save()
                                                         .then(foundElement=>{
                                                             console.log("FoundActivity saved")
+                                                            message = "Step " + foundStep._id + " was added to " + foundElement._id 
+                                                            logs.createLog(action, category, isAuth, message)
+                                                          
                                                             return res.status(200).send(foundElement)
                                                         })
                                                         .catch(err =>{
@@ -359,7 +393,9 @@ exports.addStepToActivity = function (req, res, next) {
 
 
 exports.removeStepFromActivity = function (req, res, next) {
-    console.log("Remove Tool from Activity")
+    const action = "Remove"
+    const category = "Step"
+    console.log("Remove step from Activity")
     const user = res.locals.user;
     const data = req.body;
     const search_id = req.params.id
@@ -426,6 +462,9 @@ exports.removeStepFromActivity = function (req, res, next) {
                                     }
                                 })
                                 activity.save()
+                                message = "Step " + step._id + " was removed from " + activity._id 
+                                logs.createLog(action, category, isAuth, message)
+            
                                 return res.status(200).send(activity)
             
                             }

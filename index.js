@@ -11,7 +11,7 @@ const config = require('./config/dev');
  * just for test commit
  */
 
-mongoose.connect(config.DB_URI,{ useNewUrlParser: true, useUnifiedTopology: true }).then(()=>{
+mongoose.connect(config.DB_URI_ASW,{ useNewUrlParser: true, useUnifiedTopology: true }).then(()=>{
     // const fakeDB = new FakeDB();
      /*fakeDB.seedDB().catch(error=>{ 
          console.log(error); 
@@ -38,10 +38,14 @@ mongoose.connect(config.DB_URI,{ useNewUrlParser: true, useUnifiedTopology: true
 const admin = require("firebase-admin");
 
 var serviceAccount = require("./config/serviceAccountKey.json");
+var VivoDB_URL = "https://inclusivelearning-wecaremore0.firebaseio.com"
+
+var eduServiceAccount = require("./config/vivoEduServiceAccount.json");
+var eduDB_URL = "https://vivo-edu.firebaseio.com"
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://inclusivelearning-wecaremore0.firebaseio.com"
+  credential: admin.credential.cert(eduServiceAccount),
+  databaseURL: "https://vivo-edu.firebaseio.com"
 });
 
 exports.userIsAuth = function(req, res, next) {

@@ -16,7 +16,6 @@ exports.createUser = function (req, res, next) {
     const userProfile = new UserProfile({ uid, email, role, photoURL, displayName })
     UserProfile.create(userProfile, function (error, newProfile) {
         if (error) {
-
             return res.status(400).send(
                 {
                     "action": "Create User Profile",
@@ -28,23 +27,9 @@ exports.createUser = function (req, res, next) {
                     },
                 })        }
 
-        newProfile.save().then(
-            () => {
-                return res.status(200).send(newProfile)
-            },
-            (err) => {
-                return res.status(400).send(
-                    {
-                        "action": "Create User Profile",
-                        "success": false,
-                        "status": 400,
-                        "error": {
-                            "code": err,
-                            "message": "Error in create user profile"
-                        },
-                    })
-            }
-        )
+        newProfile.save()
+     return res.status(200).send(newProfile)
+           
     });
 }
 
@@ -95,7 +80,6 @@ exports.getUsersProfile = function (req, res, next) {
                     }
                 })
         })
-
 }
 
 exports.getUserProfileById = function (req, res, next) {

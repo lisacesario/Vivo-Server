@@ -5,6 +5,7 @@ const { UserProfile } = require('../models/user_profile');
 const { BaseActivity, SelfManagementActivity } = require('../models/activities');
 const firebase = require('firebase-admin');
 const normalizeErrors = require('../helpers/mongoose');
+const logs = require('../controller/log');
 
 
 // da modificare col parametro shared
@@ -14,7 +15,6 @@ exports.getTools = function (req, res, next) {
         if (err) {
             console.log(err);
         }
-        // console.log(foundElement)
         return res.json(foundElement);
     })
 }
@@ -33,7 +33,8 @@ exports.getToolsById = function (req, res, next) {
 }
 
 exports.createTool = function (req, res, next) {
-    console.log("CREATE TOOL")
+    const action = "Create"
+    const category = "Tools"
     const { name, imgUrl, description, shared, created_by, activities, warning } = req.body;
     //console.log(req.file);
 
@@ -52,22 +53,35 @@ exports.createTool = function (req, res, next) {
     headers = req.headers;
     checkIsAuthenticated(headers)
         .then((isAuth) => {
-            console.log("is Auth;", isAuth)
             if (isAuth === false) {
                 return res.status(403).send("You are not authorized")
             }
             else {
+                console.log("is auth:", isAuth)
                 Tool.create(tool, function (err, newElement) {
                     if (err) {
                         return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
                     }
 
                     newElement.created_by = isAuth;
-                    isAuth.tools.push(newElement);
-                    isAuth.save()
-                    newElement.save()
-
-                    return res.status(200).send(newElement)
+                    isAuth.tools.push(newElement)
+                    isAuth.save(function(err, isAuth){
+                        if(err){
+                            console.log(err)
+                        }
+                        newElement.save(function(err, newElement){
+                            if(err){
+                                console.log(err)
+                            }
+                            else{
+                                message = "New Tool created with ID " + newElement._id
+                                logs.createLog(action, category, isAuth, message)
+                                return res.status(200).send(newElement)
+                            }
+                        })
+                    })
+                   
+                   
 
                 })
             }
@@ -90,7 +104,9 @@ exports.createTool = function (req, res, next) {
 
 
 exports.updateTool = function (req, res, next) {
-    console.log("PATCH")
+    const action = "Update"
+    const category = "Tools"
+
     const user = res.locals.user;
     const data = req.body;
     const search_id = req.params.id
@@ -125,6 +141,8 @@ exports.updateTool = function (req, res, next) {
                         }
                         else {
                             console.log("NUOVO", foundElement)
+                            message =  foundElement._id + " Was Updated successfully"
+                            logs.createLog(action, category, isAuth, message)
                             return res.status(200).json(foundElement);
                         }
 
@@ -143,12 +161,15 @@ exports.updateTool = function (req, res, next) {
 
 
 exports.deleteTool = function (req, res, next) {
+    const action = "Delete"
+    const category = "Tools"
+
     console.log("AUTH", req.headers)
     console.log("ID ", req.params.id)
     headers = req.headers;
     checkIsAuthenticated(headers)
         .then((isAuth) => {
-            console.log("is Auth;", isAuth)
+            console.log("is Auth: ", isAuth)
             if (isAuth === false) {
                 return res.status(403).send("You are not authorized")
             }
@@ -179,6 +200,8 @@ exports.deleteTool = function (req, res, next) {
                             });
                             isAuth.tools.pull(foundElement)
                             isAuth.save()
+                            message =  foundElement._id + " Was Deleted successfully"
+                            logs.createLog(action, category, isAuth, message)
                             return res.json({ "status": "deleted" });
                         })
                     })
@@ -186,12 +209,15 @@ exports.deleteTool = function (req, res, next) {
 
         })
         .catch(err => {
-
+            return res.status(400).send(err)
         })
 
 }
 
 exports.addToolToActivity = function (req, res, next) {
+    const action = "Add"
+    const category = "Tools"
+
     console.log("AUTH", req.headers)
     console.log("PATCH")
     // const user = res.locals.user;
@@ -231,6 +257,8 @@ exports.addToolToActivity = function (req, res, next) {
                                 foundElement.tools.push(tool);
                                 foundElement.save()
                                 console.log("FoundActivity saved")
+                                message = "Tool " + tool._id + " was added to " + foundElement._id 
+                                logs.createLog(action, category, isAuth, message)
                                 return res.status(200).send(foundElement)
 
                             })
@@ -272,6 +300,8 @@ exports.addToolToActivity = function (req, res, next) {
 
 
 exports.removeToolFromActivity = function (req, res, next) {
+    const action = "RemoveFrom"
+    const category = "Tools"
     console.log("Remove Tool from Activity")
     const user = res.locals.user;
     const data = req.body;
@@ -303,6 +333,10 @@ exports.removeToolFromActivity = function (req, res, next) {
                     console.log("pop")
                     foundElement.tools.pop(foundTool);
                     foundElement.save()
+                    message = "Tool " + tool._id + " was removed from " + foundElement._id 
+                    logs.createLog(action, category, isAuth, message)
+
+                    return res.status(200).send({"status": "ok"})
 
                 }
 
@@ -318,7 +352,7 @@ exports.removeToolFromActivity = function (req, res, next) {
 
 
 function checkIsAuthenticated(headers) {
-
+    console.log(headers)
     return new Promise((resolve, reject) => {
         firebase.auth().verifyIdToken(headers.authorization)
             .then(function (decodedToken) {
@@ -327,15 +361,15 @@ function checkIsAuthenticated(headers) {
                 UserProfile.findOne({ uid: uid })
                     .exec()
                     .then(foundUser => {
-                        console.log(foundUser)
+                        console.log("found user:",foundUser)
                         resolve(foundUser)
                     })
                     .catch(err => {
-                        reject()
+                        reject(err)
                     })
             })
             .catch(err => {
-                reject()
+                reject(err)
             })
     })
 
