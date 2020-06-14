@@ -98,7 +98,7 @@ exports.createActivity = function (req, res, next) {
 
                         newObj.save(function (err, newObj) {
                             if (err) {
-                                return res.status(200).send(err)
+                                return res.status(400).send(err)
                             }
                             else {
                                 message = "New Activity was created with ID " + newObj._id

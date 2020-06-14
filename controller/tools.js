@@ -6,6 +6,7 @@ const { BaseActivity, SelfManagementActivity } = require('../models/activities')
 const firebase = require('firebase-admin');
 const normalizeErrors = require('../helpers/mongoose');
 const logs = require('../controller/log');
+const gamification = require('../controller/gamification')
 
 
 // da modificare col parametro shared
@@ -65,23 +66,35 @@ exports.createTool = function (req, res, next) {
 
                     newElement.created_by = isAuth;
                     isAuth.tools.push(newElement)
-                    isAuth.save(function(err, isAuth){
-                        if(err){
-                            console.log(err)
+
+                    newElement.save(function (err, newElement) {
+                        if (err) {
+                            return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err }] });
                         }
-                        newElement.save(function(err, newElement){
-                            if(err){
-                                console.log(err)
-                            }
-                            else{
-                                message = "New Tool created with ID " + newElement._id
-                                logs.createLog(action, category, isAuth, message)
-                                return res.status(200).send(newElement)
-                            }
-                        })
+                        else {
+                            message = "New Tool created with ID " + newElement._id
+                            logs.createLog(action, category, isAuth, message)
+                            var counter = isAuth.game_counter.create_counter + 1;
+                            gamification.computeAchievement(isAuth, action, counter)
+                                .then(achievement => {
+                                    console.log("QUI C'è ACHIEVMENT.", achievement)
+                                    if (achievement) {
+                                        res.status(200).json({ "data": newElement, "achievement": achievement })
+                                    }
+                                    else {
+                                        res.status(200).json({ "data": newElement })
+
+                                    }
+                                })
+                                .catch(err => {
+                                    console.log(err);
+                                    return res.status(400).send(err)
+                                })
+                        }
                     })
-                   
-                   
+
+
+
 
                 })
             }
@@ -141,9 +154,24 @@ exports.updateTool = function (req, res, next) {
                         }
                         else {
                             console.log("NUOVO", foundElement)
-                            message =  foundElement._id + " Was Updated successfully"
+                            message = foundElement._id + " Was Updated successfully"
                             logs.createLog(action, category, isAuth, message)
-                            return res.status(200).json(foundElement);
+                            var counter = isAuth.game_counter.update_counter + 1
+                            gamification.computeAchievement(isAuth, action, counter)
+                                .then(achievement => {
+                                    console.log("QUI C'è ACHIEVMENT.", achievement)
+                                    if (achievement) {
+                                        res.status(200).json({ "data": foundElement, "achievement": achievement })
+                                    }
+                                    else {
+                                        res.status(200).json({ "data": foundElement })
+
+                                    }
+                                })
+                                .catch(err => {
+                                    console.log(err);
+                                    return res.status(400).send(err)
+                                })
                         }
 
 
@@ -199,10 +227,25 @@ exports.deleteTool = function (req, res, next) {
                                 })
                             });
                             isAuth.tools.pull(foundElement)
-                            isAuth.save()
-                            message =  foundElement._id + " Was Deleted successfully"
+                            message = foundElement._id + " Was Deleted successfully"
                             logs.createLog(action, category, isAuth, message)
-                            return res.json({ "status": "deleted" });
+                            var counter = isAuth.game_counter.delete_counter + 1
+
+                            gamification.computeAchievement(isAuth, action, counter)
+                                .then(achievement => {
+                                    console.log("QUI C'è ACHIEVMENT.", achievement)
+                                    if (achievement) {
+                                        res.status(200).json({ "data": "", "achievement": achievement })
+                                    }
+                                    else {
+                                        res.status(200).json({ "data": "" })
+
+                                    }
+                                })
+                                .catch(err => {
+                                    console.log(err);
+                                    return res.status(400).send(err)
+                                })
                         })
                     })
             }
@@ -257,7 +300,7 @@ exports.addToolToActivity = function (req, res, next) {
                                 foundElement.tools.push(tool);
                                 foundElement.save()
                                 console.log("FoundActivity saved")
-                                message = "Tool " + tool._id + " was added to " + foundElement._id 
+                                message = "Tool " + tool._id + " was added to " + foundElement._id
                                 logs.createLog(action, category, isAuth, message)
                                 return res.status(200).send(foundElement)
 
@@ -300,7 +343,7 @@ exports.addToolToActivity = function (req, res, next) {
 
 
 exports.removeToolFromActivity = function (req, res, next) {
-    const action = "RemoveFrom"
+    const action = "Remove"
     const category = "Tools"
     console.log("Remove Tool from Activity")
     const user = res.locals.user;
@@ -333,10 +376,10 @@ exports.removeToolFromActivity = function (req, res, next) {
                     console.log("pop")
                     foundElement.tools.pop(foundTool);
                     foundElement.save()
-                    message = "Tool " + tool._id + " was removed from " + foundElement._id 
+                    message = "Tool " + tool._id + " was removed from " + foundElement._id
                     logs.createLog(action, category, isAuth, message)
 
-                    return res.status(200).send({"status": "ok"})
+                    return res.status(200).send({ "status": "ok" })
 
                 }
 
@@ -361,7 +404,7 @@ function checkIsAuthenticated(headers) {
                 UserProfile.findOne({ uid: uid })
                     .exec()
                     .then(foundUser => {
-                        console.log("found user:",foundUser)
+                        console.log("found user:", foundUser)
                         resolve(foundUser)
                     })
                     .catch(err => {
