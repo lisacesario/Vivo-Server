@@ -16,25 +16,26 @@ const SOCIAL_VALUE = 10
 // da modificare col parametro shared
 exports.getActivity = function (req, res, next) {
     console.log("GET ACTIVITY")
-    
+    //headers = req.headers;
     BaseActivity.find()
-        .exec()
-        .then(foundActivities => {
-            return res.status(200).send(foundActivities)
-        })
-        .catch(err => {
-            return res.status(422).send(
-                {
-                    "action": "Get Activities ",
-                    "success": false,
-                    "status": 422,
-                    "error": {
-                        "code": err.errors,
-                        "message": "Error in retrieving activities"
-                    }
+    .exec()
+    .then(foundActivities => {
+        return res.status(200).send(foundActivities)
+    })
+    .catch(err => {
+        return res.status(422).send(
+            {
+                "action": "Get Activities ",
+                "success": false,
+                "status": 422,
+                "error": {
+                    "code": err,
+                    "message": "Error in retrieving activities"
                 }
-            )
-        })
+            }
+        )
+    })
+   
 }
 
 
@@ -102,8 +103,23 @@ exports.createActivity = function (req, res, next) {
                             else {
                                 message = "New Activity was created with ID " + newObj._id
                                 logs.createLog(action, category, isAuth, message)
-                                var counter = isAuth.game_counter.create_counter + 1
-                                gamification.computeAchievement(isAuth, action, counter)
+                                var counter = isAuth.game_counter.create_counter + 1;
+                                gamification.computeAchievementSecondVersion(isAuth,action,counter)
+                                            .then(achievement=>{
+                                                console.log("QUI C'è ACHIEVMENT.", achievement)
+                                                if(achievement){
+                                                    res.status(200).json({ "data": newObj, "achievement": achievement })
+                                                }
+                                                else{
+                                                    res.status(200).json({ "data": newObj})
+
+                                                }
+                                            })
+                                            .catch(err =>{
+                                                console.log(err);
+                                                return res.status(400).send(err)
+                                            })
+                               /* gamification.computeAchievement(isAuth, action, counter)
                                     .then(achievement => {
                                         console.log("QUI C'è ACHIEVMENT.", achievement)
                                         if (achievement) {
@@ -142,7 +158,7 @@ exports.createActivity = function (req, res, next) {
                                     .catch(err => {
                                         console.log("per caso entriamo qui?", err)
                                         return res.status(400).send(err)
-                                    })
+                                    })*/
 
                             }
                         })
