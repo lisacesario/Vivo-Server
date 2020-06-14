@@ -11,15 +11,20 @@ const UserProfile = require('../models/user_profile');
             Achievement.findOne({'action' : action, 'required_point':counter})
             .exec()
             .then(achievement =>{
+                console.log("A caso", achievement)
                 if(!achievement){
-                    reject()
+                    console.log("  RIGETTA TUTTO")
+                    resolve(null)
                 }
-                console.log("Entro qua dentro?", achievement)
-                var user_achievements = user.achievements.filter(x => x.unlocked == false)
-                                                        .filter(x => {return x.achievement == achievement.id})
-
-                console.log("UserAchivement ", user_achievements)
-                resolve(achievement)
+                else{
+                    console.log("Entro qua dentro?", achievement)
+                    var user_achievements = user.achievements.filter(x => x.unlocked == false)
+                                                            .filter(x => {return x.achievement == achievement.id})
+    
+                    console.log("UserAchivement ", user_achievements)
+                    resolve(achievement)
+                }
+                
               
             })
             .catch(err=>{

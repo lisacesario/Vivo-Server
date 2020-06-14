@@ -16,6 +16,7 @@ const SOCIAL_VALUE = 10
 // da modificare col parametro shared
 exports.getActivity = function (req, res, next) {
     console.log("GET ACTIVITY")
+    
     BaseActivity.find()
         .exec()
         .then(foundActivities => {
@@ -104,6 +105,7 @@ exports.createActivity = function (req, res, next) {
                                 var counter = isAuth.game_counter.create_counter + 1
                                 gamification.computeAchievement(isAuth, action, counter)
                                     .then(achievement => {
+                                        console.log("QUI C'è ACHIEVMENT.", achievement)
                                         if (achievement) {
                                             isAuth.achievements.filter(x => {
                                                 if (x.achievement == achievement.id) {
@@ -113,7 +115,7 @@ exports.createActivity = function (req, res, next) {
                                             })
 
                                             isAuth.exp = isAuth.exp + achievement.points + CREATE_VALUE
-                                            isAuth.game.create_counter = counter 
+                                            isAuth.game_counter.create_counter = counter 
 
                                             isAuth.save(function (err, isAuth) {
                                                 if (err) {
@@ -124,8 +126,9 @@ exports.createActivity = function (req, res, next) {
                                             })
                                         }
                                         else {
+                                            console.log("else ramo")
                                             isAuth.exp = isAuth.exp + CREATE_VALUE
-                                            isAuth.game.create_counter = counter
+                                            isAuth.game_counter.create_counter = counter
                                             isAuth.save(function (err, isAuth) {
                                                 if (err) {
                                                     return console.log(err)
@@ -137,6 +140,7 @@ exports.createActivity = function (req, res, next) {
 
                                     })
                                     .catch(err => {
+                                        console.log("per caso entriamo qui?", err)
                                         return res.status(400).send(err)
                                     })
 
@@ -184,7 +188,7 @@ exports.updateActivity = function (req, res, next) {
             }
             else {
                 BaseActivity.findById(req.params.id).exec(function (err, foundElement) {
-                    console.log("FOUND ELEMENT:  ", foundElement)
+                    //console.log("FOUND ELEMENT:  ", foundElement)
                     if (err) {
                         console.log("sono bloccato in quetsto errore");
                         console.log("i miei errori sono qui:", err.errors);
