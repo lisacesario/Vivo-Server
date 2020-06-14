@@ -29,4 +29,5 @@ const UserProfile = require('../models/user_profile');
         })
        
     }
+   
  }

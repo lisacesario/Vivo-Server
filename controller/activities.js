@@ -101,7 +101,8 @@ exports.createActivity = function (req, res, next) {
                             else {
                                 message = "New Activity was created with ID " + newObj._id
                                 logs.createLog(action, category, isAuth, message)
-                                gamification.computeAchievement(isAuth, action, 5)
+                                var counter = isAuth.game_counter.create_counter + 1
+                                gamification.computeAchievement(isAuth, action, counter)
                                     .then(achievement => {
                                         if (achievement) {
                                             isAuth.achievements.filter(x => {
@@ -112,6 +113,7 @@ exports.createActivity = function (req, res, next) {
                                             })
 
                                             isAuth.exp = isAuth.exp + achievement.points + CREATE_VALUE
+                                            isAuth.game.create_counter = counter 
 
                                             isAuth.save(function (err, isAuth) {
                                                 if (err) {
@@ -123,7 +125,8 @@ exports.createActivity = function (req, res, next) {
                                         }
                                         else {
                                             isAuth.exp = isAuth.exp + CREATE_VALUE
-                                             isAuth.save(function (err, isAuth) {
+                                            isAuth.game.create_counter = counter
+                                            isAuth.save(function (err, isAuth) {
                                                 if (err) {
                                                     return console.log(err)
                                                 }
@@ -134,7 +137,7 @@ exports.createActivity = function (req, res, next) {
 
                                     })
                                     .catch(err => {
-                                        console.log(err)
+                                        return res.status(400).send(err)
                                     })
 
                             }
@@ -198,8 +201,45 @@ exports.updateActivity = function (req, res, next) {
                             else {
                                 message = "New Step was created with ID " + foundElement._id
                                 logs.createLog(action, category, isAuth, message)
-                                console.log("NUOVO", foundElement)
-                                return res.status(200).json(foundElement); return res.status(200).json(foundElement);
+                                var counter = isAuth.game_counter.update_counter + 1
+                                gamification.computeAchievement(isAuth, action, counter)
+                                    .then(achievement => {
+                                        if (achievement) {
+                                            isAuth.achievements.filter(x => {
+                                                if (x.achievement == achievement.id) {
+                                                    x.unlocked = true;
+                                                    x.unlocked_time = Date.now()
+                                                }
+                                            })
+
+                                            isAuth.exp = isAuth.exp + achievement.points + UPDATE_VALUE
+                                            isAuth.game_counter.update_counter = counter 
+
+                                            isAuth.save(function (err, isAuth) {
+                                                if (err) {
+                                                    return console.log(err)
+                                                }
+                                                console.log('Achievement ', achievement)
+                                                return res.status(200).json({ "data": foundElement, "achievement": achievement })
+                                            })
+                                        }
+                                        else {
+                                            isAuth.exp = isAuth.exp + UPDATE_VALUE
+                                            isAuth.game_counter.update_counter = counter
+                                            isAuth.save(function (err, isAuth) {
+                                                if (err) {
+                                                    return console.log(err)
+                                                }
+                                                return res.status(200).json(foundElement);                                            })
+
+                                        }
+
+                                    })
+                                    .catch(err => {
+                                        return res.status(400).send(err)
+                                    })
+
+                                
                             }
 
                         });
@@ -253,12 +293,50 @@ exports.deleteActivity = function (req, res, next) {
 
                             }
                             isAuth.activities.pull(foundActivity)
-                            isAuth.save()
 
                             message = foundActivity._id + " Was Deleted successfully"
                             logs.createLog(action, category, isAuth, message)
+                            var counter = isAuth.game_counter.delete_counter + 1
+                            gamification.computeAchievement(isAuth, action, counter)
+                                .then(achievement => {
+                                    console.log(achievement)
+                                    if (achievement) {
+                                        isAuth.achievements.filter(x => {
+                                            if (x.achievement == achievement.id) {
+                                                x.unlocked = true;
+                                                x.unlocked_time = Date.now()
+                                            }
+                                        })
 
-                            return res.json({ "status": "deleted" });
+                                        isAuth.exp = isAuth.exp + achievement.points + DELETE_VALUE
+                                        console.log("exp:", isAuth.exp)
+                                        isAuth.game_counter.delete_counter = counter 
+
+                                        isAuth.save(function (err, isAuth) {
+                                            if (err) {
+                                                return console.log(err)
+                                            }
+                                            console.log('Achievement ', achievement)
+                                            return res.status(200).json({ "data": "DELETED", "achievement": achievement })
+                                        })
+                                    }
+                                    else {
+                                        isAuth.exp = isAuth.exp + DELETE_VALUE
+                                        isAuth.game_counter.delete_counter = counter
+                                        isAuth.save(function (err, isAuth) {
+                                            if (err) {
+                                                return console.log(err)
+                                            }
+                                            return res.status(200).json({ "data": "DELETED"})
+                                        })
+
+                                    }
+
+                                })
+                                .catch(err => {
+                                    return res.status(400).send(err)
+                                })
+
                         });
                     })
             }

@@ -104,6 +104,13 @@ const UserProfileSchema = new Schema({
         required: false,
         default: 0
     },
+    game_counter: {
+        create_counter : {type:Number, default:0},
+        update_counter : {type:Number, default:0},
+        delete_counter : {type:Number, default:0},
+        social_counter : {type:Number, default:0},
+        event_counter  : {type:Number, default:0},
+    },
     messages: [{
         type: Schema.Types.ObjectId,
         ref: 'Messages',
