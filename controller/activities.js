@@ -5,7 +5,13 @@ const { UserProfile, TeacherProfile } = require('../models/user_profile');
 const firebase = require('firebase-admin');
 const normalizeErrors = require('../helpers/mongoose');
 const logs = require('../controller/log');
+const gamification = require('../controller/gamification')
 
+const CREATE_VALUE =  10
+const UPDATE_VALUE = 10
+const DELETE_VALUE = 10
+const EVENT_VALUE = 10
+const SOCIAL_VALUE = 10
 
 // da modificare col parametro shared
 exports.getActivity = function (req, res, next) {
@@ -86,23 +92,54 @@ exports.createActivity = function (req, res, next) {
                     else {
                         newObj.created_by = isAuth
                         isAuth.activities.push(newObj);
-                        isAuth.save(function (err, isAuth) {
+
+
+                        newObj.save(function (err, newObj) {
                             if (err) {
-                                return console.log(err)
+                                return res.status(200).send(err)
                             }
                             else {
-                                newObj.save(function (err, newObj) {
-                                    if (err) {
-                                        return res.status(200).send(err)
-                                    }
-                                    else {
-                                        message = "New Activity was created with ID " + newObj._id
-                                        logs.createLog(action, category, isAuth, message)
-                                        return res.status(200).send(newObj)
-                                    }
-                                })
+                                message = "New Activity was created with ID " + newObj._id
+                                logs.createLog(action, category, isAuth, message)
+                                gamification.computeAchievement(isAuth, action, 5)
+                                    .then(achievement => {
+                                        if (achievement) {
+                                            isAuth.achievements.filter(x => {
+                                                if (x.achievement == achievement.id) {
+                                                    x.unlocked = true;
+                                                    x.unlocked_time = Date.now()
+                                                }
+                                            })
+
+                                            isAuth.exp = isAuth.exp + achievement.points + CREATE_VALUE
+
+                                            isAuth.save(function (err, isAuth) {
+                                                if (err) {
+                                                    return console.log(err)
+                                                }
+                                                console.log('Achievement ', achievement)
+                                                return res.status(200).json({ "data": newObj, "achievement": achievement })
+                                            })
+                                        }
+                                        else {
+                                            isAuth.exp = isAuth.exp + CREATE_VALUE
+                                             isAuth.save(function (err, isAuth) {
+                                                if (err) {
+                                                    return console.log(err)
+                                                }
+                                                return res.status(200).json({ "data": newObj})
+                                            })
+
+                                        }
+
+                                    })
+                                    .catch(err => {
+                                        console.log(err)
+                                    })
+
                             }
                         })
+
                     }
 
 
@@ -218,7 +255,7 @@ exports.deleteActivity = function (req, res, next) {
                             isAuth.activities.pull(foundActivity)
                             isAuth.save()
 
-                            message =  foundActivity._id + " Was Deleted successfully"
+                            message = foundActivity._id + " Was Deleted successfully"
                             logs.createLog(action, category, isAuth, message)
 
                             return res.json({ "status": "deleted" });
@@ -226,17 +263,17 @@ exports.deleteActivity = function (req, res, next) {
                     })
             }
         })
-        .catch (err => {
-                return res.status(422).send({
-                    "action": "Delete Activity ",
-                    "success": false,
-                    "status": 422,
-                    "error": {
-                        "code": err.errors,
-                        "message": "Error in deleting activity"
-                    }
-                })
-})
+        .catch(err => {
+            return res.status(422).send({
+                "action": "Delete Activity ",
+                "success": false,
+                "status": 422,
+                "error": {
+                    "code": err.errors,
+                    "message": "Error in deleting activity"
+                }
+            })
+        })
 }
 
 

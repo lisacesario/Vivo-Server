@@ -7,7 +7,15 @@ const AchievementSchema = new Schema({
         type: String,
         required: true
     },
-    description:{
+    action:{
+        type:String,
+        required:true,
+    },
+    required_point:{
+        type:String,
+        required:true
+    },
+    message:{
         type:String,
         required: true
     },
@@ -15,7 +23,7 @@ const AchievementSchema = new Schema({
         type: String, 
         required: true
     },
-    value:{
+    points:{
         type:String, 
         required:true
     }

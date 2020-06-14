@@ -8,6 +8,8 @@ const { BaseActivity } = require('../models/activities');
 const { Event } = require('../models/events');
 var async = require('async');
 
+const {Achievement} =  require('../models/gaming/achievement');
+const {Level} = require('../models/gaming/level')
 
 exports.createUser = function (req, res, next) {
     console.log("Create User")
@@ -25,11 +27,40 @@ exports.createUser = function (req, res, next) {
                         "code": error,
                         "message": "Error in create user profile"
                     },
-                })        }
+                })
+        }
 
-        newProfile.save()
-     return res.status(200).send(newProfile)
-           
+        Achievement.find().exec()
+                    .then(foundAchievements =>{
+                        foundAchievements.forEach(achievement =>{
+                            const data = {
+                                "active": false,
+                                "achievement":achievement
+                            }
+                            newProfile.achievements.push(data)
+                        })
+                        Level.find().exec()
+                        .then(foundLevels =>{
+                            foundLevels.forEach(level =>{
+                                const data = {
+                                    "active":false,
+                                    "level": level
+                                }
+                                newProfile.level.push(data)
+                                
+                            })
+                            newProfile.save()
+                            return res.status(200).send(newProfile)
+                        })
+          
+                
+                    })
+                    .catch(err =>{
+                        return res.status(400).send(err)
+                    })
+
+       
+
     });
 }
 
@@ -81,6 +112,8 @@ exports.getUsersProfile = function (req, res, next) {
                 })
         })
 }
+
+
 
 exports.getUserProfileById = function (req, res, next) {
     console.log("getUserProfileById")
@@ -182,46 +215,33 @@ exports.sendingFriendshipRequest = async function (req, res, next) {
     console.log("reciever : ", data)
 
     UserProfile.findOne({ uid: requestedUserId })
+        .exec()
+        .then(sender => {
+            UserProfile.findById(data._id)
                 .exec()
-                .then(sender =>{
-                    UserProfile.findById(data._id)
-                                .exec()
-                                .then(receiver =>{
-                                    console.log(sender)
-                                    console.log(receiver)
+                .then(receiver => {
+                    console.log(sender)
+                    console.log(receiver)
 
-                                    var friendshipReceiverRequest = {
-                                        'read': false,
-                                        'request_accepted': false,
-                                        'follower_id': sender
-                                    }
-                        
-                                    var friendshipSenderRequest = {
-                                        'request_accepted': false,
-                                        'followed_id': receiver
-                                    }
+                    var friendshipReceiverRequest = {
+                        'read': false,
+                        'request_accepted': false,
+                        'follower_id': sender
+                    }
 
-                                    receiver.followers.push(friendshipReceiverRequest);
-                                    sender.followed.push(friendshipSenderRequest);
-                                    receiver.save()
-                                    sender.save()
-                                    return res.status(200).send()
-                                    
-                                })
-                                .catch( (err) => {
-                                    return res.status(422).send(
-                                        {
-                                            "action": "Send Following request ",
-                                            "success": false,
-                                            "status": 422,
-                                            "error": {
-                                                "code": err.errors,
-                                                "message": "Error in send user following request"
-                                            }
-                                        })
-                                })
+                    var friendshipSenderRequest = {
+                        'request_accepted': false,
+                        'followed_id': receiver
+                    }
+
+                    receiver.followers.push(friendshipReceiverRequest);
+                    sender.followed.push(friendshipSenderRequest);
+                    receiver.save()
+                    sender.save()
+                    return res.status(200).send()
+
                 })
-                .catch( (err) => {
+                .catch((err) => {
                     return res.status(422).send(
                         {
                             "action": "Send Following request ",
@@ -233,6 +253,19 @@ exports.sendingFriendshipRequest = async function (req, res, next) {
                             }
                         })
                 })
+        })
+        .catch((err) => {
+            return res.status(422).send(
+                {
+                    "action": "Send Following request ",
+                    "success": false,
+                    "status": 422,
+                    "error": {
+                        "code": err.errors,
+                        "message": "Error in send user following request"
+                    }
+                })
+        })
 
 
 }
@@ -244,62 +277,48 @@ exports.acceptRequest = function (req, res, next) {
     const data = req.body;
     console.log("data", data)
     UserProfile.findOne({ uid: requestedUserId })
-                .exec()
-                .then(foundUser =>{
-                        foundUser.followers.forEach(request => {
-                            if (request.follower_id == data.follower_id) {
-                                request.read = true;
-                                request.request_accepted = true;
-                                console.log("Accetta la richiesta")
-                            }
-                        });
-                        foundUser.save()
+        .exec()
+        .then(foundUser => {
+            foundUser.followers.forEach(request => {
+                if (request.follower_id == data.follower_id) {
+                    request.read = true;
+                    request.request_accepted = true;
+                    console.log("Accetta la richiesta")
+                }
+            });
+            foundUser.save()
 
-                        UserProfile.findById(data.follower_id)
-                                    .exec()
-                                    .then(foundFollower =>{
-                                        foundFollower.followed.forEach(request => {
-                                            console.log(request.followed_id._id)
-                                            console.log(foundUser._id)
-                        
-                                            if (request.followed_id.equals(foundUser._id)) {
-                                                request.request_accepted = true;
-                                                console.log("Ciaone")
-                                            }
-                                        })
-                                        foundFollower.save()
-                                                    .then(foundFollower =>{
-                                                        return res.status(200).send(foundFollower)
-                                                    })
-                                                    .catch(err =>{
-                                                        return res.status(422).send(
-                                                            {
-                                                                "action": "Accept Following request ",
-                                                                "success": false,
-                                                                "status": 422,
-                                                                "error": {
-                                                                    "code": err,
-                                                                    "message": "Error in accept following request"
-                                                                }
-                                                            })
-                                                    })
-                                          
-                                    })
-                                    .catch(err=>{
-                                        return res.status(422).send(
-                                            {
-                                                "action": "Accept Following request ",
-                                                "success": false,
-                                                "status": 422,
-                                                "error": {
-                                                    "code": err.errors,
-                                                    "message": "Error in accept following request"
-                                                }
-                                            })
-                                    })
-                                    
+            UserProfile.findById(data.follower_id)
+                .exec()
+                .then(foundFollower => {
+                    foundFollower.followed.forEach(request => {
+                        console.log(request.followed_id._id)
+                        console.log(foundUser._id)
+
+                        if (request.followed_id.equals(foundUser._id)) {
+                            request.request_accepted = true;
+                            console.log("Ciaone")
+                        }
+                    })
+                    foundFollower.save()
+                        .then(foundFollower => {
+                            return res.status(200).send(foundFollower)
+                        })
+                        .catch(err => {
+                            return res.status(422).send(
+                                {
+                                    "action": "Accept Following request ",
+                                    "success": false,
+                                    "status": 422,
+                                    "error": {
+                                        "code": err,
+                                        "message": "Error in accept following request"
+                                    }
+                                })
+                        })
+
                 })
-                .catch(err=>{
+                .catch(err => {
                     return res.status(422).send(
                         {
                             "action": "Accept Following request ",
@@ -311,6 +330,20 @@ exports.acceptRequest = function (req, res, next) {
                             }
                         })
                 })
+
+        })
+        .catch(err => {
+            return res.status(422).send(
+                {
+                    "action": "Accept Following request ",
+                    "success": false,
+                    "status": 422,
+                    "error": {
+                        "code": err.errors,
+                        "message": "Error in accept following request"
+                    }
+                })
+        })
 }
 
 
@@ -323,54 +356,40 @@ exports.refuseRequest = function (req, res, next) {
     console.log("data", data)
 
     UserProfile.findOne({ uid: requestedUserId })
+        .exec()
+        .then(foundUser => {
+            foundUser.followers.forEach(request => {
+                if (request.follower_id == data.follower_id) {
+                    foundUser.followers.pop(request);
+                }
+            });
+            foundUser.save()
+
+            UserProfile.findById(data.follower_id)
                 .exec()
-                .then(foundUser => {
-                    foundUser.followers.forEach(request => {
-                        if (request.follower_id == data.follower_id) {
-                            foundUser.followers.pop(request);
+                .then(foundFollower => {
+                    foundFollower.followed.forEach(request => {
+                        if (request.followed_id.equals(foundUser._id)) {
+                            foundFollower.followed.pop(request)
                         }
-                    });
-                    foundUser.save()
-
-                    UserProfile.findById(data.follower_id)
-                                .exec()
-                                .then(foundFollower => {
-                                    foundFollower.followed.forEach(request => {
-                                        if (request.followed_id.equals(foundUser._id)) {
-                                            foundFollower.followed.pop(request)
-                                        }
-                                    })
-                                    foundFollower.save()
-                                                .then(foundFollower=>{
-                                                    return res.status(200).send(foundFollower)
-                                                })
-                                                .catch(err => {
-                                                    return res.status(422).send(
-                                                        {
-                                                            "action": "Refuse Following request ",
-                                                            "success": false,
-                                                            "status": 422,
-                                                            "error": {
-                                                                "code": err,
-                                                                "message": "Error in refuse following request"
-                                                            }
-                                                        })
-                                                })
-
+                    })
+                    foundFollower.save()
+                        .then(foundFollower => {
+                            return res.status(200).send(foundFollower)
+                        })
+                        .catch(err => {
+                            return res.status(422).send(
+                                {
+                                    "action": "Refuse Following request ",
+                                    "success": false,
+                                    "status": 422,
+                                    "error": {
+                                        "code": err,
+                                        "message": "Error in refuse following request"
+                                    }
                                 })
-                                .catch(err => {
-                                    return res.status(422).send(
-                                        {
-                                            "action": "Refuse Following request ",
-                                            "success": false,
-                                            "status": 422,
-                                            "error": {
-                                                "code": err,
-                                                "message": "Error in refuse following request"
-                                            }
-                                        })
-                                })
-            
+                        })
+
                 })
                 .catch(err => {
                     return res.status(422).send(
@@ -385,6 +404,20 @@ exports.refuseRequest = function (req, res, next) {
                         })
                 })
 
+        })
+        .catch(err => {
+            return res.status(422).send(
+                {
+                    "action": "Refuse Following request ",
+                    "success": false,
+                    "status": 422,
+                    "error": {
+                        "code": err,
+                        "message": "Error in refuse following request"
+                    }
+                })
+        })
+
 }
 
 
@@ -396,44 +429,31 @@ exports.sendBeMyTeacherRequest = function (req, res, next) {
     console.log("futureFriensd : ", data)
 
     UserProfile.findOne({ uid: requestedUserId })
+        .exec()
+        .then(student => {
+            console.log(" Student", student);
+            UserProfile.findById(data._id)
                 .exec()
-                .then(student =>{
-                    console.log(" Student", student);
-                    UserProfile.findById(data._id)
-                                .exec()
-                                .then(teacher =>{
+                .then(teacher => {
 
-                                    var learnerRequest = {
-                                        'request_accepted': false,
-                                        'learner_id': student
-                                    }
-                                    var teacherRequest = {
-                                        'request_accepted': false,
-                                        'teacher_id': teacher
-                                    }
+                    var learnerRequest = {
+                        'request_accepted': false,
+                        'learner_id': student
+                    }
+                    var teacherRequest = {
+                        'request_accepted': false,
+                        'teacher_id': teacher
+                    }
 
-                                    teacher.learner_list.push(learnerRequest)
-                                    teacher.save()
-                                    
-                                    student.teacher_list.push(teacherRequest)
-                                    student.save()
-                                    return res.status(200).send()
-                                           
-                                })
-                                .catch(err=>{
-                                    return res.status(422).send(
-                                        {
-                                            "action": "Send Teacher request ",
-                                            "success": false,
-                                            "status": 422,
-                                            "error": {
-                                                "code": err.errors,
-                                                "message": "Error in send user teaching request"
-                                            }
-                                        })
-                                })
+                    teacher.learner_list.push(learnerRequest)
+                    teacher.save()
+
+                    student.teacher_list.push(teacherRequest)
+                    student.save()
+                    return res.status(200).send()
+
                 })
-                .catch(err=>{
+                .catch(err => {
                     return res.status(422).send(
                         {
                             "action": "Send Teacher request ",
@@ -444,7 +464,20 @@ exports.sendBeMyTeacherRequest = function (req, res, next) {
                                 "message": "Error in send user teaching request"
                             }
                         })
-                })   
+                })
+        })
+        .catch(err => {
+            return res.status(422).send(
+                {
+                    "action": "Send Teacher request ",
+                    "success": false,
+                    "status": 422,
+                    "error": {
+                        "code": err.errors,
+                        "message": "Error in send user teaching request"
+                    }
+                })
+        })
 
 }
 
@@ -467,44 +500,31 @@ exports.sendBeMyStudentRequest = function (req, res, next) {
 
 
     UserProfile.findOne({ uid: requestedUserId })
+        .exec()
+        .then(teacher => {
+            console.log(" Teacher", teacher);
+            UserProfile.findById(data._id)
                 .exec()
-                .then(teacher =>{
-                    console.log(" Teacher", teacher);
-                    UserProfile.findById(data._id)
-                                .exec()
-                                .then(student =>{
+                .then(student => {
 
-                                    var learnerRequest = {
-                                        'request_accepted': false,
-                                        'learner_id': student
-                                    }
-                                    var teacherRequest = {
-                                        'request_accepted': false,
-                                        'teacher_id': teacher
-                                    }
+                    var learnerRequest = {
+                        'request_accepted': false,
+                        'learner_id': student
+                    }
+                    var teacherRequest = {
+                        'request_accepted': false,
+                        'teacher_id': teacher
+                    }
 
-                                    teacher.learner_list.push(learnerRequest)
-                                    teacher.save()
-                                    
-                                    student.teacher_list.push(teacherRequest)
-                                    student.save()
-                                    return res.status(200).send(student)
-                                           
-                                })
-                                .catch(err=>{
-                                    return res.status(422).send(
-                                        {
-                                            "action": "Send Teacher request ",
-                                            "success": false,
-                                            "status": 422,
-                                            "error": {
-                                                "code": err.errors,
-                                                "message": "Error in send user teaching request"
-                                            }
-                                        })
-                                })
+                    teacher.learner_list.push(learnerRequest)
+                    teacher.save()
+
+                    student.teacher_list.push(teacherRequest)
+                    student.save()
+                    return res.status(200).send(student)
+
                 })
-                .catch(err=>{
+                .catch(err => {
                     return res.status(422).send(
                         {
                             "action": "Send Teacher request ",
@@ -515,7 +535,20 @@ exports.sendBeMyStudentRequest = function (req, res, next) {
                                 "message": "Error in send user teaching request"
                             }
                         })
-                })   
+                })
+        })
+        .catch(err => {
+            return res.status(422).send(
+                {
+                    "action": "Send Teacher request ",
+                    "success": false,
+                    "status": 422,
+                    "error": {
+                        "code": err.errors,
+                        "message": "Error in send user teaching request"
+                    }
+                })
+        })
 
 }
 

@@ -19,7 +19,7 @@ const LevelSchema = new Schema({
         type:Number,
         required: true
     },
-    maximumPoint:{
+    endPoint:{
         type: Number, 
         required: true
     }, 

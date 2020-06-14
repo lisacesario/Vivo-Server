@@ -83,7 +83,7 @@ const UserProfileSchema = new Schema({
     }],
     level: [{
         _id: false,
-        active: { type: Boolean, default: false },
+        unlocked: { type: Boolean, default: false },
         unlocked_time: { type: Date, required: false },
         level: {
             type: Schema.Types.ObjectId,
@@ -92,7 +92,7 @@ const UserProfileSchema = new Schema({
     }],
     achievements: [{
         _id: false,
-        active: { type: Boolean, default: false },
+        unlocked: { type: Boolean, default: false },
         unlocked_time: { type: Date, required: false },
         achievement: {
             type: Schema.Types.ObjectId,

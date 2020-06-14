@@ -1,0 +1,114 @@
+{
+
+    "achievements":[
+      {
+        "name":"Create.first.object",
+        "action":"Create",
+        "required_point":1,
+        "message":"Congratulazioni, hai creato il tuo primo elemento! Continua così!",
+        "imgUrl":"/img.png",
+        "points": 20
+      },
+      {
+        "name":"Create.five.object",
+        "action":"Create",
+        "required_point":5,
+        "message":"Congratulazioni, hai creato cinque elementi!",
+        "imgUrl":"/img.png",
+        "points": 20
+      },
+      {
+        "name":"Create.ten.object",
+        "action":"Create",
+        "required_point":10,
+        "message":"Congratulazioni, hai creato dieci elementi!",
+        "imgUrl":"/img.png",
+        "points": 20
+      },
+      {
+        "name":"Update.first.object",
+        "action":"Update",
+        "required_point":1,
+        "message":"Congratulazioni, hai aggiornato per la prima volta un elemento! Continua così!",
+        "imgUrl":"/img.png",
+        "points": 20
+      },
+      {
+        "name":"Update.five.object",
+        "action":"Update",
+        "required_point":5,
+        "message":"Congratulazioni, hai creato il cinque elementi! Continua così!",
+        "imgUrl":"/img.png",
+        "points": 20
+      },
+      {
+        "name":"Update.ten.object",
+        "action":"Update",
+        "required_point":10,
+        "message":"Congratulazioni, hai creato il tuo primo elemento! Continua così!",
+        "imgUrl":"/img.png",
+        "points": 20
+      },
+      {
+        "name":"Delete.first.object",
+        "action":"Delete",
+        "required_point":1,
+        "message":"Congratulazioni, hai aggiornato per la prima volta un elemento! Continua così!",
+        "imgUrl":"/img.png",
+        "points": 20
+      },
+      {
+        "name":"Delete.five.object",
+        "action":"Delete",
+        "required_point":5,
+        "message":"Congratulazioni, hai creato il cinque elementi! Continua così!",
+        "imgUrl":"/img.png",
+        "points": 20
+      },
+      {
+        "name":"Delete.ten.object",
+        "action":"Delete",
+        "required_point":10,
+        "message":"Congratulazioni, hai creato il tuo primo elemento! Continua così!",
+        "imgUrl":"/img.png",
+        "points": 20
+      }
+    ],
+    "levels":[
+      {
+        "name":"Nuova stella",
+        "imgUrl":"/img.png",
+        "description":"Utente appena arrivato",
+        "startingPoint":0,
+        "endPoint": 100,
+        "role": "Teacher"
+      },
+      {
+        "name":"Visitatore curioso",
+        "imgUrl":"/img.png",
+        "description":"Fa qualcosa",
+        "startingPoint":101,
+        "endPoint": 300,
+        "role": "Teacher"
+      },
+      {
+        "name":"A suo agio ",
+        "imgUrl":"/img.png",
+        "description":"Fa qualcosa di più del livello precendente",
+        "startingPoint":301,
+        "endPoint": 500,
+        "role": "Teacher"
+      },
+      {
+        "name":"Esperto",
+        "imgUrl":"/img.png",
+        "description":"Non lo ferma nessuno",
+        "startingPoint":501,
+        "endPoint": 800,
+        "role": "Teacher"
+      }
+    ]
+
+  }
+  
+

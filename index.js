@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyparser = require('body-parser');
 const cors = require('cors')
 const config = require('./config/dev');
+const FakeDB = require('./FakeDB')
 //const firebase = require('firebase');
 /*****
  * 
@@ -12,8 +13,8 @@ const config = require('./config/dev');
  */
 
 mongoose.connect(config.DB_URI_ASW,{ useNewUrlParser: true, useUnifiedTopology: true }).then(()=>{
-    // const fakeDB = new FakeDB();
-     /*fakeDB.seedDB().catch(error=>{ 
+    /*const fakeDB = new FakeDB();
+     fakeDB.seedDB().catch(error=>{ 
          console.log(error); 
      })*/
  }).catch(err => console.log(err));
