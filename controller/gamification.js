@@ -11,7 +11,7 @@ const SOCIAL_VALUE = 10
 
 module.exports = {
 
-    computeAchievement: function (user, action, counter) {
+    computeAchievementSecondVersion: function (user, action, counter) {
 
         return new Promise((resolve, reject) => {
             Achievement.findOne({ 'action': action, 'required_point': counter })
@@ -41,7 +41,7 @@ module.exports = {
 
     },
 
-    computeAchievementSecondVersion: function (user, action, counter) {
+    computeAchievement: function (user, action, counter) {
         return new Promise((resolve, reject) => {
             Achievement.findOne({ 'action': action, 'required_point': counter })
                 .exec()
@@ -81,10 +81,6 @@ module.exports = {
                             if (x.achievement == unlocked_achievement.id) {
                                 x.unlocked = true;
                                 x.unlocked_time = Date.now()
-                                console.log("UserAchivement ", unlocked_achievement)
-                                console.log("type of exp", typeof(user.exp))
-                                console.log("type of unlockedachievemen", typeof(achievement.points))
-
                                 user.exp = user.exp + achievement.points
                             }
                         })
