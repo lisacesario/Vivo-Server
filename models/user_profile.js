@@ -164,6 +164,11 @@ const TeacherProfileSchema = new Schema({
         ref: 'Tool',
         required: false
     }],
+    questions: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Question',
+        required: false
+    }],
     learner_list: [{
         _id : false,
         read : {type: Boolean, default:false},

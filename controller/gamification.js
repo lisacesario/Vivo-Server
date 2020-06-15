@@ -59,7 +59,15 @@ module.exports = {
                         
                         console.log("unlocked_achievement? ", unlocked_achievement)
 
-                        user.achievements.filter(x => {
+
+                        user.achievements.forEach(x => {
+                            if (x.achievement == unlocked_achievement[0].achievement) {
+                                console.log("ci entor qui?")
+                                x.unlocked = true;
+                                x.unlocked_time = Date.now()
+                            }
+                        });
+                       /* user.achievements.filter(x => {
                             console.log("partenza:", unlocked_achievement[0].achievement)
                             console.log("destinazione:", x.achievement)
                             if (x.achievement == unlocked_achievement[0].achievement) {
@@ -67,10 +75,10 @@ module.exports = {
                                 x.unlocked = true;
                                 x.unlocked_time = Date.now()
                             }
-                        })
-                        
+                        })*/
+
+                        console.log("Ci sono problemi?")
                         user.exp = user.exp + achievement.points
-  
 
                         user.save(function (err, isAuth) {
                             if (err) {

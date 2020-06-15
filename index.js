@@ -81,6 +81,9 @@ const groupRoutes = require('./routes/groups');
 app.use('/api/v1/groups', groupRoutes);
 const messagesRoutes = require('./routes/messages');
 app.use('/api/v1/messages', messagesRoutes);
+
+const questionRoutes = require('./routes/questions');
+app.use('/api/v1/questions', questionRoutes);
 /*
 const levelsRoutes = require('./routes/admin-tool/level');
 app.use('/api/v1/admin-tools/levels', levelsRoutes);
