@@ -7,6 +7,10 @@ const LevelSchema = new Schema({
         type: String,
         required: true
     },
+    position:{
+        type: Number,
+        requred:true
+    },
     imgUrl:{
         type:String,
         required: true

@@ -33,6 +33,16 @@ module.exports = {
 
                     if (!achievement) {
                         console.log("RIGETTA TUTTO")
+                        console.log("check Livello")
+
+                       /** CAMBIARE I DUE MODELLI
+                        *  Un utente ha un solo livello alla volta
+                        *  controllo se l'esperienza accumulata supera endPoint del livello
+                        *   se non supera, non succede niente
+                        *  se supera cerco il livello successivo. Prevedere un campo numerico progressivo
+                        *  es. numero livello 1 -> Level.find({numero_livello = acstual_lvel+1})
+                        *  pop il vecchio e push il nuovo nel campo utente
+                        */
                         user.save(function (err, isAuth) {
                             if (err) {
                                 console.log(err)
@@ -50,15 +60,17 @@ module.exports = {
                         console.log("unlocked_achievement? ", unlocked_achievement)
 
                         user.achievements.filter(x => {
-                            if (x.achievement == unlocked_achievement.id) {
+                            console.log("partenza:", unlocked_achievement[0].achievement)
+                            console.log("destinazione:", x.achievement)
+                            if (x.achievement == unlocked_achievement[0].achievement) {
+                                console.log("ci entor qui?")
                                 x.unlocked = true;
                                 x.unlocked_time = Date.now()
-                                user.exp = user.exp + achievement.points
-                                console.log("userexp? ", user.exp)
-
                             }
                         })
                         
+                        user.exp = user.exp + achievement.points
+  
 
                         user.save(function (err, isAuth) {
                             if (err) {

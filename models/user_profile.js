@@ -81,7 +81,7 @@ const UserProfileSchema = new Schema({
         ref: 'BaseActivity',
         required: false
     }],
-    level: [{
+    level: {
         _id: false,
         unlocked: { type: Boolean, default: false },
         unlocked_time: { type: Date, required: false },
@@ -89,7 +89,7 @@ const UserProfileSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'Level'
         }
-    }],
+    },
     achievements: [{
         _id: false,
         unlocked: { type: Boolean, default: false },
@@ -104,10 +104,15 @@ const UserProfileSchema = new Schema({
         required: false,
         default: 0
     },
+    first_access: {
+        type:Boolean,
+        default:false
+    },
     game_counter: {
         create_counter : {type:Number, default:0},
         update_counter : {type:Number, default:0},
         delete_counter : {type:Number, default:0},
+        add_counter    : {type:Number, default:0},
         social_counter : {type:Number, default:0},
         event_counter  : {type:Number, default:0},
     },

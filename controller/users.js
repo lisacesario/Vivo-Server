@@ -34,33 +34,26 @@ exports.createUser = function (req, res, next) {
                     .then(foundAchievements =>{
                         foundAchievements.forEach(achievement =>{
                             const data = {
-                                "active": false,
+                                "unlocked": false,
                                 "achievement":achievement
                             }
                             newProfile.achievements.push(data)
                         })
-                        Level.find().exec()
-                        .then(foundLevels =>{
-                            foundLevels.forEach(level =>{
+                        Level.findOne({'position':0}).exec()
+                        .then(level =>{
                                 const data = {
-                                    "active":false,
-                                    "level": level
+                                    "unlocked":true,
+                                    "level": level,
+                                    "unlocked_time":Date.now()
                                 }
-                                newProfile.level.push(data)
-                                
-                            })
-                            newProfile.save()
-                            return res.status(200).send(newProfile)
-                        })
-          
-                
+                                newProfile.level = data
+                                newProfile.save()
+                                return res.status(200).send(newProfile)
+                            })               
                     })
                     .catch(err =>{
                         return res.status(400).send(err)
                     })
-
-       
-
     });
 }
 
