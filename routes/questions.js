@@ -16,6 +16,8 @@ router.post('/create', QuestionController.createQuiz);
 // PATCH /api/v1/users/id
 router.patch('/:id', QuestionController.updateQuestion);
 
+router.patch('/:id/answers', QuestionController.handleAnswers);
+
 router.delete('/:id', QuestionController.deleteQuestion);
 
 /*

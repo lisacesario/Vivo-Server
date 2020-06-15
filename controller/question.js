@@ -221,6 +221,99 @@ exports.updateQuestion= function (req, res, next) {
 
 
 
+
+exports.handleAnswers= function (req, res, next) {
+    const action = "Update"
+    const category = "Answers"
+    const user = res.locals.user;
+    const data = req.body;
+    const search_id = req.params.id
+    console.log('id :' + search_id);
+    console.log('user', user)
+    console.log("valure", req.body)
+    //Object.keys(data).forEach(e => console.log(` Activity DATA key=${e}  value=${data[e]}`));
+    //Object.keys(req.params).forEach(e => console.log(` req.params DATA key=${e}  value=${req.params[e]}`));
+    //Object.keys(req.body).forEach(e => console.log(` req.body DATA key=${e}  value=${req.body[e]}`));
+
+    headers = req.headers
+    checkIsAuthenticated(headers)
+        .then((isAuth) => {
+            if (isAuth === false) {
+                return res.status(403).send("You are not authorized")
+            }
+            else {
+                Question.findById(req.params.id)
+                    .exec(function (err, foundElement) {
+
+                        console.log("FOUND ELEMENT:  ", foundElement)
+                        if (err) {
+                            return res.status(422).send({
+                                "action": "Update Quiz by ID ",
+                                "success": false,
+                                "status": 422,
+                                "error": {
+                                    "code": err,
+                                    "message": "Update in quiz by ID"
+                                }
+                            })
+                        }
+                        else {
+                            if (foundElement.created_by != isAuth.id) {
+                                return res.status(403).send({
+                                    "action": "Patch Quiz by ID ",
+                                    "success": false,
+                                    "status": 422,
+                                    "error": {
+                                        "code": err,
+                                        "message": "You are not the owner"
+                                    }
+                                })
+                            }
+                            foundElement.set(data);
+                            foundElement.save(function (err) {
+                                if (err) {
+                                    return res.status(422).send({
+                                        "action": "Update Quiz by ID ",
+                                        "success": false,
+                                        "status": 422,
+                                        "error": {
+                                            "code": err,
+                                            "message": "Update in quiz by ID"
+                                        }
+                                    })
+                                }
+                                else {
+                                    console.log("NUOVO", foundElement)
+                                    message = foundElement._id + " Was Updated successfully"
+                                    logs.createLog(action, category, isAuth, message)
+                                    res.status(200).json({ "data": foundElement })
+
+                                }
+
+                                //return res.json({"activity" : foundActivity});
+
+                            });
+                        }
+
+                    })
+            }
+        })
+        .catch(err => {
+            return res.status(422).send({
+                "action": "Update Quiz by ID ",
+                "success": false,
+                "status": 422,
+                "error": {
+                    "code": err,
+                    "message": "Update in quiz by ID"
+                }
+            })
+        })
+
+
+}
+
+
 exports.deleteQuestion= function (req, res, next) {
     const action = "Delete"
     const category = "Step"
