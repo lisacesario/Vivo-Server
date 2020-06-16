@@ -61,7 +61,7 @@ exports.createStep = function (req, res, next) {
         'imgSym': imgSym,
         'shared': shared,
         'subject': subject,
-        'activities' : activities
+        'activities': activities
     });
     headers = req.headers;
     checkIsAuthenticated(headers)
@@ -73,6 +73,7 @@ exports.createStep = function (req, res, next) {
             else {
                 Step.create(step, function (err, newElement) {
                     if (err) {
+                        console(err)
                         return res.status(400).send(err)
                     }
                     newElement.created_by = isAuth;
@@ -85,29 +86,45 @@ exports.createStep = function (req, res, next) {
                             message = "New Tool created with ID " + newElement._id
                             logs.createLog(action, category, isAuth, message)
                             var counter = isAuth.game_counter.create_counter + 1;
-                            gamification.computeAchievement(isAuth, action, counter)
-                                .then(achievement => {
-                                    console.log("QUI C'è ACHIEVMENT.", achievement)
-                                    if (achievement) {
-                                        res.status(200).json({ "data": newElement, "achievement": achievement })
-                                    }
-                                    else {
-                                        res.status(200).json({ "data": newElement })
+                            console.log("CAlcola Achievement")
+                            gamification.computeAchievement(isAuth,action,counter)
+                                            .then(achievement=>{
+                                                console.log("QUI C'è ACHIEVMENT.", achievement)
+                                                console.log("check livello")
+                                                gamification.computeLevel(isAuth)
+                                                            .then(level=>{
+                                                                console.log("Level",level)
+                                                                if(level){
+                                                                    if(achievement){
+                                                                        res.status(200).json({ "data": newElement, "achievement": achievement, "level":level })
+                                                                    }
+                                                                }
+                                                                else if(achievement){
+                                                                    res.status(200).json({ "data": newElement, "achievement": achievement })
 
-                                    }
-                                })
-                                .catch(err => {
-                                    console.log(err);
-                                    return res.status(400).send(err)
-                                })
+                                                                }
+                                                                else{
+                                                                    res.status(200).json({ "data": newElement})
+                                                                }
+                                                            })
+                                                            .catch(err=>{
+                                                                console.log(err)
+                                                                return res.status(400).send(err)
+                                                            })
+
+                                            })
+                                            .catch(err =>{
+                                                console.log(err);
+                                                return res.status(400).send(err)
+                                            })
                         }
                     })
 
-                  
+
                 })
             }
         })
-        .catch( err =>{
+        .catch(err => {
             return res.status(422).send({
                 "action": "Create Step ",
                 "success": false,
@@ -147,60 +164,74 @@ exports.updateStep = function (req, res, next) {
             }
             else {
                 Step.findById(req.params.id)
-                .exec(function (err, foundElement) {
-                    console.log("FOUND ELEMENT:  ", foundElement)
-                    if (err) {
-                        return res.status(422).send({ errors: normalizeErrors(err.errors) });
-                    }
+                    .exec(function (err, foundElement) {
+                        console.log("FOUND ELEMENT:  ", foundElement)
+                        if (err) {
+                            return res.status(422).send({ errors: normalizeErrors(err.errors) });
+                        }
 
-                    if(isAuth.id != foundElement.created_by){
-                        return res.status(422).send({
-                            "action": "Patch Step by ID ",
-                            "success": false,
-                            "status": 422,
-                            "error": {
-                                "message": "You are not the owner"
-                            }
-                        })
-                    }
-                    else {
-                        foundElement.set(data);
-                        foundElement.save(function (err) {
-                            if (err) {
-                                console.log("sono solo  qui ");
-    
-                                return res.status(422).send({ errors: [{ title: 'Error in save  activity', detail: err.errors }] });
-                            }
-                            else {
-                                console.log("NUOVO", foundElement)
-                                message = foundElement._id + " Was Updated successfully"
-                                logs.createLog(action, category, isAuth, message)
-                                var counter = isAuth.game_counter.update_counter + 1
-                                gamification.computeAchievement(isAuth, action, counter)
-                                    .then(achievement => {
-                                        console.log("QUI C'è ACHIEVMENT.", achievement)
-                                        if (achievement) {
-                                            res.status(200).json({ "data": foundElement, "achievement": achievement })
-                                        }
-                                        else {
-                                            res.status(200).json({ "data": foundElement })
-    
-                                        }
-                                    })
-                                    .catch(err => {
-                                        console.log(err);
-                                        return res.status(400).send(err)
-                                    })
-                            }
-    
-    
-                        });
-                    }
-        
-                })
+                        if (isAuth.id != foundElement.created_by) {
+                            return res.status(422).send({
+                                "action": "Patch Step by ID ",
+                                "success": false,
+                                "status": 422,
+                                "error": {
+                                    "message": "You are not the owner"
+                                }
+                            })
+                        }
+                        else {
+                            foundElement.set(data);
+                            foundElement.save(function (err) {
+                                if (err) {
+                                    console.log("sono solo  qui ");
+
+                                    return res.status(422).send({ errors: [{ title: 'Error in save  activity', detail: err.errors }] });
+                                }
+                                else {
+                                    console.log("NUOVO", foundElement)
+                                    message = foundElement._id + " Was Updated successfully"
+                                    logs.createLog(action, category, isAuth, message)
+                                    var counter = isAuth.game_counter.update_counter + 1
+                                    gamification.computeAchievement(isAuth, action, counter)
+                                        .then(achievement => {
+                                            console.log("QUI C'è ACHIEVMENT.", achievement)
+                                            gamification.computeLevel(isAuth)
+                                                .then(level => {
+                                                    console.log("Level", level)
+                                                    if (level) {
+                                                        if (achievement) {
+                                                            res.status(200).json({ "data": foundElement, "achievement": achievement, "level": level })
+                                                        }
+                                                    }
+                                                    else if (achievement) {
+                                                        res.status(200).json({ "data": foundElement, "achievement": achievement })
+
+                                                    }
+                                                    else {
+                                                        res.status(200).json({ "data": foundElement })
+                                                    }
+                                                })
+                                                .catch(err => {
+                                                    console.log(err)
+                                                    return res.status(400).send(err)
+                                                })
+
+                                        })
+                                        .catch(err => {
+                                            console.log(err);
+                                            return res.status(400).send(err)
+                                        })
+                                }
+
+
+                            });
+                        }
+
+                    })
             }
         })
-        .catch( err =>{
+        .catch(err => {
             return res.status(422).send({
                 "action": "Patch Step by ID ",
                 "success": false,
@@ -238,16 +269,16 @@ exports.deleteStep = function (req, res, next) {
                             console.log(err);
                         }
 
-                        if(foundStep.created_by != isAuth.id){
+                        if (foundStep.created_by != isAuth.id) {
                             return res.status(403).send("You are not the owner")
                         }
                         foundStep.remove(function (err) {
                             if (err) {
                                 // Delete from teachers
                                 return res.status(422).send({ errors: [{ title: 'Error Remove', detail: 'there was an error removing' }] });
-    
+
                             }
-                            if(foundStep.activities.length !==0){
+                            if (foundStep.activities.length !== 0) {
                                 foundStep.activities.forEach(element => {
                                     BaseActivity.findById(element, function (err, foundActivity) {
                                         if (err) {
@@ -258,12 +289,12 @@ exports.deleteStep = function (req, res, next) {
                                                 foundActivity.steps.pull(current_step);
                                             }
                                         })
-        
+
                                         foundActivity.save()
                                     })
                                 });
                             }
-                           
+
                             isAuth.steps.pull(foundStep)
                             message = foundStep._id + " Was Deleted successfully"
                             logs.createLog(action, category, isAuth, message)
@@ -272,13 +303,26 @@ exports.deleteStep = function (req, res, next) {
                             gamification.computeAchievement(isAuth, action, counter)
                                 .then(achievement => {
                                     console.log("QUI C'è ACHIEVMENT.", achievement)
-                                    if (achievement) {
-                                        res.status(200).json({ "data": "", "achievement": achievement })
-                                    }
-                                    else {
-                                        res.status(200).json({ "data": "" })
+                                    gamification.computeLevel(isAuth)
+                                        .then(level => {
+                                            console.log("Level", level)
+                                            if (level) {
+                                                if (achievement) {
+                                                    res.status(200).json({ "data": "", "achievement": achievement, "level": level })
+                                                }
+                                            }
+                                            else if (achievement) {
+                                                res.status(200).json({ "data": "", "achievement": achievement })
 
-                                    }
+                                            }
+                                            else {
+                                                res.status(200).json({ "data": "" })
+                                            }
+                                        })
+                                        .catch(err => {
+                                            console.log(err)
+                                            return res.status(400).send(err)
+                                        })
                                 })
                                 .catch(err => {
                                     console.log(err);
@@ -288,7 +332,7 @@ exports.deleteStep = function (req, res, next) {
                     });
             }
         })
-        .catch( err =>{
+        .catch(err => {
             return res.status(422).send({
                 "action": "Delete Step ",
                 "success": false,
@@ -301,7 +345,7 @@ exports.deleteStep = function (req, res, next) {
         })
 
 
-   
+
 }
 
 
@@ -344,46 +388,46 @@ exports.addStepToActivity = function (req, res, next) {
                                 console.log(foundStep)
                                 foundStep.activities.push(foundElement);
                                 foundStep.save()
-                                        .then(foundStep =>{
-                                            console.log("found quiz saved")
-                                            const new_step = {
-                                                'position': foundElement.steps.length + 1,
-                                                'step': foundStep
-                                            }
-                                            foundElement.steps.push(new_step);
-                                            foundElement.save()
-                                                        .then(foundElement=>{
-                                                            console.log("FoundActivity saved")
-                                                            message = "Step " + foundStep._id + " was added to " + foundElement._id 
-                                                            logs.createLog(action, category, isAuth, message)
-                                                          
-                                                            return res.status(200).send(foundElement)
-                                                        })
-                                                        .catch(err =>{
-                                                            return res.status(422).send({
-                                                                "action": "Add Step to Activity ",
-                                                                "success": false,
-                                                                "status": 422,
-                                                                "error": {
-                                                                    "code": err,
-                                                                    "message": "add in Step by ID"
-                                                                }
-                                                            })
-                                                        })
-                                        })
-                                        .catch(err =>{
-                                            return res.status(422).send({
-                                                "action": "Add Step to Activity ",
-                                                "success": false,
-                                                "status": 422,
-                                                "error": {
-                                                    "code": err,
-                                                    "message": "add in Step by ID"
-                                                }
+                                    .then(foundStep => {
+                                        console.log("found quiz saved")
+                                        const new_step = {
+                                            'position': foundElement.steps.length + 1,
+                                            'step': foundStep
+                                        }
+                                        foundElement.steps.push(new_step);
+                                        foundElement.save()
+                                            .then(foundElement => {
+                                                console.log("FoundActivity saved")
+                                                message = "Step " + foundStep._id + " was added to " + foundElement._id
+                                                logs.createLog(action, category, isAuth, message)
+
+                                                return res.status(200).send(foundElement)
                                             })
+                                            .catch(err => {
+                                                return res.status(422).send({
+                                                    "action": "Add Step to Activity ",
+                                                    "success": false,
+                                                    "status": 422,
+                                                    "error": {
+                                                        "code": err,
+                                                        "message": "add in Step by ID"
+                                                    }
+                                                })
+                                            })
+                                    })
+                                    .catch(err => {
+                                        return res.status(422).send({
+                                            "action": "Add Step to Activity ",
+                                            "success": false,
+                                            "status": 422,
+                                            "error": {
+                                                "code": err,
+                                                "message": "add in Step by ID"
+                                            }
                                         })
-                                    
-                                
+                                    })
+
+
                             })
                             .catch(err => {
                                 return res.status(422).send({
@@ -464,7 +508,7 @@ exports.removeStepFromActivity = function (req, res, next) {
                         })
                     }
 
-                    if(activity.created_by != isAuth.id){
+                    if (activity.created_by != isAuth.id) {
                         return res.status(403).send({
                             "action": "Remove Step from Activity ",
                             "success": false,
@@ -493,20 +537,20 @@ exports.removeStepFromActivity = function (req, res, next) {
                                 step.save()
                                 console.log("pop")
                                 console.log("Steps ", activity.steps)
-                                activity.steps.forEach( element =>{
-                                    if(element.step == step.id){
+                                activity.steps.forEach(element => {
+                                    if (element.step == step.id) {
                                         console.log("poppi")
                                         activity.steps.pop(element)
                                     }
                                 })
                                 activity.save()
-                                message = "Step " + step._id + " was removed from " + activity._id 
+                                message = "Step " + step._id + " was removed from " + activity._id
                                 logs.createLog(action, category, isAuth, message)
-            
+
                                 return res.status(200).send(activity)
-            
+
                             }
-            
+
                         })
                 })
             }
@@ -526,12 +570,12 @@ exports.removeStepFromActivity = function (req, res, next) {
 }
 
 
-exports.changeOrder = function(req,res,next){
+exports.changeOrder = function (req, res, next) {
     console.log("Change order of Step from Activity")
     const user = res.locals.user;
     const data = req.body;
     const search_id = req.params.id
-   // console.log('activity_id :' + search_id);
+    // console.log('activity_id :' + search_id);
     //console.log('user', user)
     console.log("data", req.body)
 
@@ -539,7 +583,7 @@ exports.changeOrder = function(req,res,next){
     headers = req.headers;
     checkIsAuthenticated(headers)
         .then((isAuth) => {
-           // console.log("is Auth;", isAuth)
+            // console.log("is Auth;", isAuth)
             if (isAuth === false) {
                 return res.status(403).send("You are not authorized")
             }
@@ -558,7 +602,7 @@ exports.changeOrder = function(req,res,next){
                         })
                     }
 
-                    if(activity.created_by != isAuth.id){
+                    if (activity.created_by != isAuth.id) {
                         return res.status(403).send({
                             "action": "Change order Step from Activity ",
                             "success": false,
@@ -568,12 +612,12 @@ exports.changeOrder = function(req,res,next){
                             }
                         })
                     }
-                    
+
                     console.log("Previous", activity.steps)
-                    activity.steps.forEach( current_step =>{
-                        data.forEach(actual_step =>{
-                            if(current_step.step == actual_step.step._id){
-                                if(current_step.position != actual_step.position){
+                    activity.steps.forEach(current_step => {
+                        data.forEach(actual_step => {
+                            if (current_step.step == actual_step.step._id) {
+                                if (current_step.position != actual_step.position) {
                                     current_step.position = actual_step.position
                                 }
                             }
@@ -608,7 +652,7 @@ function checkIsAuthenticated(headers) {
         firebase.auth().verifyIdToken(headers.authorization)
             .then(function (decodedToken) {
                 let uid = decodedToken.uid
-               // console.log("UDI :", uid)
+                // console.log("UDI :", uid)
                 UserProfile.findOne({ uid: uid })
                     .exec()
                     .then(foundUser => {

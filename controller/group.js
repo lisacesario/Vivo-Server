@@ -14,6 +14,8 @@ exports.getGroupById = function (req, res, next) {
             return res.status(200).send(foundGroup);
         })
         .catch( err =>{
+
+            
             return res.status(422).send(
                 {
                     "action": "Get group by ID",

@@ -1,4 +1,4 @@
-const Level = require('../models/gaming/level');
+const {Level} = require('../models/gaming/level');
 const { Achievement } = require('../models/gaming/achievement');
 
 const UserProfile = require('../models/user_profile');
@@ -10,8 +10,48 @@ const EVENT_VALUE = 10
 const SOCIAL_VALUE = 10
 
 module.exports = {
+
+    computeLevel : function(user){
+        return new Promise((resolve, reject)=>{
+            console.log("CALCOLO LIVELLO")
+            Level.findById(user.level.level).exec()
+                .then(current_level =>{
+                    if(current_level.endPoint > user.exp){
+                        resolve(null)
+                    }
+                    else{
+                        console.log("Nuovo livello")
+
+                        Level.findOne({'position': (current_level.position + 1)}).exec()
+                            .then( newLevel =>{
+                                console.log("nuovo livello", newLevel)
+                                user.level.level = newLevel;
+                                user.level.unlocked_time = Date.now()
+                                user.save(function(err,user){
+                                    if(err){
+                                        console.log(err)
+                                        reject()
+                                    }
+                                    else{
+                                        resolve(newLevel)
+                                    }
+                                })
+                            })
+                            .catch(err =>{
+                                console.log(err)
+                                reject()
+                            })
+                    }
+                })
+                .catch(err =>{
+                    console.log(err);
+                    reject()
+                })
+        }
+    )},
     computeAchievement: function (user, action, counter) {
         return new Promise((resolve, reject) => {
+            console.log("calcola achievement")
             Achievement.findOne({ 'action': action, 'required_point': counter })
                 .exec()
                 .then(achievement => {
@@ -35,14 +75,6 @@ module.exports = {
                         console.log("RIGETTA TUTTO")
                         console.log("check Livello")
 
-                       /** CAMBIARE I DUE MODELLI
-                        *  Un utente ha un solo livello alla volta
-                        *  controllo se l'esperienza accumulata supera endPoint del livello
-                        *   se non supera, non succede niente
-                        *  se supera cerco il livello successivo. Prevedere un campo numerico progressivo
-                        *  es. numero livello 1 -> Level.find({numero_livello = acstual_lvel+1})
-                        *  pop il vecchio e push il nuovo nel campo utente
-                        */
                         user.save(function (err, isAuth) {
                             if (err) {
                                 console.log(err)
@@ -77,14 +109,15 @@ module.exports = {
                             }
                         })*/
 
-                        console.log("Ci sono problemi?")
                         user.exp = user.exp + achievement.points
+                        console.log("ecp ", user.exp )
 
                         user.save(function (err, isAuth) {
                             if (err) {
-                                console.log(err)
+                                console.log("perovlema,", err)
                                 reject()
                             }
+                            console.log("achievement ")
                             resolve(achievement)
                         });
                        
@@ -93,7 +126,7 @@ module.exports = {
 
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.log("errore",err)
                     reject()
                 })
         })

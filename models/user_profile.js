@@ -83,7 +83,6 @@ const UserProfileSchema = new Schema({
     }],
     level: {
         _id: false,
-        unlocked: { type: Boolean, default: false },
         unlocked_time: { type: Date, required: false },
         level: {
             type: Schema.Types.ObjectId,

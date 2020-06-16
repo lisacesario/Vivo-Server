@@ -107,13 +107,27 @@ exports.createActivity = function (req, res, next) {
                                 gamification.computeAchievement(isAuth,action,counter)
                                             .then(achievement=>{
                                                 console.log("QUI C'è ACHIEVMENT.", achievement)
-                                                if(achievement){
-                                                    res.status(200).json({ "data": newObj, "achievement": achievement })
-                                                }
-                                                else{
-                                                    res.status(200).json({ "data": newObj})
+                                                gamification.computeLevel(isAuth)
+                                                            .then(level=>{
+                                                                console.log("Level",level)
+                                                                if(level){
+                                                                    if(achievement){
+                                                                        res.status(200).json({ "data": newObj, "achievement": achievement, "level":level })
+                                                                    }
+                                                                }
+                                                                else if(achievement){
+                                                                    res.status(200).json({ "data": newObj, "achievement": achievement })
 
-                                                }
+                                                                }
+                                                                else{
+                                                                    res.status(200).json({ "data": newObj})
+                                                                }
+                                                            })
+                                                            .catch(err=>{
+                                                                console.log(err)
+                                                                return res.status(400).send(err)
+                                                            })
+
                                             })
                                             .catch(err =>{
                                                 console.log(err);
@@ -186,13 +200,27 @@ exports.updateActivity = function (req, res, next) {
                                 gamification.computeAchievement(isAuth,action,counter)
                                 .then(achievement=>{
                                     console.log("QUI C'è ACHIEVMENT.", achievement)
-                                    if(achievement){
-                                        res.status(200).json({ "data": foundElement, "achievement": achievement })
-                                    }
-                                    else{
-                                        res.status(200).json({ "data": foundElement})
+                                    gamification.computeLevel(isAuth)
+                                                .then(level=>{
+                                                    console.log("Level",level)
+                                                    if(level){
+                                                        if(achievement){
+                                                            res.status(200).json({ "data": foundElement, "achievement": achievement, "level":level })
+                                                        }
+                                                    }
+                                                    else if(achievement){
+                                                        res.status(200).json({ "data": foundElement, "achievement": achievement })
 
-                                    }
+                                                    }
+                                                    else{
+                                                        res.status(200).json({ "data": foundElement})
+                                                    }
+                                                })
+                                                .catch(err=>{
+                                                    console.log(err)
+                                                    return res.status(400).send(err)
+                                                })
+                             
                                 })
                                 .catch(err =>{
                                     console.log(err);
@@ -260,13 +288,27 @@ exports.deleteActivity = function (req, res, next) {
                             gamification.computeAchievement(isAuth,action,counter)
                             .then(achievement=>{
                                 console.log("QUI C'è ACHIEVMENT.", achievement)
-                                if(achievement){
-                                    res.status(200).json({ "data": "", "achievement": achievement })
-                                }
-                                else{
-                                    res.status(200).json({ "data": ""})
+                                gamification.computeLevel(isAuth)
+                                            .then(level=>{
+                                                console.log("Level",level)
+                                                if(level){
+                                                    if(achievement){
+                                                        res.status(200).json({ "data": "", "achievement": achievement, "level":level })
+                                                    }
+                                                }
+                                                else if(achievement){
+                                                    res.status(200).json({ "data": "", "achievement": achievement })
 
-                                }
+                                                }
+                                                else{
+                                                    res.status(200).json({ "data": ""})
+                                                }
+                                            })
+                                            .catch(err=>{
+                                                console.log(err)
+                                                return res.status(400).send(err)
+                                            })
+                    
                             })
                             .catch(err =>{
                                 console.log(err);

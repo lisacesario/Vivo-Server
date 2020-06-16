@@ -75,21 +75,35 @@ exports.createTool = function (req, res, next) {
                             message = "New Tool created with ID " + newElement._id
                             logs.createLog(action, category, isAuth, message)
                             var counter = isAuth.game_counter.create_counter + 1;
-                            gamification.computeAchievement(isAuth, action, counter)
-                                .then(achievement => {
-                                    console.log("QUI C'è ACHIEVMENT.", achievement)
-                                    if (achievement) {
-                                        res.status(200).json({ "data": newElement, "achievement": achievement })
-                                    }
-                                    else {
-                                        res.status(200).json({ "data": newElement })
+                            gamification.computeAchievement(isAuth,action,counter)
+                            .then(achievement=>{
+                                console.log("QUI C'è ACHIEVMENT.", achievement)
+                                gamification.computeLevel(isAuth)
+                                            .then(level=>{
+                                                console.log("Level",level)
+                                                if(level){
+                                                    if(achievement){
+                                                        res.status(200).json({ "data": newElement, "achievement": achievement, "level":level })
+                                                    }
+                                                }
+                                                else if(achievement){
+                                                    res.status(200).json({ "data": newElement, "achievement": achievement })
 
-                                    }
-                                })
-                                .catch(err => {
-                                    console.log(err);
-                                    return res.status(400).send(err)
-                                })
+                                                }
+                                                else{
+                                                    res.status(200).json({ "data": newElement})
+                                                }
+                                            })
+                                            .catch(err=>{
+                                                console.log(err)
+                                                return res.status(400).send(err)
+                                            })
+      
+                            })
+                            .catch(err =>{
+                                console.log(err);
+                                return res.status(400).send(err)
+                            })
                         }
                     })
 
@@ -157,21 +171,35 @@ exports.updateTool = function (req, res, next) {
                             message = foundElement._id + " Was Updated successfully"
                             logs.createLog(action, category, isAuth, message)
                             var counter = isAuth.game_counter.update_counter + 1
-                            gamification.computeAchievement(isAuth, action, counter)
-                                .then(achievement => {
-                                    console.log("QUI C'è ACHIEVMENT.", achievement)
-                                    if (achievement) {
-                                        res.status(200).json({ "data": foundElement, "achievement": achievement })
-                                    }
-                                    else {
-                                        res.status(200).json({ "data": foundElement })
+                            gamification.computeAchievement(isAuth,action,counter)
+                            .then(achievement=>{
+                                console.log("QUI C'è ACHIEVMENT.", achievement)
+                                gamification.computeLevel(isAuth)
+                                            .then(level=>{
+                                                console.log("Level",level)
+                                                if(level){
+                                                    if(achievement){
+                                                        res.status(200).json({ "data": foundElement, "achievement": achievement, "level":level })
+                                                    }
+                                                }
+                                                else if(achievement){
+                                                    res.status(200).json({ "data": foundElement, "achievement": achievement })
 
-                                    }
-                                })
-                                .catch(err => {
-                                    console.log(err);
-                                    return res.status(400).send(err)
-                                })
+                                                }
+                                                else{
+                                                    res.status(200).json({ "data": foundElement})
+                                                }
+                                            })
+                                            .catch(err=>{
+                                                console.log(err)
+                                                return res.status(400).send(err)
+                                            })
+
+                            })
+                            .catch(err =>{
+                                console.log(err);
+                                return res.status(400).send(err)
+                            })
                         }
 
 
@@ -231,21 +259,34 @@ exports.deleteTool = function (req, res, next) {
                             logs.createLog(action, category, isAuth, message)
                             var counter = isAuth.game_counter.delete_counter + 1
 
-                            gamification.computeAchievement(isAuth, action, counter)
-                                .then(achievement => {
-                                    console.log("QUI C'è ACHIEVMENT.", achievement)
-                                    if (achievement) {
-                                        res.status(200).json({ "data": "", "achievement": achievement })
-                                    }
-                                    else {
-                                        res.status(200).json({ "data": "" })
+                            gamification.computeAchievement(isAuth,action,counter)
+                            .then(achievement=>{
+                                console.log("QUI C'è ACHIEVMENT.", achievement)
+                                gamification.computeLevel(isAuth)
+                                            .then(level=>{
+                                                console.log("Level",level)
+                                                if(level){
+                                                    if(achievement){
+                                                        res.status(200).json({ "data": "", "achievement": achievement, "level":level })
+                                                    }
+                                                }
+                                                else if(achievement){
+                                                    res.status(200).json({ "data": "", "achievement": achievement })
 
-                                    }
-                                })
-                                .catch(err => {
-                                    console.log(err);
-                                    return res.status(400).send(err)
-                                })
+                                                }
+                                                else{
+                                                    res.status(200).json({ "data": ""})
+                                                }
+                                            })
+                                            .catch(err=>{
+                                                console.log(err)
+                                                return res.status(400).send(err)
+                                            })
+                              })
+                            .catch(err =>{
+                                console.log(err);
+                                return res.status(400).send(err)
+                            })
                         })
                     })
             }
