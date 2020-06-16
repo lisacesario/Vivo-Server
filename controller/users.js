@@ -85,11 +85,11 @@ exports.getUsersProfile = function (req, res, next) {
     console.log("Get tutti i profili Utenti")
     const requestedUserId = req.params.id;
     console.log("bu:", requestedUserId)
-
-    UserProfile.find()
+    UserProfile.find({uid:{$ne: requestedUserId}})
         .select('displayName photoURL role')
         .exec()
         .then(userProfile => {
+            console.log("userProfile", userProfile)
             return res.status(200).send(userProfile)
         })
         .catch(err => {
@@ -99,7 +99,7 @@ exports.getUsersProfile = function (req, res, next) {
                     "success": false,
                     "status": 400,
                     "error": {
-                        "code": err.errors,
+                        "code": err,
                         "message": "Error in retrieving users profiles"
                     }
                 })
@@ -124,7 +124,7 @@ exports.getUserProfileById = function (req, res, next) {
                     "success": false,
                     "status": 400,
                     "error": {
-                        "code": err.errors,
+                        "code": err,
                         "message": "Error in retrieving user profile"
                     }
                 })

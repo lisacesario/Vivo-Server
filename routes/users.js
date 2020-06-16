@@ -15,7 +15,7 @@ router.post('/register', UserController.register);
 
 
 // GET /api/v1/users/profile/
-router.get('/profile/', UserController.getUsersProfile);
+router.get('/profile/less/:id', UserController.getUsersProfile);
 
 // GET /api/v1/users/profile/
 router.get('/profile/:id', UserController.getUserProfileById);

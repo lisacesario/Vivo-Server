@@ -453,6 +453,158 @@ exports.deleteQuestion= function (req, res, next) {
 
 
 
+exports.addQuizToActivity = function (req, res, next) {
+    console.log("AUTH", req.headers)
+    console.log("PATCH")
+    // const user = res.locals.user;
+    const data = req.body;
+    const search_id = req.params.id
+    console.log('activity_id :' + search_id);
+    //console.log('user', user)
+    console.log("data", req.body)
+    headers = req.headers;
+    checkIsAuthenticated(headers)
+        .then((isAuth) => {
+            console.log("is Auth;", isAuth)
+            if (isAuth === false) {
+                return res.status(403).send("You are not authorized")
+            }
+            else {
+
+                QuizActivity.findById(search_id).exec()
+                    .then(foundElement => {
+                        console.log("Found Element: \n", foundElement);
+                        if (foundElement.created_by != isAuth.id) {
+                            return res.status(403).send({
+                                "action": "Add Quiz to Activity",
+                                "success": false,
+                                "status": 422,
+                                "error": {
+                                    "message": "You can't add elements in Activity. You are not the owner"
+                                }
+                            })
+                        }
+                        Question.findById(data._id).exec()
+                            .then(foundQuiz => {
+                                console.log(foundQuiz)
+                                foundQuiz.activities.push(foundElement);
+                                foundQuiz.save()
+                                console.log("found quiz saved")
+                                foundElement.quiz.push(foundQuiz);
+                                foundElement.save()
+                                console.log("FoundActivity saved")
+                                return res.status(200).send(foundElement)
+                            })
+                            .catch(err => {
+                                return res.status(422).send({
+                                    "action": "Add Quiz to Activity ",
+                                    "success": false,
+                                    "status": 422,
+                                    "error": {
+                                        "code": err,
+                                        "message": "Error adding in quiz in activity"
+                                    }
+                                })
+                            })
+
+                    })
+                    .catch(err => {
+                        return res.status(422).send({
+                            "action": "Add Quiz to Activity ",
+                            "success": false,
+                            "status": 422,
+                            "error": {
+                                "code": err,
+                                "message": "Delete in quiz by ID"
+                            }
+                        })
+                    })
+            }
+
+        })
+        .catch(err => {
+            console.log(err)
+        })
+
+
+
+
+}
+
+
+exports.removeQuizFromActivity = function (req, res, next) {
+    console.log("PATCH")
+    const user = res.locals.user;
+    const data = req.body;
+    const search_id = req.params.id
+    console.log('activity_id :' + search_id);
+    console.log('user', user)
+    console.log("data", req.body)
+
+    headers = req.headers;
+    checkIsAuthenticated(headers)
+        .then((isAuth) => {
+            console.log("is Auth;", isAuth)
+            if (isAuth === false) {
+                return res.status(403).send("You are not authorized")
+            }
+            else {
+                QuizActivity.findById(search_id).exec()
+                    .then(foundElement => {
+                        console.log("Found Element: \n", foundElement);
+                        Question.findById(data._id).exec()
+                            .then(foundQuiz => {
+                                console.log(foundQuiz)
+                                foundQuiz.activities.pop(foundElement);
+                                foundQuiz.save()
+                                console.log("found quiz saved")
+                                foundElement.quiz.pop(foundQuiz);
+                                foundElement.save()
+                                console.log("FoundActivity saved")
+                                return res.status(200).send(foundElement)
+                            })
+                            .catch(err => {
+                                return res.status(422).send({
+                                    "action": "Remove Quiz from Activity ",
+                                    "success": false,
+                                    "status": 422,
+                                    "error": {
+                                        "code": err,
+                                        "message": "Error remove in quiz in activity"
+                                    }
+                                })
+                            })
+
+                    })
+                    .catch(err => {
+                        return res.status(422).send({
+                            "action": "Remove Quiz from Activity ",
+                            "success": false,
+                            "status": 422,
+                            "error": {
+                                "code": err,
+                                "message": "Remove Quiz from Activity",
+                            }
+                        })
+                    })
+            }
+        })
+        .catch(err => {
+            return res.status(422).send({
+                "action": "Remove Quiz from Activity ",
+                "success": false,
+                "status": 422,
+                "error": {
+                    "code": err,
+                    "message": "Error remove in quiz in activity"
+                }
+            })
+        })
+
+
+}
+
+
 function checkIsAuthenticated(headers) {
 
     return new Promise((resolve, reject) => {
