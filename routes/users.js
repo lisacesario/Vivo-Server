@@ -28,6 +28,7 @@ router.post('/create', UserController.createUser);
 router.patch('/:id', UserController.patchUser);
 
 
+
 router.post('/:id/events/new', EventController.createEvent)
 router.patch('/:id/events/update', EventController.updateEvent)
 router.delete('/events/:id/delete', EventController.deleteEvent)
@@ -63,6 +64,11 @@ router.patch('/teacher-of/:id/refuse', UserController.refuseBeMyTeacherRequest);
 router.patch('/student-of/:id', UserController.sendBeMyStudentRequest);
 router.patch('/student-of/:id/accept', UserController.acceptBeMyStudentRequest);
 router.patch('/student-of/:id/refuse', UserController.refuseBeMyStudentRequest);
+
+
+// GAMIFICATION STUFF
+router.get('/achievements/:id', UserController.getAchievementById);
+router.get('/level/:id', UserController.getLevelById);
 
 
 

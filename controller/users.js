@@ -57,6 +57,30 @@ exports.createUser = function (req, res, next) {
     });
 }
 
+exports.getAchievementById = function(req,res,next){
+    const search_id = req.params.id;
+    Achievement.findById(search_id).exec()
+                .then(foundAchievements =>{
+                    return res.status(200).send(foundAchievements)
+                })
+                .catch(err =>{
+                    return res.status(400).send(err)
+                })
+
+}
+
+exports.getLevelById = function(req,res,next){
+    const search_id = req.params.id;
+    Level.findById(search_id).exec()
+                .then(foundLevel =>{
+                    return res.status(200).send(foundLevel)
+                })
+                .catch(err =>{
+                    return res.status(400).send(err)
+                })
+}
+
+
 exports.getUser = function (req, res, next) {
     console.log("Get auth user")
     const requestedUserId = req.params.id;

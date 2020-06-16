@@ -9,6 +9,8 @@ const DELETE_VALUE = 10
 const EVENT_VALUE = 10
 const SOCIAL_VALUE = 10
 
+
+
 module.exports = {
 
     computeLevel : function(user){
