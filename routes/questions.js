@@ -20,11 +20,11 @@ router.patch('/:id/answers', QuestionController.handleAnswers);
 
 router.delete('/:id', QuestionController.deleteQuestion);
 
-/*
-router.patch('/add-to/:id', QuizController.addQuizToActivity)
 
-router.patch('/remove-from/:id', QuizController.removeQuizFromActivity)
+router.patch('/add-to/:id', QuestionController.addQuestionToActivity)
 
-*/
+router.patch('/remove-from/:id', QuestionController.removeQuestionFromActivity)
+
+
 
 module.exports = router;

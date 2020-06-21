@@ -117,7 +117,7 @@ module.exports = {
                         user.save(function (err, isAuth) {
                             if (err) {
                                 console.log("perovlema,", err)
-                                reject()
+                                reject(err)
                             }
                             console.log("achievement ")
                             resolve(achievement)

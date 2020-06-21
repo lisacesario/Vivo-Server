@@ -67,7 +67,7 @@ exports.getActivityByID = function (req, res, next) {
 exports.createActivity = function (req, res, next) {
     const action = "Create"
     const category = "Activity"
-    const { name, photoURL, description, type, shared, created_by } = req.body;
+    const { name, photoURL, description, type, shared } = req.body;
     console.log(req.body);
 
     const activity = new BaseActivity({
@@ -92,6 +92,7 @@ exports.createActivity = function (req, res, next) {
                         return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
                     }
                     else {
+                        console.log(newObj)
                         newObj.created_by = isAuth
                         isAuth.activities.push(newObj);
 

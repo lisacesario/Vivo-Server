@@ -161,62 +161,57 @@ exports.patchUser = function (req, res, next) {
     console.log("PATCH")
     const user = res.locals.user;
     const data = req.body;
-    const search_id = req.params.id
-    console.log('id :' + search_id);
+    //const search_id = req.params.id
+    //console.log('id :' + search_id);
     console.log("valure", req.body)
     //Object.keys(data).forEach(e => console.log(` Activity DATA key=${e}  value=${data[e]}`));
     //Object.keys(req.params).forEach(e => console.log(` req.params DATA key=${e}  value=${req.params[e]}`));
     //Object.keys(req.body).forEach(e => console.log(` req.body DATA key=${e}  value=${req.body[e]}`));
 
-
-    UserProfile.findOne({ uid: search_id })
-        .exec()
-        .then(user => {
-            if (user.uid != search_id) {
-                console.log("created by ", user.uid);
-                console.log("hser ", search_id);
-                console.log("sono bloccato");
-                return res.status(403).send(
-                    {
-                        "action": "Patch User Profile",
-                        "success": false,
-                        "status": 403,
-                        "error": {
-                            "message": "Error in patch user profile: You are not the owner"
-                        }
-                    })
+    headers =  req.headers
+    checkIsAuthenticated(headers)
+        .then(isAuth=>{
+            if(isAuth === false){
+                return res.status(403).send("You are not authorized")
             }
-            user.set(data)
-            user.save()
-                .then(user => {
-                    return res.status(200).send(user)
-                })
-                .catch(err => {
-                    return res.status(400).send(
-                        {
-                            "action": "Patch User Profile",
-                            "success": false,
-                            "status": 400,
-                            "error": {
-                                "code": err.errors,
-                                "message": "Error in patch user profile"
-                            }
+            UserProfile.findOne({uid:isAuth.uid})
+                        .then(user =>{
+                            user.set(data)
+                            user.save(function(err, user){
+                                if(err){
+                                    return res.status(400).send(err)
+                                }
+                                else{
+                                    return res.status("200").send(user)
+                                }
+                            })
                         })
-                })
-
+                        .catch(err =>{
+                            return res.status(400).send(
+                                {
+                                    "action": "Patch User Profile",
+                                    "success": false,
+                                    "status": 400,
+                                    "error": {
+                                        "code": err,
+                                        "message": "Error in patch user profile"
+                                    }
+                                })
+                        })
         })
-        .catch(err => {
+        .catch(err =>{
             return res.status(400).send(
                 {
                     "action": "Patch User Profile",
                     "success": false,
                     "status": 400,
                     "error": {
-                        "code": err.errors,
+                        "code": err,
                         "message": "Error in patch user profile"
                     }
                 })
         })
+ 
 
 }
 

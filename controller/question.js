@@ -258,10 +258,6 @@ exports.handleAnswers= function (req, res, next) {
     console.log('id :' + search_id);
     console.log('user', user)
     console.log("valure", req.body)
-    //Object.keys(data).forEach(e => console.log(` Activity DATA key=${e}  value=${data[e]}`));
-    //Object.keys(req.params).forEach(e => console.log(` req.params DATA key=${e}  value=${req.params[e]}`));
-    //Object.keys(req.body).forEach(e => console.log(` req.body DATA key=${e}  value=${req.body[e]}`));
-
     headers = req.headers
     checkIsAuthenticated(headers)
         .then((isAuth) => {
@@ -453,7 +449,7 @@ exports.deleteQuestion= function (req, res, next) {
 
 
 
-exports.addQuizToActivity = function (req, res, next) {
+exports.addQuestionToActivity = function (req, res, next) {
     console.log("AUTH", req.headers)
     console.log("PATCH")
     // const user = res.locals.user;
@@ -488,12 +484,15 @@ exports.addQuizToActivity = function (req, res, next) {
                             .then(foundQuiz => {
                                 console.log(foundQuiz)
                                 foundQuiz.activities.push(foundElement);
-                                foundQuiz.save()
-                                console.log("found quiz saved")
-                                foundElement.quiz.push(foundQuiz);
-                                foundElement.save()
-                                console.log("FoundActivity saved")
-                                return res.status(200).send(foundElement)
+                                foundElement.questions.push(foundQuiz);
+                                foundElement.save(function(err,activity){
+                                    if(err){
+                                        return res.status(400).send(err)
+                                    }
+                                    foundQuiz.save(function(err,foundQuiz){
+                                        return res.status(200).send(foundQuiz)
+                                    })
+                                })
                             })
                             .catch(err => {
                                 return res.status(422).send({
@@ -532,7 +531,7 @@ exports.addQuizToActivity = function (req, res, next) {
 }
 
 
-exports.removeQuizFromActivity = function (req, res, next) {
+exports.removeQuestionFromActivity = function (req, res, next) {
     console.log("PATCH")
     const user = res.locals.user;
     const data = req.body;
@@ -556,12 +555,13 @@ exports.removeQuizFromActivity = function (req, res, next) {
                             .then(foundQuiz => {
                                 console.log(foundQuiz)
                                 foundQuiz.activities.pop(foundElement);
-                                foundQuiz.save()
-                                console.log("found quiz saved")
-                                foundElement.quiz.pop(foundQuiz);
-                                foundElement.save()
-                                console.log("FoundActivity saved")
-                                return res.status(200).send(foundElement)
+                                foundElement.questions.pop(foundQuiz);
+                                foundQuiz.save( function(err, quiz){
+                                    foundElement.save(function(err,foundElement){
+                                        return res.status(200).send(foundElement)
+                                    })
+                                })
+                                
                             })
                             .catch(err => {
                                 return res.status(422).send({

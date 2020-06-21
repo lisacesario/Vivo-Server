@@ -63,7 +63,7 @@ const SelfManagementActivitySchema = new Schema({
 
 
 const QuizActivitySchema = new Schema({
-    quiz: [{
+    questions: [{
         type: Schema.Types.ObjectId,
         ref: 'Question',
         required: false
