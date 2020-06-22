@@ -394,41 +394,47 @@ exports.removeToolFromActivity = function (req, res, next) {
     console.log('user', user)
     console.log("data", req.body)
 
+    headers = req.headers;
+    checkIsAuthenticated(headers)
+        .then(isAuth => {
+            if (isAuth === false) {
+                return res.status(403).send("You are not authorized")
+            }
+            else {
+                SelfManagementActivity.findById(search_id).populate().exec(function (err, foundElement) {
 
-    SelfManagementActivity.findById(search_id).populate().exec(function (err, foundElement) {
+                    if (err) {
+                        console.log("sono bloccato in quetsto errore");
+                        console.log("i miei errori sono qui:", err.errors);
+                        return res.status(422).send({ errors: normalizeErrors(err.errors) });
+                    }
+                    console.log("Found Element: /n", foundElement);
+                    Tool.findById(data._id)
+                        .exec(function (err, foundTool) {
+                            if (err) {
+                                console.log("sono bloccato in quetsto errore");
+                                console.log("i miei errori sono qui:", err.errors);
+                                return res.status(422).send({ errors: normalizeErrors(err.errors) });
+                            }
+                            else {
+            
+                                foundTool.activities.pop(foundElement);
+                                foundTool.save()
+                                console.log("pop")
+                                foundElement.tools.pop(foundTool);
+                                foundElement.save()
+                                message = "Tool " + foundTool._id + " was removed from " + foundElement._id
+                                logs.createLog(action, category, isAuth, message)
+            
+                                return res.status(200).send({ "status": "ok" })
+            
+                            }
+            
+                        })
+                })
+            }
+        })
 
-        if (err) {
-            console.log("sono bloccato in quetsto errore");
-            console.log("i miei errori sono qui:", err.errors);
-            return res.status(422).send({ errors: normalizeErrors(err.errors) });
-        }
-        console.log("Found Element: /n", foundElement);
-        Tool.findById(data._id)
-            .exec(function (err, foundTool) {
-                if (err) {
-                    console.log("sono bloccato in quetsto errore");
-                    console.log("i miei errori sono qui:", err.errors);
-                    return res.status(422).send({ errors: normalizeErrors(err.errors) });
-                }
-                else {
-
-                    foundTool.activities.pop(foundElement);
-                    foundTool.save()
-                    console.log("pop")
-                    foundElement.tools.pop(foundTool);
-                    foundElement.save()
-                    message = "Tool " + tool._id + " was removed from " + foundElement._id
-                    logs.createLog(action, category, isAuth, message)
-
-                    return res.status(200).send({ "status": "ok" })
-
-                }
-
-            })
-    })
-    /* }).then(foundElement =>{
-         
-     })*/
 
 
 }

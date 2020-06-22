@@ -50,7 +50,6 @@ const UserProfileSchema = new Schema({
             can_see_follower_list: { type: Boolean, default: false },
             can_see_followed_list: { type: Boolean, default: false },
             can_see_agenda : { type: Boolean, default: false },
-            can_edit_agenda: { type: Boolean, default: false },
             can_see_stats: { type: Boolean, default: false },
             can_see_achievements: { type: Boolean, default: false },
 
@@ -70,7 +69,6 @@ const UserProfileSchema = new Schema({
             can_see_follower_list: { type: Boolean, default: false },
             can_see_followed_list: { type: Boolean, default: false },
             can_see_agenda : { type: Boolean, default: false },
-            can_edit_agenda: { type: Boolean, default: false },
             can_see_stats: { type: Boolean, default: false },
             can_see_achievements: { type: Boolean, default: false },
 
@@ -213,8 +211,8 @@ const LearnerProfileSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'Teacher',
             required: false
-        }
-       
+        },
+        can_edit_agenda: { type: Boolean, default: false },
     }],
     agenda: [{
             type: Schema.Types.ObjectId,

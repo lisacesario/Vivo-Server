@@ -11,6 +11,10 @@ var async = require('async');
 const {Achievement} =  require('../models/gaming/achievement');
 const {Level} = require('../models/gaming/level')
 
+const gamification = require('../controller/gamification')
+
+const logs = require('../controller/log');
+
 exports.createUser = function (req, res, next) {
     console.log("Create User")
     const { uid, email, role, photoURL, displayName } = req.body;
@@ -220,12 +224,101 @@ exports.patchUser = function (req, res, next) {
 * @: ROUTE
 */
 exports.sendingFriendshipRequest = async function (req, res, next) {
+    const action = "Social"
+    const category = "Users"
+
     const requestedUserId = req.params.id;
     const user = res.locals.user;
     const data = req.body;
     console.log("sender", requestedUserId)
     console.log("reciever : ", data)
 
+    header = req.headers
+    checkIsAuthenticated(header)
+        .then(isAuth =>{
+            if(isAuth === false){
+                return res.status(403).send("Not Authenticated")
+            }
+
+            UserProfile.findById(data._id)
+                        .exec()
+                        .then(receiver=>{
+
+                            var friendshipReceiverRequest = {
+                                'read': false,
+                                'request_accepted': false,
+                                'follower_id': isAuth
+                            }
+
+                            var friendshipSenderRequest = {
+                                'request_accepted': false,
+                                'followed_id': receiver
+                            }
+
+                            receiver.followers.push(friendshipReceiverRequest);
+                            isAuth.followed.push(friendshipSenderRequest);
+                            receiver.save(function(err,receiver){
+                                if(err){
+                                    return res.status(400).send(err)
+                                }
+                                else{
+                                    message = "New Followers request sent "
+                                    logs.createLog(action, category, isAuth, message)
+                                    console.log("logs creati")
+                                    var counter = isAuth.game_counter.social_counter + 1;
+                                    gamification.computeAchievement(isAuth,action, counter)
+                                                .then(achievement =>{
+                                                    console.log("QUI C'è ACHIEVMENT.", achievement)
+                                                    gamification.computeLevel(isAuth)
+                                                                .then(level =>{
+                                                                    console.log("Level ", level)
+                                                                    if(level){
+                                                                        if(achievement){
+                                                                            res.status(200).json({ "data": "Inviato", "achievement": achievement, "level":level })
+
+                                                                        }
+                                                                    }
+                                                                    else if(achievement){
+                                                                        res.status(200).json({ "data": "Inviato", "achievement": achievement})
+
+                                                                    }
+                                                                    else{
+                                                                        res.status(200).json({ "data": "Inviato"})
+
+                                                                    }
+                                                                })
+                                                })
+                                }
+                            })
+
+                        })
+                        .catch((err) => {
+                            return res.status(422).send(
+                                {
+                                    "action": "Send Following request ",
+                                    "success": false,
+                                    "status": 422,
+                                    "error": {
+                                        "code": err,
+                                        "message": "Error in send user following request"
+                                    }
+                                })
+                        })
+        })
+        .catch((err) => {
+            return res.status(422).send(
+                {
+                    "action": "Send Following request ",
+                    "success": false,
+                    "status": 422,
+                    "error": {
+                        "code": err,
+                        "message": "Error in send user following request"
+                    }
+                })
+        })
+
+/*
     UserProfile.findOne({ uid: requestedUserId })
         .exec()
         .then(sender => {
@@ -278,7 +371,7 @@ exports.sendingFriendshipRequest = async function (req, res, next) {
                     }
                 })
         })
-
+*/
 
 }
 
@@ -600,7 +693,7 @@ exports.permissionSettings = function (req, res, next) {
                 follower.permission.can_see_followed_list = data.permission.can_see_my_followed_list;
                 follower.permission.can_see_follower_list = data.permission.can_see_my_follower_list;
                 follower.permission.can_see_agenda = data.permission.can_see_agenda;
-                follower.permission.can_edit_agenda = data.permission.can_edit_agenda;
+              //  follower.permission.can_edit_agenda = data.permission.can_edit_agenda;
                 follower.permission.can_see_stats = data.permission.can_see_stats;
                 follower.permission.can_see_achievements = data.permission.can_see_achievements;
                 console.log("Cambia i permessi la richiesta")
@@ -628,7 +721,7 @@ exports.permissionSettings = function (req, res, next) {
                             element.permission.can_see_followed_list = data.permission.can_see_my_followed_list;
                             element.permission.can_see_follower_list = data.permission.can_see_my_follower_list;
                             element.permission.can_see_agenda = data.permission.can_see_agenda;
-                            element.permission.can_edit_agenda = data.permission.can_edit_agenda;
+                           // element.permission.can_edit_agenda = data.permission.can_edit_agenda;
                             element.permission.can_see_stats = data.permission.can_see_stats;
                             element.permission.can_see_achievements = data.permission.can_see_achievements;
                         }
