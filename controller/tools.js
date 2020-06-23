@@ -41,15 +41,6 @@ exports.createTool = function (req, res, next) {
 
     console.log("my body", req.body);
 
-    const tool = new Tool({
-        'name': name,
-        'description': description,
-        'imgUrl': imgUrl,
-        'warning': warning,
-        'shared': shared,
-        'activities': activities
-    });
-
 
     headers = req.headers;
     checkIsAuthenticated(headers)
@@ -59,6 +50,17 @@ exports.createTool = function (req, res, next) {
             }
             else {
                 console.log("is auth:", isAuth)
+
+                const tool = new Tool({
+                    'name': name,
+                    'description': description,
+                    'imgUrl': imgUrl,
+                    'warning': warning,
+                    'shared': shared,
+                    'activities': activities,
+                    'created_by':isAuth
+                });
+
                 Tool.create(tool, function (err, newElement) {
                     if (err) {
                         return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
@@ -67,13 +69,8 @@ exports.createTool = function (req, res, next) {
                     newElement.created_by = isAuth;
                     isAuth.tools.push(newElement)
 
-                    newElement.save(function (err, newElement) {
-                        if (err) {
-                            return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err }] });
-                        }
-                        else {
-                            message = "New Tool created with ID " + newElement._id
-                            logs.createLog(action, category, isAuth, message)
+                            //message = "New Tool created with ID " + newElement._id
+                            //logs.createLog(action, category, isAuth, message)
                             var counter = isAuth.game_counter.create_counter + 1;
                             gamification.computeAchievement(isAuth,action,counter)
                             .then(achievement=>{
@@ -104,8 +101,7 @@ exports.createTool = function (req, res, next) {
                                 console.log(err);
                                 return res.status(400).send(err)
                             })
-                        }
-                    })
+                
 
 
 

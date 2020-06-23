@@ -54,15 +54,7 @@ exports.createStep = function (req, res, next) {
 
     console.log(req.body);
 
-    const step = new Step({
-        'name': name,
-        'description': description,
-        'imgUrl': imgUrl,
-        'imgSym': imgSym,
-        'shared': shared,
-        'subject': subject,
-        'activities': activities
-    });
+
     headers = req.headers;
     checkIsAuthenticated(headers)
         .then((isAuth) => {
@@ -71,54 +63,57 @@ exports.createStep = function (req, res, next) {
                 return res.status(403).send("You are not authorized")
             }
             else {
+                const step = new Step({
+                    'name': name,
+                    'description': description,
+                    'imgUrl': imgUrl,
+                    'imgSym': imgSym,
+                    'shared': shared,
+                    'subject': subject,
+                    'activities': activities,
+                    'created_by': isAuth
+                });
                 Step.create(step, function (err, newElement) {
                     if (err) {
                         console(err)
                         return res.status(400).send(err)
                     }
-                    newElement.created_by = isAuth;
                     isAuth.steps.push(newElement);
-                    newElement.save(function (err, newElement) {
-                        if (err) {
-                            return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err }] });
-                        }
-                        else {
-                            message = "New Tool created with ID " + newElement._id
-                            logs.createLog(action, category, isAuth, message)
-                            var counter = isAuth.game_counter.create_counter + 1;
-                            console.log("CAlcola Achievement")
-                            gamification.computeAchievement(isAuth,action,counter)
-                                            .then(achievement=>{
-                                                console.log("QUI C'è ACHIEVMENT.", achievement)
-                                                console.log("check livello")
-                                                gamification.computeLevel(isAuth)
-                                                            .then(level=>{
-                                                                console.log("Level",level)
-                                                                if(level){
-                                                                    if(achievement){
-                                                                        res.status(200).json({ "data": newElement, "achievement": achievement, "level":level })
-                                                                    }
-                                                                }
-                                                                else if(achievement){
-                                                                    res.status(200).json({ "data": newElement, "achievement": achievement })
 
-                                                                }
-                                                                else{
-                                                                    res.status(200).json({ "data": newElement})
-                                                                }
-                                                            })
-                                                            .catch(err=>{
-                                                                console.log(err)
-                                                                return res.status(400).send(err)
-                                                            })
+                    message = "New Tool created with ID " + newElement._id
+                    logs.createLog(action, category, isAuth, message)
+                    var counter = isAuth.game_counter.create_counter + 1;
+                    console.log("CAlcola Achievement")
+                    gamification.computeAchievement(isAuth, action, counter)
+                        .then(achievement => {
+                            console.log("QUI C'è ACHIEVMENT.", achievement)
+                            console.log("check livello")
+                            gamification.computeLevel(isAuth)
+                                .then(level => {
+                                    console.log("Level", level)
+                                    if (level) {
+                                        if (achievement) {
+                                            return res.status(200).json({ "data": newElement, "achievement": achievement, "level": level })
+                                        }
+                                    }
+                                    else if (achievement) {
+                                        return res.status(200).json({ "data": newElement, "achievement": achievement })
 
-                                            })
-                                            .catch(err =>{
-                                                console.log(err);
-                                                return res.status(400).send(err)
-                                            })
-                        }
-                    })
+                                    }
+                                    else {
+                                        return res.status(200).json({ "data": newElement })
+                                    }
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                    return res.status(400).send(err)
+                                })
+
+                        })
+                        .catch(err => {
+                            console.log(err);
+                            return res.status(400).send(err)
+                        })
 
 
                 })
@@ -190,8 +185,8 @@ exports.updateStep = function (req, res, next) {
                                 }
                                 else {
                                     console.log("NUOVO", foundElement)
-                                    message = foundElement._id + " Was Updated successfully"
-                                    logs.createLog(action, category, isAuth, message)
+                                    // message = foundElement._id + " Was Updated successfully"
+                                    // logs.createLog(action, category, isAuth, message)
                                     var counter = isAuth.game_counter.update_counter + 1
                                     gamification.computeAchievement(isAuth, action, counter)
                                         .then(achievement => {
