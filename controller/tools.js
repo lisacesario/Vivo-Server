@@ -34,8 +34,8 @@ exports.getToolsById = function (req, res, next) {
 }
 
 exports.createTool = function (req, res, next) {
-    const action = "Create"
-    const category = "Tools"
+   // const action = "Create"
+    //const category = "Tools"
     const { name, imgUrl, description, shared, created_by, activities, warning } = req.body;
     //console.log(req.file);
 
@@ -49,9 +49,8 @@ exports.createTool = function (req, res, next) {
                 return res.status(403).send("You are not authorized")
             }
             else {
-                console.log("is auth:", isAuth)
 
-                const tool = new Tool({
+                const tool_data = new Tool({
                     'name': name,
                     'description': description,
                     'imgUrl': imgUrl,
@@ -61,61 +60,70 @@ exports.createTool = function (req, res, next) {
                     'created_by':isAuth
                 });
 
-                Tool.create(tool, function (err, newElement) {
+                Tool.create(tool, function (err, tool) {
                     if (err) {
                         return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
                     }
 
-                    isAuth.tools.push(newElement)
-                    gamification.computeAchievementForCreate(isAuth)
-                    .then(object=>{
-                        const achievement = object.achievement
-                        isAuth.exp = object.user.exp
-                        isAuth.achievements = object.user.achievements
-                       return achievement
-                    })
-                    .then((achievement)=>{
-                        console.log("OBJ;", achievement)
+                   // isAuth.tools.push(tool)
 
+                    isAuth.exp = isAuth.exp + 10
+                    isAuth.game_counter.create_counter = isAuth.game_counter.create_counter + 1;
+                  
+                    Promise.all([
+                        gamification.computeAchievementForCreate(isAuth),
                         gamification.computeLevelCreate(isAuth)
-                            .then(other=>{
-                                console.log("levelobk", other)
-                                const level = other.level
-                                if(level !== null){
-                                    isAuth.level = other.user.level
-                                }
-                              
-                                process.nextTick(()=>{
-                                    console.log("Programmazione Becera")
-                                    isAuth.save(function(err,user){
-                                        if(err){
-                                            return res.status(400).send(err)
-                                        }
-                                        else{
-                                            if(level && achievement){
-                                                return res.status(200).send({"data":newElement, "achievement":achievement,"level":level})
-                                            }
-                                            else if (level){
-                                                return res.status(200).send({"data":newElement,"level":level})
-            
-                                            }
-                                            else if (achievement){
-                                                return res.status(200).send({"data":newElement, "achievement":achievement})
-            
-                                            }
-                                            else{
-                                                return res.status(200).send({"data":newElement})
-                                            
-                                            }
-                                        }
-                                    })
-                                })
-                            })
-                    })
-                    .catch(err=>{
-                        return res.status(400).send(err)
+                    ]).then(values =>{
+                        console.log(values)
+                        let achievement = values[0]
+                        let level = values[1]
+
+                        if(achievement !== null){
+                            const obj = {
+                                "unlocked_time":Date.now(),
+                                "unlocked":true,
+                                "achievement":achievement
+                            }
+                            isAuth.achievements.push(obj)
+                            isAuth.exp = isAuth.exp + achievement.points
+                        }
+                        if(level !== null){
+                            isAuth.level.level = level
+                            isAuth.level.unlocked_time = Date.now()
+                        }
+                  
+                        isAuth.save(function(err,elem){
+                            console.log("entri=??")
+
+                            if(err){
+                                res.status(400).send(err)
+                            }
+                            if(level && achievement){
+                                return res.status(200).send({"data":tool, "achievement":achievement,"level":level})
+                                
+                            }
+                            else if (level){
+                                return res.status(200).send({"data":tool,"level":level})
+                                 
+    
+                            }
+                            else if (achievement){
+                                return res.status(200).send({"data":tool, "achievement":achievement})
+                                 
+    
+                            }
+                            else{
+                                return res.status(200).send({"data":activity})
+                                
+                            
+                            }
+                        }) 
                     })
 
+                    .catch(err =>{
+                            console.log(err)
+                           return res.send(err)
+                        })
 
 
 

@@ -45,16 +45,11 @@ exports.getQuestionById = function (req, res, next) {
 
 
 exports.createQuiz = function (req, res, next) {
-    const action = "Create"
-    const category = "Question"
+   // const action = "Create"
+    //const category = "Question"
 
-    const { question, imgUrl, environment, shared, created_by } = req.body;
-    //console.log(req.file);
-
+    const { question, imgUrl, environment, shared } = req.body;
     console.log(req.body);
-
-
-
     headers = req.headers
     checkIsAuthenticated(headers)
         .then((isAuth) => {
@@ -62,70 +57,77 @@ exports.createQuiz = function (req, res, next) {
                 return res.status(403).send("You are not authorized")
             }
             else {
-                const data = new Question({
+                const question_data = new Question({
                     'question': question,
                     'imgUrl': imgUrl,
                     'environment': environment,
                     'shared': shared,
                     'created_by': isAuth
                 });
-                Question.create(data, function (err, newQuestion) {
+                Question.create(data, function (err, question) {
                     if (err) {
                         return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
                     }
-                    isAuth.questions.push(newQuestion)
 
-                    //message = "New Question created with ID " + newQuestion._id
-                    //logs.createLog(action, category, isAuth, message)
-                    gamification.computeAchievementForCreate(isAuth)
-                        .then(object=>{
-                            const achievement = object.achievement
-                            isAuth.exp = object.user.exp
-                            isAuth.achievements = object.user.achievements
-                           return achievement
-                        })
-                        .then((achievement)=>{
-                            console.log("OBJ;", achievement)
+                    //isAuth.questions.push(question)
+                    isAuth.exp = isAuth.exp + 10
+                    isAuth.game_counter.create_counter = isAuth.game_counter.create_counter + 1;
+                    Promise.all([
+                        gamification.computeAchievementForCreate(isAuth),
+                        gamification.computeLevelCreate(isAuth)
+                    ]).then(values =>{
+                        console.log(values)
+                        let achievement = values[0]
+                        let level = values[1]
 
-                            gamification.computeLevelCreate(isAuth)
-                                .then(other=>{
-                                    console.log("levelobk", other)
-                                    const level = other.level
-                                    if(level !== null){
-                                        isAuth.level = other.user.level
-                                    }
-                                  
-                                    process.nextTick(()=>{
-                                        console.log("Programmazione Becera")
-                                        isAuth.save(function(err,user){
-                                            if(err){
-                                                 res.status(400).send(err)
-                                            }
-                                            else{
-                                                if(level && achievement){
-                                                     res.status(200).send({"data":newQuestion, "achievement":achievement,"level":level})
-                                                }
-                                                else if (level){
-                                                     res.status(200).send({"data":newQuestion,"level":level})
-                
-                                                }
-                                                else if (achievement){
-                                                     res.status(200).send({"data":newQuestion, "achievement":achievement})
-                
-                                                }
-                                                else{
-                                                     res.status(200).send({"data":newQuestion})
-                                                
-                                                }
-                                            }
-                                        })
-                                    })
-                                })
-                        })
-                        .catch(err=>{
-                            return res.status(400).send(err)
-                        })
+                        if(achievement !== null){
+                            const obj = {
+                                "unlocked_time":Date.now(),
+                                "unlocked":true,
+                                "achievement":achievement
+                            }
+                            isAuth.achievements.push(obj)
+                            isAuth.exp = isAuth.exp + achievement.points
+                        }
+                        if(level !== null){
+                            isAuth.level.level = level
+                            isAuth.level.unlocked_time = Date.now()
+                        }
+                  
+                        isAuth.save(function(err,elem){
+                            console.log("entri=??")
 
+                            if(err){
+                                res.status(400).send(err)
+                            }
+                            if(level && achievement){
+                                return res.status(200).send({"data":question, "achievement":achievement,"level":level})
+                                
+                            }
+                            else if (level){
+                                return res.status(200).send({"data":question,"level":level})
+                                 
+    
+                            }
+                            else if (achievement){
+                                return res.status(200).send({"data":question, "achievement":achievement})
+                                 
+    
+                            }
+                            else{
+                                return res.status(200).send({"data":question})
+                                
+                            
+                            }
+                        }) 
+                    })
+
+                    .catch(err =>{
+                            console.log(err)
+                           return res.send(err)
+                        })
+                       
+                       
                 })
 
             }

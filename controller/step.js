@@ -63,7 +63,8 @@ exports.createStep = function (req, res, next) {
                 return res.status(403).send("You are not authorized")
             }
             else {
-                const step = new Step({
+
+                const step_data = new Step({
                     'name': name,
                     'description': description,
                     'imgUrl': imgUrl,
@@ -73,62 +74,69 @@ exports.createStep = function (req, res, next) {
                     'activities': activities,
                     'created_by': isAuth
                 });
-                Step.create(step, function (err, newElement) {
+                
+              
+                Step.create(step_data, function (err, step) {
                     if (err) {
-                        console(err)
                         return res.status(400).send(err)
                     }
-                    isAuth.steps.push(newElement);
-
-                    gamification.computeAchievementForCreate(isAuth)
-                    .then(object=>{
-                        const achievement = object.achievement
-                        isAuth.exp = object.user.exp
-                        isAuth.achievements = object.user.achievements
-                       return achievement
-                    })
-                    .then((achievement)=>{
-                        console.log("OBJ;", achievement)
-
+                   // isAuth.steps.push(step);
+                    isAuth.exp = isAuth.exp + 10
+                    isAuth.game_counter.create_counter = isAuth.game_counter.create_counter + 1;
+                   
+                    Promise.all([
+                        gamification.computeAchievementForCreate(isAuth),
                         gamification.computeLevelCreate(isAuth)
-                            .then(other=>{
-                                console.log("levelobk", other)
-                                const level = other.level
-                                if(level !== null){
-                                    isAuth.level = other.user.level
-                                }
-                              
-                                process.nextTick(()=>{
-                                    console.log("Programmazione Becera")
-                                    isAuth.save(function(err,user){
-                                        if(err){
-                                            return res.status(400).send(err)
-                                        }
-                                        else{
-                                            if(level && achievement){
-                                                return res.status(200).send({"data":newElement, "achievement":achievement,"level":level})
-                                            }
-                                            else if (level){
-                                                return res.status(200).send({"data":newElement,"level":level})
-            
-                                            }
-                                            else if (achievement){
-                                                return res.status(200).send({"data":newElement, "achievement":achievement})
-            
-                                            }
-                                            else{
-                                                return res.status(200).send({"data":newElement})
-            
-                                            
-                                            }
-                                        }
-                                    })
-                                })
-                            })
+                    ]).then(values =>{
+                        console.log(values)
+                        let achievement = values[0]
+                        let level = values[1]
+
+                        if(achievement !== null){
+                            const obj = {
+                                "unlocked_time":Date.now(),
+                                "unlocked":true,
+                                "achievement":achievement
+                            }
+                            isAuth.achievements.push(obj)
+                            isAuth.exp = isAuth.exp + achievement.points
+                        }
+                        if(level !== null){
+                            isAuth.level.level = level
+                            isAuth.level.unlocked_time = Date.now()
+                        }
+                  
+                        isAuth.save(function(err,elem){
+                            console.log("entri=??")
+
+                            if(err){
+                                res.status(400).send(err)
+                            }
+                            if(level && achievement){
+                                return res.status(200).send({"data":step, "achievement":achievement,"level":level})
+                                
+                            }
+                            else if (level){
+                                return res.status(200).send({"data":step,"level":level})
+                                 
+    
+                            }
+                            else if (achievement){
+                                return res.status(200).send({"data":step, "achievement":achievement})
+                                 
+    
+                            }
+                            else{
+                                return res.status(200).send({"data":step})
+                                
+                            
+                            }
+                        }) 
+                    }).catch(err =>{
+                        console.log(err)
+                       return res.send(err)
                     })
-                    .catch(err=>{
-                        return res.status(400).send(err)
-                    })
+
 
                 })
             }
