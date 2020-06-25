@@ -34,7 +34,18 @@ exports.createUser = function (req, res, next) {
                 })
         }
 
-        Achievement.find().exec()
+        Level.findOne({'position':0}).exec()
+            .then(level =>{
+                    const data = {
+                        "level": level,
+                        "unlocked_time":Date.now()
+                    }
+                    newProfile.level = data
+                    newProfile.save()
+                    return res.status(200).send(newProfile)
+                })       
+
+     /*   Achievement.find().exec()
                     .then(foundAchievements =>{
                         foundAchievements.forEach(achievement =>{
                             const data = {
@@ -43,21 +54,11 @@ exports.createUser = function (req, res, next) {
                             }
                             newProfile.achievements.push(data)
                         })
-                        Level.findOne({'position':0}).exec()
-                        .then(level =>{
-                                const data = {
-                                    "unlocked":true,
-                                    "level": level,
-                                    "unlocked_time":Date.now()
-                                }
-                                newProfile.level = data
-                                newProfile.save()
-                                return res.status(200).send(newProfile)
-                            })               
+                    
                     })
                     .catch(err =>{
                         return res.status(400).send(err)
-                    })
+                    })*/
     });
 }
 

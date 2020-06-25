@@ -8,6 +8,9 @@ const logs = require('../controller/log');
 const gamification = require('../controller/gamification');
 const process = require('process');
 const { send } = require('process');
+const { Achievement } = require('../models/gaming/achievement');
+const { Level } = require('../models/gaming/level');
+const { isatty } = require('tty');
 
 const CREATE_VALUE = 10
 const UPDATE_VALUE = 10
@@ -99,16 +102,69 @@ exports.createActivity =   function (req, res, next) {
                     isAuth.activities.push(isAuth)
                     isAuth.exp = isAuth.exp + 10
                     isAuth.game_counter.create_counter = isAuth.game_counter.create_counter + 1;
-                    isAuth.save(function(err,isauth){
-                        if(err){
-                            res.status(400).send(err)
-                            return
+                    
+                    Promise.all([
+                        gamification.computeAchievementForCreate(isAuth),
+                        gamification.computeLevelCreate(isAuth)
+                    ]).then(values =>{
+                        console.log(values)
+                        let achievement = values[0]
+                        let level = values[1]
+
+                        if(achievement !== null){
+                            const obj = {
+                                "unlocked_time":Date.now(),
+                                "unlocked":true,
+                                "achievement":achievement
+                            }
+                            isAuth.achievements.push(obj)
+                            isAuth.exp = isAuth.exp + achievement.points
                         }
-                        console.log("fdsafad",activity)
-                        res.status(200).send(activity)
-                        return
-                
+                        if(level !== null){
+                            isAuth.level.level = level
+                            isAuth.level.unlocked_time = Date.now()
+                        }
+                  
+                        isAuth.save(function(err,elem){
+                            console.log("entri=??")
+
+                            if(err){
+                                res.status(400).send(err)
+                            }
+                            if(level && achievement){
+                                return res.status(200).send({"data":activity, "achievement":achievement,"level":level})
+                                
+                            }
+                            else if (level){
+                                return res.status(200).send({"data":activity,"level":level})
+                                 
+    
+                            }
+                            else if (achievement){
+                                return res.status(200).send({"data":activity, "achievement":achievement})
+                                 
+    
+                            }
+                            else{
+                                return res.status(200).send({"data":activity})
+                                
+                            
+                            }
+                        }) 
                     })
+
+                    .catch(err =>{
+                            console.log(err)
+                           return res.send(err)
+                        })
+                       
+
+                    })
+                }
+            })
+     
+                    
+                    
            /*         gamification.computeAchievementForCreate(isAuth)
                         .then(object=>{
                             const achievement = object.achievement
@@ -159,12 +215,7 @@ exports.createActivity =   function (req, res, next) {
                             return res.status(400).send(err)
                         })
                    */
-                })
-            }
-        })
-        .catch(err=>{
-            return res.status(400).send(err)
-        })
+      
   
       
           /*  setTimeout(() => {

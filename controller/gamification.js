@@ -58,7 +58,7 @@ module.exports = {
             Level.findById(user.level.level).exec()
                 .then(current_level => {
                     if (current_level.endPoint > user.exp) {
-                        resolve({"level":null, "user":null})
+                        resolve(null)
 
                     }
                     else {
@@ -66,9 +66,9 @@ module.exports = {
                         Level.findOne({ 'position': (current_level.position + 1) }).exec()
                             .then(newLevel => {
                                 console.log("nuovo livello", newLevel)
-                                user.level.level = newLevel;
-                                user.level.unlocked_time = Date.now()
-                                resolve({"level":newLevel, "user":user})
+                               // user.level.level = newLevel;
+                                ///user.level.unlocked_time = Date.now()
+                                resolve(newLevel)
                             })
                             .catch(err => {
                                 console.log(err)
@@ -86,41 +86,16 @@ module.exports = {
     },
     computeAchievementForCreate: function (user) {
         return new Promise((resolve, reject) => {
-
-                user.exp = user.exp + CREATE_VALUE
-                user.game_counter.create_counter =  user.game_counter.create_counter +1;
-        
             Achievement.findOne({ 'action': "Create", 'required_point': user.game_counter.create_counter  })
                 .exec()
                 .then(achievement => {
                     if (!achievement) {
                         console.log("RIGETTA TUTTO")
-                        resolve({"user":user,"achievement":null})
+                        resolve(null)
                     }
                     else {
-
-                        console.log("Entro qua dentro?", achievement)
-                        var unlocked_achievement = user.achievements.filter(x => x.unlocked == false)
-                            .filter(x => { return x.achievement == achievement.id })
-
-                        console.log("unlocked_achievement? ", unlocked_achievement)
-
-
-                        user.achievements.forEach(x => {
-                            if (x.achievement == unlocked_achievement[0].achievement) {
-                                console.log("ci entor qui?")
-                                x.unlocked = true;
-                                x.unlocked_time = Date.now()
-                            }
-                        });
-
-                        user.exp = user.exp + achievement.points
-                        console.log("ecp ", user.exp)
-                        resolve({"user":user,"achievement":achievement})
-                    
+                        resolve(achievement)
                     }
-
-
                 })
                 .catch(err => {
                     console.log("errore", err)
