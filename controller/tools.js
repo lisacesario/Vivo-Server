@@ -66,42 +66,56 @@ exports.createTool = function (req, res, next) {
                         return res.status(422).send({ errors: [{ title: 'Base Activity Error', detail: err.errors }] });
                     }
 
-                    newElement.created_by = isAuth;
                     isAuth.tools.push(newElement)
+                    gamification.computeAchievementForCreate(isAuth)
+                    .then(object=>{
+                        const achievement = object.achievement
+                        isAuth.exp = object.user.exp
+                        isAuth.achievements = object.user.achievements
+                       return achievement
+                    })
+                    .then((achievement)=>{
+                        console.log("OBJ;", achievement)
 
-                            //message = "New Tool created with ID " + newElement._id
-                            //logs.createLog(action, category, isAuth, message)
-                            var counter = isAuth.game_counter.create_counter + 1;
-                            gamification.computeAchievement(isAuth,action,counter)
-                            .then(achievement=>{
-                                console.log("QUI C'è ACHIEVMENT.", achievement)
-                                gamification.computeLevel(isAuth)
-                                            .then(level=>{
-                                                console.log("Level",level)
-                                                if(level){
-                                                    if(achievement){
-                                                        res.status(200).json({ "data": newElement, "achievement": achievement, "level":level })
-                                                    }
-                                                }
-                                                else if(achievement){
-                                                    res.status(200).json({ "data": newElement, "achievement": achievement })
+                        gamification.computeLevelCreate(isAuth)
+                            .then(other=>{
+                                console.log("levelobk", other)
+                                const level = other.level
+                                if(level !== null){
+                                    isAuth.level = other.user.level
+                                }
+                              
+                                process.nextTick(()=>{
+                                    console.log("Programmazione Becera")
+                                    isAuth.save(function(err,user){
+                                        if(err){
+                                            return res.status(400).send(err)
+                                        }
+                                        else{
+                                            if(level && achievement){
+                                                return res.status(200).send({"data":newElement, "achievement":achievement,"level":level})
+                                            }
+                                            else if (level){
+                                                return res.status(200).send({"data":newElement,"level":level})
+            
+                                            }
+                                            else if (achievement){
+                                                return res.status(200).send({"data":newElement, "achievement":achievement})
+            
+                                            }
+                                            else{
+                                                return res.status(200).send({"data":newElement})
+                                            
+                                            }
+                                        }
+                                    })
+                                })
+                            })
+                    })
+                    .catch(err=>{
+                        return res.status(400).send(err)
+                    })
 
-                                                }
-                                                else{
-                                                    res.status(200).json({ "data": newElement})
-                                                }
-                                            })
-                                            .catch(err=>{
-                                                console.log(err)
-                                                return res.status(400).send(err)
-                                            })
-      
-                            })
-                            .catch(err =>{
-                                console.log(err);
-                                return res.status(400).send(err)
-                            })
-                
 
 
 

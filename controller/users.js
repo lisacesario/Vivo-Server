@@ -822,6 +822,113 @@ exports.addEventToAgenda = function (req, res, next) {
 }
 
 
+exports.getCurrentAchivements = function(req,res,next){
+    const requestedUserId = req.params.id;
+    const {action,counter} = req.body
+
+    Promise.all([
+        UserProfile.findOne({ uid: requestedUserId }).exec(),
+        Achievement.findOne({ 'action': action, 'required_point': counter }).exec()
+    ]).then(values=>{
+        var user = values[0]
+        const achievement = values[1]
+        if(!achievement){
+            return res.status(200).send({"achievement":null})
+        }
+        else{
+            console.log("Entro qua dentro?", achievement)
+                        var unlocked_achievement = user.achievements.filter(x => x.unlocked == false)
+                            .filter(x => { return x.achievement == achievement.id })
+
+                        console.log("unlocked_achievement? ", unlocked_achievement)
+
+
+                        user.achievements.forEach(x => {
+                            if (x.achievement == unlocked_achievement[0].achievement) {
+                                console.log("ci entor qui?")
+                                x.unlocked = true;
+                                x.unlocked_time = Date.now()
+                            }
+                        });
+                        user.exp = user.exp + achievement.points
+
+                        user.save(function (err, isAuth) {
+                            if (err) {
+                                console.log("perovlema,", err)
+                                return res.status(400).send(err)
+                            }
+                            console.log("achievement ")
+                            return res.status(200).send({"achievement":achievement})
+                        });
+        }
+    })
+        .catch(err => {
+            return res.status(400).send(
+                {
+                    "action": "Get User Profile",
+                    "success": false,
+                    "status": 400,
+                    "error": {
+                        "code": err,
+                        "message": "Error in retrieving user profile"
+                    },
+                })
+        })
+}
+
+
+exports.getCurrentLevel = function(req,res,next){
+    const requestedUserId = req.params.id;
+    const {level}= req.body
+
+    Promise.all([
+        UserProfile.findOne({ uid: requestedUserId }).exec(),
+        Level.findById(level).exec()
+    ])
+    .then(values =>{
+        var user = values[0]
+        var current_levle = values[1]
+        if(current_levle.endPoint > user.exp){
+            return res.status(200).send({"level":null})
+        }
+        else{
+            Level.findOne({ 'position': (current_level.position + 1) }).exec()
+            .then(newLevel => {
+                console.log("nuovo livello", newLevel)
+                user.level.level = newLevel;
+                user.level.unlocked_time = Date.now()
+                user.save(function (err, user) {
+                    if (err) {
+                        console.log(err)
+                        return res.status(400).send(err)
+                    }
+                    else {
+                        return res.status(200).send({"level":newLevel})
+
+                    }
+                })
+            })
+            .catch(err => {
+                console.log(err)
+                return res.status(400).send(err)
+            })
+        }
+    })
+    .catch(err =>{
+        return res.status(400).send(
+            {
+                "action": "Get User Profile",
+                "success": false,
+                "status": 400,
+                "error": {
+                    "code": err,
+                    "message": "Error in retrieving user profile"
+                },
+            })
+    })
+}
+
+
 /*
 exports.auth = function(req,res, next){
     const {email, password} = req.body;

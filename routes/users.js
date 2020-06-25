@@ -67,8 +67,13 @@ router.patch('/student-of/:id/refuse', UserController.refuseBeMyStudentRequest);
 
 
 // GAMIFICATION STUFF
+
+router.get('/current-achievement/:id', UserController.getCurrentAchivements);
+router.get('/current-level/:id', UserController.getCurrentLevel);
+
 router.get('/achievements/:id', UserController.getAchievementById);
 router.get('/level/:id', UserController.getLevelById);
+
 
 
 

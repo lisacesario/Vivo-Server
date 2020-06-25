@@ -80,41 +80,55 @@ exports.createStep = function (req, res, next) {
                     }
                     isAuth.steps.push(newElement);
 
-                    message = "New Tool created with ID " + newElement._id
-                    logs.createLog(action, category, isAuth, message)
-                    var counter = isAuth.game_counter.create_counter + 1;
-                    console.log("CAlcola Achievement")
-                    gamification.computeAchievement(isAuth, action, counter)
-                        .then(achievement => {
-                            console.log("QUI C'è ACHIEVMENT.", achievement)
-                            console.log("check livello")
-                            gamification.computeLevel(isAuth)
-                                .then(level => {
-                                    console.log("Level", level)
-                                    if (level) {
-                                        if (achievement) {
-                                            return res.status(200).json({ "data": newElement, "achievement": achievement, "level": level })
+                    gamification.computeAchievementForCreate(isAuth)
+                    .then(object=>{
+                        const achievement = object.achievement
+                        isAuth.exp = object.user.exp
+                        isAuth.achievements = object.user.achievements
+                       return achievement
+                    })
+                    .then((achievement)=>{
+                        console.log("OBJ;", achievement)
+
+                        gamification.computeLevelCreate(isAuth)
+                            .then(other=>{
+                                console.log("levelobk", other)
+                                const level = other.level
+                                if(level !== null){
+                                    isAuth.level = other.user.level
+                                }
+                              
+                                process.nextTick(()=>{
+                                    console.log("Programmazione Becera")
+                                    isAuth.save(function(err,user){
+                                        if(err){
+                                            return res.status(400).send(err)
                                         }
-                                    }
-                                    else if (achievement) {
-                                        return res.status(200).json({ "data": newElement, "achievement": achievement })
-
-                                    }
-                                    else {
-                                        return res.status(200).json({ "data": newElement })
-                                    }
+                                        else{
+                                            if(level && achievement){
+                                                return res.status(200).send({"data":newElement, "achievement":achievement,"level":level})
+                                            }
+                                            else if (level){
+                                                return res.status(200).send({"data":newElement,"level":level})
+            
+                                            }
+                                            else if (achievement){
+                                                return res.status(200).send({"data":newElement, "achievement":achievement})
+            
+                                            }
+                                            else{
+                                                return res.status(200).send({"data":newElement})
+            
+                                            
+                                            }
+                                        }
+                                    })
                                 })
-                                .catch(err => {
-                                    console.log(err)
-                                    return res.status(400).send(err)
-                                })
-
-                        })
-                        .catch(err => {
-                            console.log(err);
-                            return res.status(400).send(err)
-                        })
-
+                            })
+                    })
+                    .catch(err=>{
+                        return res.status(400).send(err)
+                    })
 
                 })
             }
