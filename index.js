@@ -4,7 +4,6 @@ const bodyparser = require('body-parser');
 const cors = require('cors')
 const config = require('./config/dev');
 const FakeDB = require('./FakeDB')
-
 //const firebase = require('firebase');
 /*****
  * 
@@ -21,6 +20,7 @@ mongoose.connect(config.DB_URI_ASW,{ useNewUrlParser: true, useUnifiedTopology: 
  }).catch(err => console.log(err));
  mongoose.set('useCreateIndex', true);
  mongoose.set('debug', true);
+
 
  const app = express();
  app.use(bodyparser.json());

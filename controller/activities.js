@@ -199,43 +199,60 @@ exports.updateActivity = function (req, res, next) {
                                 console.log("sono solo  qui ");
                                 return res.status(422).send({ errors: [{ title: 'Error in save  activity', detail: err.errors }] });
                             }
-                            else {
-                                message = "New Step was created with ID " + foundElement._id
-                                logs.createLog(action, category, isAuth, message)
-                                var counter = isAuth.game_counter.update_counter + 1
-                                gamification.computeAchievement(isAuth, action, counter)
-                                    .then(achievement => {
-                                        console.log("QUI C'è ACHIEVMENT.", achievement)
-                                        gamification.computeLevel(isAuth)
-                                            .then(level => {
-                                                console.log("Level", level)
-                                                if (level) {
-                                                    if (achievement) {
-                                                        return res.status(200).json({ "data": foundElement, "achievement": achievement, "level": level })
-                                                    }
-                                                }
-                                                else if (achievement) {
-                                                    return res.status(200).json({ "data": foundElement, "achievement": achievement })
+                            isAuth.game_counter.update_counter = isAuth.game_counter.update_counter + 1
 
-                                                }
-                                                else {
-                                                    return res.status(200).json({ "data": foundElement })
-                                                }
-                                            })
-                                            .catch(err => {
-                                                console.log(err)
-                                                return res.status(400).send(err)
-                                            })
+                            Promise.all([
+                                gamification.computeAchievement(isAuth, isAuth.game_counter.update_counter, "Update"),
+                                gamification.computeLevelCreate(isAuth)
+                            ]).then(values => {
+                                console.log(values)
+                                let achievement = values[0]
+                                let level = values[1]
 
-                                    })
-                                    .catch(err => {
-                                        console.log(err);
-                                        return res.status(400).send(err)
-                                    })
+                                if (achievement !== null) {
+                                    const obj = {
+                                        "unlocked_time": Date.now(),
+                                        "unlocked": true,
+                                        "achievement": achievement
+                                    }
+                                    isAuth.achievements.push(obj)
+                                    isAuth.exp = isAuth.exp + achievement.points
+                                }
+                                if (level !== null) {
+                                    isAuth.level.level = level
+                                    isAuth.level.unlocked_time = Date.now()
+                                }
+
+                                isAuth.save(function (err, elem) {
+                                    console.log("entri=??")
+
+                                    if (err) {
+                                        res.status(400).send(err)
+                                    }
+                                    if (level && achievement) {
+                                        return res.status(200).send({ "data": foundElement, "achievement": achievement, "level": level })
+
+                                    }
+                                    else if (level) {
+                                        return res.status(200).send({ "data": foundElement, "level": level })
 
 
-                            }
+                                    }
+                                    else if (achievement) {
+                                        return res.status(200).send({ "data": foundElement, "achievement": achievement })
 
+
+                                    }
+                                    else {
+                                        return res.status(200).send({ "data": foundElement })
+
+
+                                    }
+                                })
+                            }).catch(err => {
+                                console.log(err)
+                                return res.send(err)
+                            })
                         });
                     }
 
@@ -288,38 +305,60 @@ exports.deleteActivity = function (req, res, next) {
                             }
                             isAuth.activities.pull(foundActivity)
 
-                            message = foundActivity._id + " Was Deleted successfully"
-                            logs.createLog(action, category, isAuth, message)
-                            var counter = isAuth.game_counter.delete_counter + 1
-                            gamification.computeAchievement(isAuth, action, counter)
-                                .then(achievement => {
-                                    console.log("QUI C'è ACHIEVMENT.", achievement)
-                                    gamification.computeLevel(isAuth)
-                                        .then(level => {
-                                            console.log("Level", level)
-                                            if (level) {
-                                                if (achievement) {
-                                                    return res.status(200).json({ "data": "", "achievement": achievement, "level": level })
-                                                }
-                                            }
-                                            else if (achievement) {
-                                                return res.status(200).json({ "data": "", "achievement": achievement })
+                            isAuth.game_counter.delete_counter = isAuth.game_counter.delete_counter + 1
 
-                                            }
-                                            else {
-                                                return res.status(200).json({ "data": "" })
-                                            }
-                                        })
-                                        .catch(err => {
-                                            console.log(err)
-                                            return res.status(400).send(err)
-                                        })
+                            Promise.all([
+                                gamification.computeAchievement(isAuth, isAuth.game_counter.delete_counter, "Delete"),
+                                gamification.computeLevelCreate(isAuth)
+                            ]).then(values => {
+                                console.log(values)
+                                let achievement = values[0]
+                                let level = values[1]
 
+                                if (achievement !== null) {
+                                    const obj = {
+                                        "unlocked_time": Date.now(),
+                                        "unlocked": true,
+                                        "achievement": achievement
+                                    }
+                                    isAuth.achievements.push(obj)
+                                    isAuth.exp = isAuth.exp + achievement.points
+                                }
+                                if (level !== null) {
+                                    isAuth.level.level = level
+                                    isAuth.level.unlocked_time = Date.now()
+                                }
+
+                                isAuth.save(function (err, elem) {
+                                    console.log("entri=??")
+
+                                    if (err) {
+                                        res.status(400).send(err)
+                                    }
+                                    if (level && achievement) {
+                                        return res.status(200).send({ "data": "", "achievement": achievement, "level": level })
+
+                                    }
+                                    else if (level) {
+                                        return res.status(200).send({ "data": "", "level": level })
+
+
+                                    }
+                                    else if (achievement) {
+                                        return res.status(200).send({ "data": "", "achievement": achievement })
+
+
+                                    }
+                                    else {
+                                        return res.status(200).send({ "data": "" })
+
+
+                                    }
                                 })
-                                .catch(err => {
-                                    console.log(err);
-                                    return res.status(400).send(err)
-                                })
+                            }).catch(err => {
+                                console.log(err)
+                                return res.send(err)
+                            })
 
                         });
                     })

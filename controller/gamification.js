@@ -57,6 +57,7 @@ module.exports = {
             console.log("CALCOLO LIVELLO")
             Level.findById(user.level.level).exec()
                 .then(current_level => {
+                    console.log(current_level)
                     if (current_level.endPoint > user.exp) {
                         resolve(null)
 
@@ -103,81 +104,18 @@ module.exports = {
                 })
         })
     },
-    computeAchievement: function (user, action, counter) {
+    computeAchievement: function (user,counter,action) {
         return new Promise((resolve, reject) => {
-            console.log("calcola achievement")
             Achievement.findOne({ 'action': action, 'required_point': counter })
                 .exec()
                 .then(achievement => {
-                    console.log("A caso", achievement)
-                    switch (action) {
-                        case "Create":
-                            user.exp = user.exp + CREATE_VALUE
-                            user.game_counter.create_counter = counter;
-                            break;
-                        case "Update":
-                            user.exp = user.exp + UPDATE_VALUE
-                            user.game_counter.update_counter = counter
-                            break;
-                        case "Delete":
-                            user.exp = user.exp + DELETE_VALUE
-                            user.game_counter.delete_counter = counter
-                            break;
-                    }
-
                     if (!achievement) {
                         console.log("RIGETTA TUTTO")
-                        console.log("check Livello")
-
-                        user.save(function (err, isAuth) {
-                            if (err) {
-                                console.log(err)
-                                return reject()
-                            }
-                            resolve(null)
-                        });
+                        resolve(null)
                     }
                     else {
-
-                        console.log("Entro qua dentro?", achievement)
-                        var unlocked_achievement = user.achievements.filter(x => x.unlocked == false)
-                            .filter(x => { return x.achievement == achievement.id })
-
-                        console.log("unlocked_achievement? ", unlocked_achievement)
-
-
-                        user.achievements.forEach(x => {
-                            if (x.achievement == unlocked_achievement[0].achievement) {
-                                console.log("ci entor qui?")
-                                x.unlocked = true;
-                                x.unlocked_time = Date.now()
-                            }
-                        });
-                        /* user.achievements.filter(x => {
-                             console.log("partenza:", unlocked_achievement[0].achievement)
-                             console.log("destinazione:", x.achievement)
-                             if (x.achievement == unlocked_achievement[0].achievement) {
-                                 console.log("ci entor qui?")
-                                 x.unlocked = true;
-                                 x.unlocked_time = Date.now()
-                             }
-                         })*/
-
-                        user.exp = user.exp + achievement.points
-                        console.log("ecp ", user.exp)
-
-                        user.save(function (err, isAuth) {
-                            if (err) {
-                                console.log("perovlema,", err)
-                                reject(err)
-                            }
-                            console.log("achievement ")
-                            resolve(achievement)
-                        });
-
+                        resolve(achievement)
                     }
-
-
                 })
                 .catch(err => {
                     console.log("errore", err)
@@ -185,124 +123,5 @@ module.exports = {
                 })
         })
     },
-
-
-    calcAchiAndLevel: function (user) {
-
-        return new Promise((resolve, reject) => {
-            console.log("calcola achievement")
-            user.exp = user.exp + CREATE_VALUE
-            user.game_counter.create_counter = user.game_counter.create_counter + 1;
-            Achievement.findOne({ 'action': "Create", 'required_point': user.game_counter.create_counter  })
-                .exec()
-                .then(achievement => {
-                    console.log("A caso", achievement)
-                
-                    if (!achievement) {
-                        console.log("RIGETTA TUTTO")
-                        console.log("check Livello")
-
-                        Level.findById(user.level.level).exec()
-                        .then(async(current_level) => {
-                            if (current_level.endPoint > user.exp) {
-                            
-                                resolve([null,null,user ])
-                          
-                                
-                            }
-                            else {
-                                console.log("Nuovo livello")
-        
-                                Level.findOne({ 'position': (current_level.position + 1) }).exec()
-                                    .then(async(newLevel) => {
-                                        console.log("nuovo livello", newLevel)
-                                        user.level.level = newLevel;
-                                        user.level.unlocked_time = Date.now()
-                                 
-                                            resolve([null, newLevel, user])
-                                    })
-                                    .catch(err => {
-                                        console.log(err)
-                                        reject(err)
-                                    })
-                            }
-                        })
-                        .catch(err => {
-                            console.log(err);
-                            reject(err)
-                        })
-                    }
-                    else {
-
-                        console.log("Entro qua dentro?", achievement)
-                        var unlocked_achievement = user.achievements.filter(x => x.unlocked == false)
-                            .filter(x => { return x.achievement == achievement.id })
-
-                        console.log("unlocked_achievement? ", unlocked_achievement)
-
-
-                        user.achievements.forEach(x => {
-                            if (x.achievement == unlocked_achievement[0].achievement) {
-                                console.log("ci entor qui?")
-                                x.unlocked = true;
-                                x.unlocked_time = Date.now()
-                            }
-                        });
-                        /* user.achievements.filter(x => {
-                             console.log("partenza:", unlocked_achievement[0].achievement)
-                             console.log("destinazione:", x.achievement)
-                             if (x.achievement == unlocked_achievement[0].achievement) {
-                                 console.log("ci entor qui?")
-                                 x.unlocked = true;
-                                 x.unlocked_time = Date.now()
-                             }
-                         })*/
-
-                        user.exp = user.exp + achievement.points
-                        console.log("ecp ", user.exp)
-                        Level.findById(user.level.level).exec()
-                        .then(async(current_level) => {
-                            
-                            if (current_level.endPoint > user.exp) {
-                                
-                                        resolve([achievement,null,user])
-                              
-                              
-                               
-                            }
-                            else {
-                                console.log("Nuovo livello")
-        
-                                Level.findOne({ 'position': (current_level.position + 1) }).exec()
-                                    .then(async(newLevel) => {
-                                        console.log("nuovo livello", newLevel)
-                                        user.level.level = newLevel;
-                                        user.level.unlocked_time = Date.now()
-                                        resolve([achievement, newLevel,user])
-
-                                    .catch(err => {
-                                        console.log(err)
-                                        reject(err)
-                                    })
-                                })
-                            }
-                            
-                        })
-                        .catch(err => {
-                            console.log(err);
-                            reject(err)
-                        })
-                
-
-                    }
-
-
-                })
-                .catch(err => {
-                    console.log("errore", err)
-                    reject(err)
-                })
-        })
-    }
 
 }
