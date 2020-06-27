@@ -2,155 +2,187 @@
 
     "achievements":[
       {
-        "name":"Create.first.object",
+        "name":"Primo elemento creato",
         "action":"Create",
         "required_point":1,
         "message":"Congratulazioni, hai creato il tuo primo elemento! Continua così!",
-        "imgUrl":"/img.png",
+        "imgUrl":"/achievements/create_achievement.svg",
         "points": 20
       },
       {
-        "name":"Create.five.object",
+        "name":"Cinque elementi creati",
         "action":"Create",
         "required_point":5,
         "message":"Congratulazioni, hai creato cinque elementi!",
-        "imgUrl":"/img.png",
+        "imgUrl":"/achievements/create_achievement.svg",
         "points": 20
       },
       {
-        "name":"Create.ten.object",
+        "name":"Dieci elementi creati",
         "action":"Create",
         "required_point":10,
         "message":"Congratulazioni, hai creato dieci elementi!",
-        "imgUrl":"/img.png",
+        "imgUrl":"/achievements/create_achievement.svg",
         "points": 20
       },
       {
-        "name":"Create.fifty.object",
+        "name":"Venti elementi creati",
+        "action":"Create",
+        "required_point":20,
+        "message":"Congratulazioni, hai creato venti elementi!",
+        "imgUrl":"/achievements/create_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Cinquanta elementi creati",
         "action":"Create",
         "required_point":50,
-        "message":"Congratulazioni, hai creato dieci elementi!",
-        "imgUrl":"/img.png",
+        "message":"Congratulazioni, hai creato cinquanta elementi!",
+        "imgUrl":"/achievements/create_achievement.svg",
         "points": 50
       },
       {
-        "name":"Create.hundred.object",
+        "name":"Cento elementi creati",
         "action":"Create",
         "required_point":100,
-        "message":"Congratulazioni, hai creato dieci elementi!",
-        "imgUrl":"/img.png",
+        "message":"Congratulazioni, hai creato cento elementi!!!",
+        "imgUrl":"/achievements/create_achievement.svg",
         "points": 100
       },
       {
-        "name":"Update.first.object",
+        "name":"Primo aggiornamento",
         "action":"Update",
         "required_point":1,
         "message":"Congratulazioni, hai aggiornato per la prima volta un elemento! Continua così!",
-        "imgUrl":"/img.png",
+        "imgUrl":"/achievements/update_achievement.svg",
         "points": 20
       },
       {
-        "name":"Update.five.object",
+        "name":"Cinque aggiornamenti",
         "action":"Update",
         "required_point":5,
-        "message":"Congratulazioni, hai creato il cinque elementi! Continua così!",
-        "imgUrl":"/img.png",
+        "message":"Congratulazioni, hai aggiornato cinque elementi!",
+        "imgUrl":"/achievements/update_achievement.svg",
         "points": 20
       },
       {
-        "name":"Update.ten.object",
+        "name":"Dieci aggiornamenti",
         "action":"Update",
         "required_point":10,
-        "message":"Congratulazioni, hai creato il tuo primo elemento! Continua così!",
-        "imgUrl":"/img.png",
+        "message":"Congratulazioni, hai aggiornato dieci elementi!",
+        "imgUrl":"/achievements/update_achievement.svg",
         "points": 20
       },
       {
-        "name":"Update.fifty.object",
+        "name":"Cinquanta aggiornamenti",
         "action":"Update",
         "required_point":50,
-        "message":"Congratulazioni, hai creato il tuo primo elemento! Continua così!",
-        "imgUrl":"/img.png",
+        "message":"Congratulazioni, hai aggiornato cinquanta elementi!",
+        "imgUrl":"/achievements/update_achievement.svg",
         "points": 50
       },
       {
-        "name":"Update.hundred.object",
+        "name":"Cento! aggiornamenti",
         "action":"Update",
         "required_point":100,
-        "message":"Congratulazioni, hai creato il tuo primo elemento! Continua così!",
-        "imgUrl":"/img.png",
+        "message":"Congratulazioni, hai aggiornato cento elementi!",
+        "imgUrl":"/achievements/update_achievement.svg",
         "points": 100
       },
       {
-        "name":"Delete.first.object",
+        "name":"Primo eliminato",
         "action":"Delete",
         "required_point":1,
-        "message":"Congratulazioni, hai aggiornato per la prima volta un elemento! Continua così!",
-        "imgUrl":"/img.png",
+        "message":"Congratulazioni, hai eliminato per la prima volta un elemento!",
+        "imgUrl":"/achievements/delete_achievement.svg",
         "points": 20
       },
       {
-        "name":"Delete.five.object",
+        "name":"Cinque eliminati",
         "action":"Delete",
         "required_point":5,
-        "message":"Congratulazioni, hai creato il cinque elementi! Continua così!",
-        "imgUrl":"/img.png",
+        "message":"Congratulazioni, hai eliminato ben cinque elementi!",
+        "imgUrl":"/achievements/delete_achievement.svg",
         "points": 20
       },
       {
-        "name":"Delete.ten.object",
+        "name":"Dieci eliminati",
         "action":"Delete",
         "required_point":10,
-        "message":"Congratulazioni, hai creato il tuo primo elemento! Continua così!",
-        "imgUrl":"/img.png",
+        "message":"Congratulazioni, hai eliminato ben dieci elementi!",
+        "imgUrl":"/achievements/delete_achievement.svg",
         "points": 20
       },
       {
-        "name":"Add.first.person",
-        "action":"Add",
-        "required_point":1,
-        "message":"Congratulazioni, hai creato il tuo primo elemento! Continua così!",
-        "imgUrl":"/img.png",
+        "name":"Venti eliminati",
+        "action":"Delete",
+        "required_point":20,
+        "message":"Congratulazioni, hai eliminato ben venti elementi!",
+        "imgUrl":"/achievements/delete_achievement.svg",
         "points": 20
       },
       {
-        "name":"Add.five.person",
-        "action":"Add",
+        "name":"Cinquanta eliminati",
+        "action":"Delete",
+        "required_point":50,
+        "message":"Congratulazioni, hai eliminato ben cinquanta elementi!",
+        "imgUrl":"/achievements/delete_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Cento eliminati",
+        "action":"Delete",
         "required_point":5,
-        "message":"Congratulazioni, hai creato il tuo primo elemento! Continua così!",
-        "imgUrl":"/img.png",
+        "message":"Congratulazioni, hai eliminato ben cento elementi!",
+        "imgUrl":"/achievements/delete_achievement.svg",
         "points": 20
       },
       {
-        "name":"Add.ten.person",
-        "action":"Add",
-        "required_point":10,
-        "message":"Congratulazioni, hai creato il tuo primo elemento! Continua così!",
-        "imgUrl":"/img.png",
-        "points": 20
-      },
-      {
-        "name":"Social.first.message",
+        "name":"Primo rinforzo",
         "action":"Social",
         "required_point":1,
-        "message":"Congratulazioni, hai creato il tuo primo elemento! Continua così!",
-        "imgUrl":"/img.png",
+        "message":"Congratulazioni, hai inviato il tuo primo rinforzo!",
+        "imgUrl":"/achievements/social_reward_achievement.svg",
         "points": 20
       },
       {
-        "name":"Social.five.message",
+        "name":"Cinque rinforzi",
         "action":"Social",
         "required_point":5,
-        "message":"Congratulazioni, hai creato il tuo primo elemento! Continua così!",
-        "imgUrl":"/img.png",
+        "message":"Congratulazioni, hai inviato cinque rinforzi!",
+        "imgUrl":"/achievements/social_reward_achievement.svg",
         "points": 20
       },
       {
-        "name":"Social.ten.message",
+        "name":"Dieci rinforzi",
         "action":"Social",
         "required_point":10,
-        "message":"Congratulazioni, hai creato il tuo primo elemento! Continua così!",
-        "imgUrl":"/img.png",
+        "message":"Congratulazioni, hai inviato dieci rinforzi!",
+        "imgUrl":"/achievements/social_reward_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Venti rinforzi",
+        "action":"Social",
+        "required_point":20,
+        "message":"Congratulazioni, hai inviato venti rinforzi!",
+        "imgUrl":"/achievements/social_reward_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Cinquanta rinforzi",
+        "action":"Social",
+        "required_point":50,
+        "message":"Congratulazioni, hai inviato cinquanta rinforzi!",
+        "imgUrl":"/achievements/social_reward_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Cento rinforzi",
+        "action":"Social",
+        "required_point":100,
+        "message":"Congratulazioni, hai inviato cento rinforzi!",
+        "imgUrl":"/achievements/social_reward_achievement.svg",
         "points": 20
       }
     ],
@@ -158,7 +190,7 @@
       {
         "name":"Bianco",
         "position":0,
-        "imgUrl":"/img.png",
+        "imgUrl":"/levels/white.svg",
         "description":"Ti sei appena interfacciato al mondo vivo. ",
         "startingPoint":0,
         "endPoint": 100,
@@ -167,7 +199,7 @@
       {
         "name":"Giallo",
         "position":1,
-        "imgUrl":"/img.png",
+        "imgUrl":"/levels/yellow.svg",
         "description":"Hai preso un po' di confidenza con la piattaforma Vivo, continua a creare nuove attività!",
         "startingPoint":101,
         "endPoint": 300,
@@ -176,7 +208,7 @@
       {
         "name":"Arancione",
         "position":2,
-        "imgUrl":"/img.png",
+        "imgUrl":"/levels/orange.svg",
         "description":"Ti destreggi agevolmente nella piattaforma Vivo",
         "startingPoint":301,
         "endPoint": 500,
@@ -185,7 +217,7 @@
       {
         "name":"Verde",
         "position":3,
-        "imgUrl":"/img.png",
+        "imgUrl":"/levels/green.svg",
         "description":"Ti destreggi agevolmente nella piattaforma Vivo",
         "startingPoint":501,
         "endPoint": 800,
@@ -194,7 +226,7 @@
       {
         "name":"Blu",
         "position":4,
-        "imgUrl":"/img.png",
+        "imgUrl":"/levels/blu.svg",
         "description":"Ti destreggi agevolmente nella piattaforma Vivo",
         "startingPoint":801,
         "endPoint": 1200,
@@ -203,7 +235,7 @@
       {
         "name":"Marrone",
         "position":5,
-        "imgUrl":"/img.png",
+        "imgUrl":"/levels/brown.svg",
         "description":"Ti destreggi agevolmente nella piattaforma Vivo",
         "startingPoint":1201,
         "endPoint": 1500,
@@ -212,7 +244,7 @@
       {
         "name":"Nero",
         "position":6,
-        "imgUrl":"/img.png",
+        "imgUrl":"/levels/black.svg",
         "description":"Il mondo VIVO non ha più segreti per te, padroneggi la piattaforma.",
         "startingPoint":1501,
         "endPoint": 2000,

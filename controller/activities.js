@@ -303,8 +303,6 @@ exports.deleteActivity = function (req, res, next) {
                                 return res.status(422).send({ errors: [{ title: 'Error Remove', detail: 'there was an error removing' }] });
 
                             }
-                            isAuth.activities.pull(foundActivity)
-
                             isAuth.game_counter.delete_counter = isAuth.game_counter.delete_counter + 1
 
                             Promise.all([

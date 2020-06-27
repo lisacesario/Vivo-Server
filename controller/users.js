@@ -45,20 +45,6 @@ exports.createUser = function (req, res, next) {
                     return res.status(200).send(newProfile)
                 })       
 
-     /*   Achievement.find().exec()
-                    .then(foundAchievements =>{
-                        foundAchievements.forEach(achievement =>{
-                            const data = {
-                                "unlocked": false,
-                                "achievement":achievement
-                            }
-                            newProfile.achievements.push(data)
-                        })
-                    
-                    })
-                    .catch(err =>{
-                        return res.status(400).send(err)
-                    })*/
     });
 }
 
@@ -166,12 +152,7 @@ exports.patchUser = function (req, res, next) {
     console.log("PATCH")
     const user = res.locals.user;
     const data = req.body;
-    //const search_id = req.params.id
-    //console.log('id :' + search_id);
     console.log("valure", req.body)
-    //Object.keys(data).forEach(e => console.log(` Activity DATA key=${e}  value=${data[e]}`));
-    //Object.keys(req.params).forEach(e => console.log(` req.params DATA key=${e}  value=${req.params[e]}`));
-    //Object.keys(req.body).forEach(e => console.log(` req.body DATA key=${e}  value=${req.body[e]}`));
 
     headers =  req.headers
     checkIsAuthenticated(headers)
@@ -221,6 +202,117 @@ exports.patchUser = function (req, res, next) {
 }
 
 
+exports.completeActivity = function(req,res,next){
+
+    const{activity, score} = req.body;
+    headers = req.headers
+
+    checkIsAuthenticated(headers)
+        .then(isAuth =>{
+            if(isAuth === null){
+                return res.status(403).send("NOT-AUTHORIZED")
+            }
+            if(isAuth === "Teacher"){
+                return res.status(403).send("WRONG-ROLE")
+            }
+            else{
+
+               isAuth.activities_completed.push({
+                   "activity":activity,
+                   "score" : score
+               })
+
+               isAuth.exp = isAuth.exp + score
+
+                  
+               Promise.all([
+                gamification.computeAchievementForCreate(isAuth),
+                gamification.computeLevelCreate(isAuth)
+            ]).then(values =>{
+                console.log(values)
+                let achievement = values[0]
+                let level = values[1]
+
+                if(achievement !== null){
+                    const obj = {
+                        "unlocked_time":Date.now(),
+                        "unlocked":true,
+                        "achievement":achievement
+                    }
+                    isAuth.achievements.push(obj)
+                    isAuth.exp = isAuth.exp + achievement.points
+                }
+                if(level !== null){
+                    isAuth.level.level = level
+                    isAuth.level.unlocked_time = Date.now()
+                }
+          
+                isAuth.save(function(err,elem){
+                    console.log("entri=??")
+
+                    if(err){
+                        res.status(400).send(err)
+                    }
+                    if(level && achievement){
+                        return res.status(200).send({"data":isAuth, "achievement":achievement,"level":level})
+                        
+                    }
+                    else if (level){
+                        return res.status(200).send({"data":isAuth,"level":level})
+                         
+
+                    }
+                    else if (achievement){
+                        return res.status(200).send({"data":isAuth, "achievement":achievement})
+                         
+
+                    }
+                    else{
+                        return res.status(200).send({"data":isAuth})
+                        
+                    
+                    }
+                }) 
+            })
+            .catch(err=>{
+                res.status(400).send(err)
+            })
+
+
+            }
+        })
+        .catch(err=>{
+            res.status(400).send(err)
+
+        })
+}
+
+
+exports.markAsFavouriteItem = function(req,res, next){
+    const {activity} = req.body
+    headers = req.headers
+
+    checkIsAuthenticated(headers)
+        .then(isAuth=>{
+            if(isAuth === false){
+                return res.status(403).send("NOT-AUTH")
+            }
+            isAuth.favourite_activities.push(activity)
+            isAuth.save(function(err,elem){
+                if(err){
+                    return res.status(400).send(err)
+                }
+                return res.status(200).send("OK")
+            })
+        })
+        .catch(err=>{
+            return res.status(400).send(err)
+        })
+}
+
+
+
+
 /*
 * @: ROUTE
 */
@@ -263,32 +355,13 @@ exports.sendingFriendshipRequest = async function (req, res, next) {
                                     return res.status(400).send(err)
                                 }
                                 else{
-                                    message = "New Followers request sent "
-                                    logs.createLog(action, category, isAuth, message)
-                                    console.log("logs creati")
-                                    var counter = isAuth.game_counter.social_counter + 1;
-                                    gamification.computeAchievement(isAuth,action, counter)
-                                                .then(achievement =>{
-                                                    console.log("QUI C'è ACHIEVMENT.", achievement)
-                                                    gamification.computeLevel(isAuth)
-                                                                .then(level =>{
-                                                                    console.log("Level ", level)
-                                                                    if(level){
-                                                                        if(achievement){
-                                                                            res.status(200).json({ "data": "Inviato", "achievement": achievement, "level":level })
-
-                                                                        }
-                                                                    }
-                                                                    else if(achievement){
-                                                                        res.status(200).json({ "data": "Inviato", "achievement": achievement})
-
-                                                                    }
-                                                                    else{
-                                                                        res.status(200).json({ "data": "Inviato"})
-
-                                                                    }
-                                                                })
-                                                })
+                                    isAuth.save(function(err,sender){
+                                        if(err){
+                                            return res.status(400).send(err)
+                                        }
+                                        return res.status(200).send({"data":"OK"})
+                                    })
+                                 
                                 }
                             })
 
@@ -823,113 +896,6 @@ exports.addEventToAgenda = function (req, res, next) {
 }
 
 
-exports.getCurrentAchivements = function(req,res,next){
-    const requestedUserId = req.params.id;
-    const {action,counter} = req.body
-
-    Promise.all([
-        UserProfile.findOne({ uid: requestedUserId }).exec(),
-        Achievement.findOne({ 'action': action, 'required_point': counter }).exec()
-    ]).then(values=>{
-        var user = values[0]
-        const achievement = values[1]
-        if(!achievement){
-            return res.status(200).send({"achievement":null})
-        }
-        else{
-            console.log("Entro qua dentro?", achievement)
-                        var unlocked_achievement = user.achievements.filter(x => x.unlocked == false)
-                            .filter(x => { return x.achievement == achievement.id })
-
-                        console.log("unlocked_achievement? ", unlocked_achievement)
-
-
-                        user.achievements.forEach(x => {
-                            if (x.achievement == unlocked_achievement[0].achievement) {
-                                console.log("ci entor qui?")
-                                x.unlocked = true;
-                                x.unlocked_time = Date.now()
-                            }
-                        });
-                        user.exp = user.exp + achievement.points
-
-                        user.save(function (err, isAuth) {
-                            if (err) {
-                                console.log("perovlema,", err)
-                                return res.status(400).send(err)
-                            }
-                            console.log("achievement ")
-                            return res.status(200).send({"achievement":achievement})
-                        });
-        }
-    })
-        .catch(err => {
-            return res.status(400).send(
-                {
-                    "action": "Get User Profile",
-                    "success": false,
-                    "status": 400,
-                    "error": {
-                        "code": err,
-                        "message": "Error in retrieving user profile"
-                    },
-                })
-        })
-}
-
-
-exports.getCurrentLevel = function(req,res,next){
-    const requestedUserId = req.params.id;
-    const {level}= req.body
-
-    Promise.all([
-        UserProfile.findOne({ uid: requestedUserId }).exec(),
-        Level.findById(level).exec()
-    ])
-    .then(values =>{
-        var user = values[0]
-        var current_levle = values[1]
-        if(current_levle.endPoint > user.exp){
-            return res.status(200).send({"level":null})
-        }
-        else{
-            Level.findOne({ 'position': (current_level.position + 1) }).exec()
-            .then(newLevel => {
-                console.log("nuovo livello", newLevel)
-                user.level.level = newLevel;
-                user.level.unlocked_time = Date.now()
-                user.save(function (err, user) {
-                    if (err) {
-                        console.log(err)
-                        return res.status(400).send(err)
-                    }
-                    else {
-                        return res.status(200).send({"level":newLevel})
-
-                    }
-                })
-            })
-            .catch(err => {
-                console.log(err)
-                return res.status(400).send(err)
-            })
-        }
-    })
-    .catch(err =>{
-        return res.status(400).send(
-            {
-                "action": "Get User Profile",
-                "success": false,
-                "status": 400,
-                "error": {
-                    "code": err,
-                    "message": "Error in retrieving user profile"
-                },
-            })
-    })
-}
-
-
 /*
 exports.auth = function(req,res, next){
     const {email, password} = req.body;
@@ -1144,11 +1110,11 @@ function checkIsAuthenticated(headers) {
                         resolve(foundUser)
                     })
                     .catch(err => {
-                        reject()
+                        reject(err)
                     })
             })
             .catch(err => {
-                reject()
+                reject(err)
             })
     })
 

@@ -127,7 +127,12 @@ const UserProfileSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'Event',
             required: false
-    }]
+    }],
+    favourite_activities: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Activity',
+        required: false
+    }],
 }, options);
 
 
@@ -135,35 +140,6 @@ const TeacherProfileSchema = new Schema({
     groups: [{
         type: Schema.Types.ObjectId,
         ref: 'Group',
-        required: false
-    }],
-
-    activities: [{
-        type: Schema.Types.ObjectId,
-        ref: 'BaseActivity',
-        required: false
-    }],
-
-    quizzes: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Quiz',
-        required: false
-    }],
-
-    steps: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Step',
-        required: false
-    }],
-
-    tools: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Tool',
-        required: false
-    }],
-    questions: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Question',
         required: false
     }],
     learner_list: [{
@@ -187,21 +163,17 @@ const LearnerProfileSchema = new Schema({
             ref: 'Character',
             required: false
         },
-        unlocked_time: { type: Date, default: Date.now }
+        unlocked_time: { type: Date, default: Date.now() }
     }],
     activities_completed: [{
         _id: false,
-        date: { type: Date, default: Date.now },
-        activities: {
+        date: { type: Date, default: Date.now() },
+        activity: {
             type: Schema.Types.ObjectId,
             ref: 'Activity',
             required: false
-        }
-    }],
-    favourite_activities: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Activity',
-        required: false
+        },
+        score :{type:Number, default:0}
     }],
     teacher_list: [{
         _id : false,
