@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config/dev');
-const { UserProfile } = require('../models/user_profile');
+const { UserProfile, TeacherProfile, LearnerProfile } = require('../models/user_profile');
 const firebase = require('firebase-admin');
 const normalizeErrors = require('../helpers/mongoose');
 
@@ -14,6 +14,8 @@ const {Level} = require('../models/gaming/level')
 const gamification = require('../controller/gamification')
 
 const logs = require('../controller/log');
+const { isatty } = require('tty');
+const { type } = require('os');
 
 exports.createUser = function (req, res, next) {
     console.log("Create User")
@@ -202,6 +204,72 @@ exports.patchUser = function (req, res, next) {
 }
 
 
+
+exports.updateUserInfo = function (req, res, next) {
+    const search_id = req.params.id;
+    const {obj, typeOfAction} = req.body;
+    console.log("type Of Action ", typeOfAction)
+    console.log("obj", obj)
+    if(typeOfAction == "ADD_TEACHER"){
+        UserProfile.findById(search_id)
+                    .then(learner =>{
+                        console.log("teacher")
+                        learner.teachers.push(obj)
+                        learner.save(function(err,learner){
+                            if(err){
+                                return res.status(400).send(err)
+                            }
+                            return res.status(400).send(learner)
+                        })
+                    })
+                    .catch(err=>{
+                        return res.send(err)
+                    })
+    }
+    else if(typeOfAction == "ADD_LEARNER"){
+        UserProfile.findById(search_id)
+                    .then(teacher =>{
+                        console.log("teacher")
+                        teacher.learners.push(obj)
+                        teacher.save(function(err,teacher){
+                            if(err){
+                                return res.status(400).send(err)
+                            }
+                            return res.status(200).send(teacher)
+                        })
+                    })
+                    .catch(err=>{
+                        return res.send(err)
+                    })
+    }
+    else{
+        UserProfile.findById(search_id)
+        .then(user =>{
+                if(typeOfAction == "NEW_FOLLOWER"){
+                    user.followers.push(obj)
+                }
+                else if(typeOfAction == "NEW_FOLLOWED"){
+                    user.followed.push(obj)
+                }
+                    user.save(function(err, user){
+                        if(err){
+                            return res.status(400).send(err)
+                        }
+                        else{
+                            return res.status("200").send(user)
+                        }
+                    })
+                })
+                .catch(err =>{
+                    return res.send(err)
+                })
+
+    }
+   
+
+}
+
+
 exports.completeActivity = function(req,res,next){
 
     const{activity, score} = req.body;
@@ -322,9 +390,8 @@ exports.sendingFriendshipRequest = async function (req, res, next) {
 
     const requestedUserId = req.params.id;
     const user = res.locals.user;
-    const data = req.body;
     console.log("sender", requestedUserId)
-    console.log("reciever : ", data)
+    console.log("reciever : ", req.body)
 
     header = req.headers
     checkIsAuthenticated(header)
@@ -332,52 +399,103 @@ exports.sendingFriendshipRequest = async function (req, res, next) {
             if(isAuth === false){
                 return res.status(403).send("Not Authenticated")
             }
+            else{
+                const {receiverID, typeOfAction} = req.body;
 
-            UserProfile.findById(data._id)
-                        .exec()
-                        .then(receiver=>{
-
-                            var friendshipReceiverRequest = {
-                                'read': false,
-                                'request_accepted': false,
-                                'follower_id': isAuth
-                            }
-
-                            var friendshipSenderRequest = {
-                                'request_accepted': false,
-                                'followed_id': receiver
-                            }
-
-                            receiver.followers.push(friendshipReceiverRequest);
-                            isAuth.followed.push(friendshipSenderRequest);
-                            receiver.save(function(err,receiver){
-                                if(err){
-                                    return res.status(400).send(err)
-                                }
-                                else{
-                                    isAuth.save(function(err,sender){
+                UserProfile.findById(receiverID._id)
+                            .exec()
+                            .then(receiver=>{
+                                console.log("FOUNDRECEIVER", receiver)
+                                if(typeOfAction =="Follower"){
+                                    var friendshipReceiverRequest = {
+                                        'read': false,
+                                        'request_accepted': false,
+                                        'follower_id': isAuth
+                                    }
+        
+                                    var friendshipSenderRequest = {
+                                        'request_accepted': false,
+                                        'followed_id': receiver
+                                    }
+        
+                                    receiver.followers.push(friendshipReceiverRequest);
+                                    isAuth.followed.push(friendshipSenderRequest);
+                                    receiver.save(function(err,receiver){
                                         if(err){
                                             return res.status(400).send(err)
                                         }
-                                        return res.status(200).send({"data":"OK"})
+                                        else{
+                                            isAuth.save(function(err,sender){
+                                                if(err){
+                                                    return res.status(400).send(err)
+                                                }
+                                                return res.status(200).send({"data":"OK"})
+                                            })
+                                        
+                                        }
                                     })
-                                 
                                 }
-                            })
+                                else if( typeOfAction == "Education"){
+                                    if(isAuth.role == "Teacher" && receiver.role =="Learner"){
 
-                        })
-                        .catch((err) => {
-                            return res.status(422).send(
-                                {
-                                    "action": "Send Following request ",
-                                    "success": false,
-                                    "status": 422,
-                                    "error": {
-                                        "code": err,
-                                        "message": "Error in send user following request"
+                                        var learnerRequest = {
+                                            'request_accepted': false,
+                                            'learner_id': receiver
+                                        }
+                                        var teacherRequest = {
+                                            'request_accepted': false,
+                                            'teacher_id': isAuth
+                                        }
+                    
+                                        isAuth.learner_list.push(learnerRequest)
+                                        isAuth.save()
+                    
+                                        receiver.teacher_list.push(teacherRequest)
+                                        receiver.save()
+                                        return res.status(200).send(sender)
                                     }
-                                })
-                        })
+                                    else if(isAuth.role == "Learner" && receiver.role == "Teacher"){
+
+                                        var learnerRequest = {
+                                            'request_accepted': false,
+                                            'learner_id': isAuth
+                                        }
+                                        var teacherRequest = {
+                                            'request_accepted': false,
+                                            'teacher_id': receiver
+                                        }
+                    
+                                        receiver.learner_list.push(learnerRequest)
+                                        receiver.save()
+                    
+                                        isAuth.teacher_list.push(teacherRequest)
+                                        isAuth.save()
+                                        return res.status(200).send(sender)
+                                    }
+                                    else{
+                                        return res.status(400).send({error:"SAME-ROLE-RELATIONSHIP"})
+                                    }
+                                }
+                                else{
+                                    return res.status(400).send({error:"WRONG-TYPEOFACITON"})
+                                }
+
+                        
+
+                            })
+                            .catch((err) => {
+                                return res.status(422).send(
+                                    {
+                                        "action": "Send Following request ",
+                                        "success": false,
+                                        "status": 422,
+                                        "error": {
+                                            "code": err,
+                                            "message": "Error in send user following request"
+                                        }
+                                    })
+                            })
+                    }
         })
         .catch((err) => {
             return res.status(422).send(
@@ -391,61 +509,6 @@ exports.sendingFriendshipRequest = async function (req, res, next) {
                     }
                 })
         })
-
-/*
-    UserProfile.findOne({ uid: requestedUserId })
-        .exec()
-        .then(sender => {
-            UserProfile.findById(data._id)
-                .exec()
-                .then(receiver => {
-                    console.log(sender)
-                    console.log(receiver)
-
-                    var friendshipReceiverRequest = {
-                        'read': false,
-                        'request_accepted': false,
-                        'follower_id': sender
-                    }
-
-                    var friendshipSenderRequest = {
-                        'request_accepted': false,
-                        'followed_id': receiver
-                    }
-
-                    receiver.followers.push(friendshipReceiverRequest);
-                    sender.followed.push(friendshipSenderRequest);
-                    receiver.save()
-                    sender.save()
-                    return res.status(200).send()
-
-                })
-                .catch((err) => {
-                    return res.status(422).send(
-                        {
-                            "action": "Send Following request ",
-                            "success": false,
-                            "status": 422,
-                            "error": {
-                                "code": err.errors,
-                                "message": "Error in send user following request"
-                            }
-                        })
-                })
-        })
-        .catch((err) => {
-            return res.status(422).send(
-                {
-                    "action": "Send Following request ",
-                    "success": false,
-                    "status": 422,
-                    "error": {
-                        "code": err.errors,
-                        "message": "Error in send user following request"
-                    }
-                })
-        })
-*/
 
 }
 
@@ -524,8 +587,6 @@ exports.acceptRequest = function (req, res, next) {
                 })
         })
 }
-
-
 
 exports.refuseRequest = function (req, res, next) {
     console.log("Refuse Request")

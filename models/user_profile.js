@@ -35,7 +35,36 @@ const UserProfileSchema = new Schema({
         type: String,
         required: true
     },
-    followers: [{
+    followers:[{
+        _id: false,
+        read: { type: Boolean, default: false },
+        request_accepted: { type: Boolean, default: false },
+        date: { type: Date, default: Date.now },
+        follower: {
+            type: Schema.Types.ObjectId,
+            ref: 'UserProfile'
+        },
+    }],
+    followed:[{
+        _id: false,
+        read: { type: Boolean, default: false },
+        request_accepted: { type: Boolean, default: false },
+        date: { type: Date, default: Date.now },
+        followed: {
+            type: Schema.Types.ObjectId,
+            ref: 'UserProfile'
+        },
+    }],
+    permission:{
+        can_write: { type: Boolean, default: false },
+        can_see_bio_info: { type: Boolean, default: false },
+        can_see_follower_list: { type: Boolean, default: false },
+        can_see_followed_list: { type: Boolean, default: false },
+        can_see_agenda : { type: Boolean, default: false },
+        can_see_stats: { type: Boolean, default: false },
+        can_see_achievements: { type: Boolean, default: false },
+    },
+    followers_old: [{
         _id: false,
         read: { type: Boolean, default: false },
         request_accepted: { type: Boolean, default: false },
@@ -55,7 +84,7 @@ const UserProfileSchema = new Schema({
 
         }
     }],
-    followed: [{
+    followed_old: [{
         _id: false,
         request_accepted: { type: Boolean, default: false },
         date: { type: Date, default: Date.now },
@@ -142,11 +171,11 @@ const TeacherProfileSchema = new Schema({
         ref: 'Group',
         required: false
     }],
-    learner_list: [{
+    learners: [{
         _id : false,
         read : {type: Boolean, default:false},
         request_accepted : {type: Boolean, default:false},
-        learner_id : {
+        learner : {
             type: Schema.Types.ObjectId,
             ref: 'Learner',
             required: false
@@ -175,16 +204,16 @@ const LearnerProfileSchema = new Schema({
         },
         score :{type:Number, default:0}
     }],
-    teacher_list: [{
+    teachers: [{
         _id : false,
         read : {type: Boolean, default:false},
         request_accepted : {type: Boolean, default:false},
-        teacher_id : {
+        teacher : {
             type: Schema.Types.ObjectId,
             ref: 'Teacher',
             required: false
         },
-        can_edit_agenda: { type: Boolean, default: false },
+        //can_edit_agenda: { type: Boolean, default: false },
     }],
     agenda: [{
             type: Schema.Types.ObjectId,

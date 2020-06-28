@@ -25,6 +25,7 @@ router.post('/create', UserController.createUser);
 
 
 // PATCH /api/v1/users/id
+router.patch('/requests/:id', UserController.updateUserInfo)
 router.patch('/:id', UserController.patchUser);
 
 
