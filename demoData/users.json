@@ -1,0 +1,10 @@
+{
+    "users":[
+        {
+            "displayName":"Demo",
+            "email":"demo@demo.com",
+            "photoURL":"/assets/demoData/profile.svg",
+            "role":"Teacher"
+        }
+    ]
+}

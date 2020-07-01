@@ -13,10 +13,12 @@ const FakeDB = require('./FakeDB')
  */
 
 mongoose.connect(config.DB_URI_ASW,{ useNewUrlParser: true, useUnifiedTopology: true }).then(()=>{
-   /* const fakeDB = new FakeDB();
+    /*
+    const fakeDB = new FakeDB();
      fakeDB.seedDB().catch(error=>{ 
          console.log(error); 
-     })*/
+     })
+     */
  }).catch(err => console.log(err));
  mongoose.set('useCreateIndex', true);
  mongoose.set('debug', true);

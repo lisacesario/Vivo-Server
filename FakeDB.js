@@ -1,12 +1,26 @@
 const {Achievement} = require('./models/gaming/achievement');
 const {Level} = require('./models/gaming/level');
+const { UserProfile } = require('./models/user_profile');
+const { Tool } = require('./models/tools');
+const { Step } = require('./models/steps');
+const { Question } = require('./models/question');
+
+
 
 const fakeDBData = require('./data.json');
+const achievementDB = require('./demoData/achievements.json');
+const itemsDB = require('./demoData/items.json');
+const usersDB = require('./demoData/users.json');
+
 
 class FakeDB {
 
     constructor(){
-        this.achievements = fakeDBData.achievements;
+        this.users = usersDB.users
+        this.questions = itemsDB.questions
+        this.tools = itemsDB.tools       
+        this.steps = itemsDB.steps
+        this.achievements = achievementDB.achievements;
         this.levels = fakeDBData.levels;
     }
 
@@ -34,6 +48,25 @@ class FakeDB {
               newLevel.save()
           })
 
+         /* this.users.forEach((user)=>{
+              const newUser = new UserProfile(user);
+              newUser.save()
+          })*/
+
+          this.tools.forEach((tool)=>{
+              const newTool = new Tool(tool)
+              newTool.save()
+          })
+          
+          this.steps.forEach((step)=>{
+              const newStep = new Step(step)
+              newStep.save()
+          })
+
+          this.questions.forEach((question)=>{
+              const newQuestion = new Question(question)
+              newQuestion.save()
+          })
         
     
         //user.save().catch(error=>{console.log(error); });
