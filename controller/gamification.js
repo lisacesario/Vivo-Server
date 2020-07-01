@@ -13,45 +13,7 @@ const SOCIAL_VALUE = 10
 
 module.exports = {
 
-    computeLevel: function (user) {
-        return new Promise((resolve, reject) => {
-            console.log("CALCOLO LIVELLO")
-            Level.findById(user.level.level).exec()
-                .then(current_level => {
-                    if (current_level.endPoint > user.exp) {
-                        resolve(null)
-                    }
-                    else {
-                        console.log("Nuovo livello")
 
-                        Level.findOne({ 'position': (current_level.position + 1) }).exec()
-                            .then(newLevel => {
-                                console.log("nuovo livello", newLevel)
-                                user.level.level = newLevel;
-                                user.level.unlocked_time = Date.now()
-                                user.save(function (err, user) {
-                                    if (err) {
-                                        console.log(err)
-                                        reject()
-                                    }
-                                    else {
-                                        resolve(newLevel)
-                                    }
-                                })
-                            })
-                            .catch(err => {
-                                console.log(err)
-                                reject()
-                            })
-                    }
-                })
-                .catch(err => {
-                    console.log(err);
-                    reject()
-                })
-        }
-        )
-    },
     computeLevelCreate: function (user) {
         return new Promise((resolve, reject) => {
             console.log("CALCOLO LIVELLO")

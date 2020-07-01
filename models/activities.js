@@ -26,6 +26,10 @@ const BaseActivitySchema = new Schema({
         type:Boolean,
         default:false
     },
+    subject:{
+        type:String,
+        required:true
+    },
     shared:{
         type:Boolean,
         default:false

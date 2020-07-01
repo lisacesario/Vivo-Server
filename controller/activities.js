@@ -73,7 +73,7 @@ exports.getActivityByID = function (req, res, next) {
 exports.createActivity =   function (req, res, next) {
     const action = "Create"
     const category = "Activity"
-    const { name, photoURL, description, type, shared } = req.body;
+    const { name, photoURL, description, type, subject, shared } = req.body;
     console.log(req.body);
 
     headers = req.headers;
@@ -90,6 +90,7 @@ exports.createActivity =   function (req, res, next) {
                     'photoURL': photoURL,
                     'description': description,
                     'type': type,
+                    'subject':subject,
                     'shared': shared,
                     'likes': 0,
                     'created_by': isAuth

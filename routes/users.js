@@ -17,6 +17,8 @@ router.post('/register', UserController.register);
 // GET /api/v1/users/profile/
 router.get('/profile/less/:id', UserController.getUsersProfile);
 
+router.get('/profile/populated/:id', UserController.getPopulatedUserProfile);
+
 // GET /api/v1/users/profile/
 router.get('/profile/:id', UserController.getUserProfileById);
 
@@ -26,8 +28,8 @@ router.post('/create', UserController.createUser);
 
 // PATCH /api/v1/users/id
 router.patch('/requests/:id', UserController.updateUserInfo)
-router.patch('/:id', UserController.patchUser);
-
+router.patch('/complete-activity', UserController.completeActivity);
+router.patch('/:id', UserController.patchUser)
 
 
 router.post('/:id/events/new', EventController.createEvent)
@@ -70,7 +72,6 @@ router.patch('/student-of/:id/refuse', UserController.refuseBeMyStudentRequest);
 // GAMIFICATION STUFF
 router.get('/achievements/:id', UserController.getAchievementById);
 router.get('/level/:id', UserController.getLevelById);
-router.patch('/complete-activity/:id', UserController.completeActivity);
 
 
 

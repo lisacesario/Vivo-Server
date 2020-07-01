@@ -149,6 +149,40 @@ exports.getUserProfileById = function (req, res, next) {
 }
 
 
+exports.getPopulatedUserProfile =  function(req,res,next){
+    const requestedUserId = req.params.id;
+    UserProfile.findOne({uid:requestedUserId})
+                .populate({
+                    path:'teachers.teacher',
+                    model:'UserProfile',
+                    })
+                .exec()
+                .then( user => {
+                    UserProfile.populate(user,
+                        {
+                            path:'followers.follower',
+                            model:'UserProfile',
+                        },function(err,user){
+                            if(err){
+                                return res.status(400).send(err)
+                            }
+                            UserProfile.populate(user,
+                                {
+                                    path:'followed.followed',
+                                    model:'UserProfile',
+                                },function(err,user){
+                                    if(err){
+                                        return res.status(400).send(err)
+                                    }
+                                    return res.status(200).send(user)
+                                })
+                        })
+                })
+                .catch(err =>{
+                    return res.status(400).send(err)
+                })
+}
+
 
 exports.patchUser = function (req, res, next) {
     console.log("PATCH")
@@ -272,7 +306,7 @@ exports.updateUserInfo = function (req, res, next) {
 
 exports.completeActivity = function(req,res,next){
 
-    const{activity, score} = req.body;
+    const{activity, score, answers} = req.body;
     headers = req.headers
 
     checkIsAuthenticated(headers)
@@ -284,17 +318,18 @@ exports.completeActivity = function(req,res,next){
                 return res.status(403).send("WRONG-ROLE")
             }
             else{
+                console.log("STIAMOFACENDO LA FUNZIONE GIUSTA??")
 
                isAuth.activities_completed.push({
                    "activity":activity,
-                   "score" : score
+                   "score" : score,
+                   "answers":answers
                })
-
-               isAuth.exp = isAuth.exp + score
+               isAuth.exp = isAuth.exp + 50
 
                   
                Promise.all([
-                gamification.computeAchievementForCreate(isAuth),
+                gamification.computeAchievement(isAuth,isAuth.activities_completed.length, "Activity"),
                 gamification.computeLevelCreate(isAuth)
             ]).then(values =>{
                 console.log(values)
@@ -567,7 +602,7 @@ exports.acceptRequest = function (req, res, next) {
                             "success": false,
                             "status": 422,
                             "error": {
-                                "code": err.errors,
+                                "code": err,
                                 "message": "Error in accept following request"
                             }
                         })
@@ -581,7 +616,7 @@ exports.acceptRequest = function (req, res, next) {
                     "success": false,
                     "status": 422,
                     "error": {
-                        "code": err.errors,
+                        "code": err,
                         "message": "Error in accept following request"
                     }
                 })

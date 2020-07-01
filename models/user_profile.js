@@ -152,11 +152,6 @@ const UserProfileSchema = new Schema({
         ref: 'Post',
         required: false
     }],
-    events: [{
-            type: Schema.Types.ObjectId,
-            ref: 'Event',
-            required: false
-    }],
     favourite_activities: [{
         type: Schema.Types.ObjectId,
         ref: 'Activity',
@@ -202,7 +197,13 @@ const LearnerProfileSchema = new Schema({
             ref: 'Activity',
             required: false
         },
-        score :{type:Number, default:0}
+        score :{type:Number, default:0},
+        answers: [{
+            _id : false,
+            text: {type:String, required:false},
+            value : {type: Number, required:false},
+            correct:{type:Boolean, required:false}
+        }]
     }],
     teachers: [{
         _id : false,
