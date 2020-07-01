@@ -35,7 +35,36 @@ const UserProfileSchema = new Schema({
         type: String,
         required: true
     },
-    followers: [{
+    followers:[{
+        _id: false,
+        read: { type: Boolean, default: false },
+        request_accepted: { type: Boolean, default: false },
+        date: { type: Date, default: Date.now },
+        follower: {
+            type: Schema.Types.ObjectId,
+            ref: 'UserProfile'
+        },
+    }],
+    followed:[{
+        _id: false,
+        read: { type: Boolean, default: false },
+        request_accepted: { type: Boolean, default: false },
+        date: { type: Date, default: Date.now },
+        followed: {
+            type: Schema.Types.ObjectId,
+            ref: 'UserProfile'
+        },
+    }],
+    permission:{
+        can_write: { type: Boolean, default: false },
+        can_see_bio_info: { type: Boolean, default: false },
+        can_see_follower_list: { type: Boolean, default: false },
+        can_see_followed_list: { type: Boolean, default: false },
+        can_see_agenda : { type: Boolean, default: false },
+        can_see_stats: { type: Boolean, default: false },
+        can_see_achievements: { type: Boolean, default: false },
+    },
+    followers_old: [{
         _id: false,
         read: { type: Boolean, default: false },
         request_accepted: { type: Boolean, default: false },
@@ -50,13 +79,12 @@ const UserProfileSchema = new Schema({
             can_see_follower_list: { type: Boolean, default: false },
             can_see_followed_list: { type: Boolean, default: false },
             can_see_agenda : { type: Boolean, default: false },
-            can_edit_agenda: { type: Boolean, default: false },
             can_see_stats: { type: Boolean, default: false },
             can_see_achievements: { type: Boolean, default: false },
 
         }
     }],
-    followed: [{
+    followed_old: [{
         _id: false,
         request_accepted: { type: Boolean, default: false },
         date: { type: Date, default: Date.now },
@@ -70,7 +98,6 @@ const UserProfileSchema = new Schema({
             can_see_follower_list: { type: Boolean, default: false },
             can_see_followed_list: { type: Boolean, default: false },
             can_see_agenda : { type: Boolean, default: false },
-            can_edit_agenda: { type: Boolean, default: false },
             can_see_stats: { type: Boolean, default: false },
             can_see_achievements: { type: Boolean, default: false },
 
@@ -81,18 +108,17 @@ const UserProfileSchema = new Schema({
         ref: 'BaseActivity',
         required: false
     }],
-    level: [{
+    level: {
         _id: false,
-        active: { type: Boolean, default: false },
         unlocked_time: { type: Date, required: false },
         level: {
             type: Schema.Types.ObjectId,
             ref: 'Level'
         }
-    }],
+    },
     achievements: [{
         _id: false,
-        active: { type: Boolean, default: false },
+        unlocked: { type: Boolean, default: false },
         unlocked_time: { type: Date, required: false },
         achievement: {
             type: Schema.Types.ObjectId,
@@ -104,6 +130,18 @@ const UserProfileSchema = new Schema({
         required: false,
         default: 0
     },
+    first_access: {
+        type:Boolean,
+        default:false
+    },
+    game_counter: {
+        create_counter : {type:Number, default:0},
+        update_counter : {type:Number, default:0},
+        delete_counter : {type:Number, default:0},
+        add_counter    : {type:Number, default:0},
+        social_counter : {type:Number, default:0},
+        event_counter  : {type:Number, default:0},
+    },
     messages: [{
         type: Schema.Types.ObjectId,
         ref: 'Messages',
@@ -114,43 +152,25 @@ const UserProfileSchema = new Schema({
         ref: 'Post',
         required: false
     }],
-    events: [{
-            type: Schema.Types.ObjectId,
-            ref: 'Event',
-            required: false
-    }]
+    favourite_activities: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Activity',
+        required: false
+    }],
 }, options);
 
 
 const TeacherProfileSchema = new Schema({
-    activities: [{
+    groups: [{
         type: Schema.Types.ObjectId,
-        ref: 'BaseActivity',
+        ref: 'Group',
         required: false
     }],
-
-    quizzes: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Quiz',
-        required: false
-    }],
-
-    steps: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Step',
-        required: false
-    }],
-
-    tools: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Tool',
-        required: false
-    }],
-    learner_list: [{
+    learners: [{
         _id : false,
         read : {type: Boolean, default:false},
         request_accepted : {type: Boolean, default:false},
-        learner_id : {
+        learner : {
             type: Schema.Types.ObjectId,
             ref: 'Learner',
             required: false
@@ -167,32 +187,34 @@ const LearnerProfileSchema = new Schema({
             ref: 'Character',
             required: false
         },
-        unlocked_time: { type: Date, default: Date.now }
+        unlocked_time: { type: Date, default: Date.now() }
     }],
     activities_completed: [{
         _id: false,
-        date: { type: Date, default: Date.now },
-        activities: {
+        date: { type: Date, default: Date.now() },
+        activity: {
             type: Schema.Types.ObjectId,
             ref: 'Activity',
             required: false
-        }
+        },
+        score :{type:Number, default:0},
+        answers: [{
+            _id : false,
+            text: {type:String, required:false},
+            value : {type: Number, required:false},
+            correct:{type:Boolean, required:false}
+        }]
     }],
-    favourite_activities: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Activity',
-        required: false
-    }],
-    teacher_list: [{
+    teachers: [{
         _id : false,
         read : {type: Boolean, default:false},
         request_accepted : {type: Boolean, default:false},
-        teacher_id : {
+        teacher : {
             type: Schema.Types.ObjectId,
             ref: 'Teacher',
             required: false
-        }
-       
+        },
+        //can_edit_agenda: { type: Boolean, default: false },
     }],
     agenda: [{
             type: Schema.Types.ObjectId,

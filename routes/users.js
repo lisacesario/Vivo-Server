@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const UserController = require('../controller/users')
-
+const EventController = require('../controller/events')
 
 // POST /api/v1/users/auth
 /*
@@ -15,7 +15,9 @@ router.post('/register', UserController.register);
 
 
 // GET /api/v1/users/profile/
-router.get('/profile/', UserController.getUsersProfile);
+router.get('/profile/less/:id', UserController.getUsersProfile);
+
+router.get('/profile/populated/:id', UserController.getPopulatedUserProfile);
 
 // GET /api/v1/users/profile/
 router.get('/profile/:id', UserController.getUserProfileById);
@@ -25,11 +27,17 @@ router.post('/create', UserController.createUser);
 
 
 // PATCH /api/v1/users/id
-router.patch('/:id', UserController.patchUser);
+router.patch('/requests/:id', UserController.updateUserInfo)
+router.patch('/complete-activity', UserController.completeActivity);
+router.patch('/:id', UserController.patchUser)
 
 
+router.post('/:id/events/new', EventController.createEvent)
+router.patch('/:id/events/update', EventController.updateEvent)
+router.delete('/events/:id/delete', EventController.deleteEvent)
+router.get('/events/:id', EventController.getEventById)
 
-router.post('/:id/agenda/add-to', UserController.addEventToAgenda);
+//router.post('/:id/agenda/add-to', UserController.addEventToAgenda);
 //router.patch('/:id/agenda/update', UserController.addEventToAgenda);
 //router.patch('/:id/agenda/remove-from', UserController.addEventToAgenda);
 
@@ -60,6 +68,10 @@ router.patch('/student-of/:id', UserController.sendBeMyStudentRequest);
 router.patch('/student-of/:id/accept', UserController.acceptBeMyStudentRequest);
 router.patch('/student-of/:id/refuse', UserController.refuseBeMyStudentRequest);
 
+
+// GAMIFICATION STUFF
+router.get('/achievements/:id', UserController.getAchievementById);
+router.get('/level/:id', UserController.getLevelById);
 
 
 

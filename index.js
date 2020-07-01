@@ -3,16 +3,24 @@ const mongoose = require('mongoose');
 const bodyparser = require('body-parser');
 const cors = require('cors')
 const config = require('./config/dev');
+const FakeDB = require('./FakeDB')
 //const firebase = require('firebase');
+/*****
+ * 
+ * 
+ * 
+ * just for test commit
+ */
 
-
-mongoose.connect(config.DB_URI,{ useNewUrlParser: true, useUnifiedTopology: true }).then(()=>{
-    // const fakeDB = new FakeDB();
-     /*fakeDB.seedDB().catch(error=>{ 
+mongoose.connect(config.DB_URI_ASW,{ useNewUrlParser: true, useUnifiedTopology: true }).then(()=>{
+   /* const fakeDB = new FakeDB();
+     fakeDB.seedDB().catch(error=>{ 
          console.log(error); 
      })*/
  }).catch(err => console.log(err));
  mongoose.set('useCreateIndex', true);
+ mongoose.set('debug', true);
+
 
  const app = express();
  app.use(bodyparser.json());
@@ -33,10 +41,14 @@ mongoose.connect(config.DB_URI,{ useNewUrlParser: true, useUnifiedTopology: true
 const admin = require("firebase-admin");
 
 var serviceAccount = require("./config/serviceAccountKey.json");
+var VivoDB_URL = "https://inclusivelearning-wecaremore0.firebaseio.com"
+
+var eduServiceAccount = require("./config/vivoEduServiceAccount.json");
+var eduDB_URL = "https://vivo-edu.firebaseio.com"
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://inclusivelearning-wecaremore0.firebaseio.com"
+  credential: admin.credential.cert(eduServiceAccount),
+  databaseURL: "https://vivo-edu.firebaseio.com"
 });
 
 exports.userIsAuth = function(req, res, next) {
@@ -66,6 +78,14 @@ const stepRoutes = require('./routes/steps');
 app.use('/api/v1/steps', stepRoutes);
 const toolRoutes = require('./routes/tools');
 app.use('/api/v1/tools', toolRoutes);
+
+const groupRoutes = require('./routes/groups');
+app.use('/api/v1/groups', groupRoutes);
+const messagesRoutes = require('./routes/messages');
+app.use('/api/v1/messages', messagesRoutes);
+
+const questionRoutes = require('./routes/questions');
+app.use('/api/v1/questions', questionRoutes);
 /*
 const levelsRoutes = require('./routes/admin-tool/level');
 app.use('/api/v1/admin-tools/levels', levelsRoutes);

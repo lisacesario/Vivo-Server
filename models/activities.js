@@ -26,6 +26,10 @@ const BaseActivitySchema = new Schema({
         type:Boolean,
         default:false
     },
+    subject:{
+        type:String,
+        required:true
+    },
     shared:{
         type:Boolean,
         default:false
@@ -46,30 +50,26 @@ const BaseActivitySchema = new Schema({
 
 
 const SelfManagementActivitySchema = new Schema({
-    steps: [
-        {
+    steps: [{
             _id:false,
             position: {type: Number},
             step: {
                 type: Schema.Types.ObjectId,
                 ref: 'Steps',
             }
-        }
-           
-    ],
-
+        }],
     tools: [{
         type: Schema.Types.ObjectId,
-        ref: 'Quiz',
+        ref: 'Tool',
         required: false
     }],
 }, options)
 
 
 const QuizActivitySchema = new Schema({
-    quizzes: [{
+    questions: [{
         type: Schema.Types.ObjectId,
-        ref: 'Quiz',
+        ref: 'Question',
         required: false
     }],
 }, options);

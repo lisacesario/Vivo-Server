@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config/dev');
-const { UserProfile } = require('../models/user_profile');
+const { UserProfile, TeacherProfile, LearnerProfile } = require('../models/user_profile');
 const firebase = require('firebase-admin');
 const normalizeErrors = require('../helpers/mongoose');
 
@@ -8,6 +8,14 @@ const { BaseActivity } = require('../models/activities');
 const { Event } = require('../models/events');
 var async = require('async');
 
+const {Achievement} =  require('../models/gaming/achievement');
+const {Level} = require('../models/gaming/level')
+
+const gamification = require('../controller/gamification')
+
+const logs = require('../controller/log');
+const { isatty } = require('tty');
+const { type } = require('os');
 
 exports.createUser = function (req, res, next) {
     console.log("Create User")
@@ -16,29 +24,55 @@ exports.createUser = function (req, res, next) {
     const userProfile = new UserProfile({ uid, email, role, photoURL, displayName })
     UserProfile.create(userProfile, function (error, newProfile) {
         if (error) {
-
-            return res.status(422).send({ errors: [{ title: 'Errore nella creazione del Profilo', detail: error.errors }] });
+            return res.status(400).send(
+                {
+                    "action": "Create User Profile",
+                    "success": false,
+                    "status": 400,
+                    "error": {
+                        "code": error,
+                        "message": "Error in create user profile"
+                    },
+                })
         }
 
-        newProfile.save().then(
-            () => {
-                return res.status(200).send(newProfile)
-            },
-            (err) => {
-                return res.status(400).send(
-                    {
-                        "action": "Create User Profile",
-                        "success": false,
-                        "status": 400,
-                        "error": {
-                            "code": err.errors,
-                            "message": "Error in create user profile"
-                        },
-                    })
-            }
-        )
+        Level.findOne({'position':0}).exec()
+            .then(level =>{
+                    const data = {
+                        "level": level,
+                        "unlocked_time":Date.now()
+                    }
+                    newProfile.level = data
+                    newProfile.save()
+                    return res.status(200).send(newProfile)
+                })       
+
     });
 }
+
+exports.getAchievementById = function(req,res,next){
+    const search_id = req.params.id;
+    Achievement.findById(search_id).exec()
+                .then(foundAchievements =>{
+                    return res.status(200).send(foundAchievements)
+                })
+                .catch(err =>{
+                    return res.status(400).send(err)
+                })
+
+}
+
+exports.getLevelById = function(req,res,next){
+    const search_id = req.params.id;
+    Level.findById(search_id).exec()
+                .then(foundLevel =>{
+                    return res.status(200).send(foundLevel)
+                })
+                .catch(err =>{
+                    return res.status(400).send(err)
+                })
+}
+
 
 exports.getUser = function (req, res, next) {
     console.log("Get auth user")
@@ -68,11 +102,11 @@ exports.getUsersProfile = function (req, res, next) {
     console.log("Get tutti i profili Utenti")
     const requestedUserId = req.params.id;
     console.log("bu:", requestedUserId)
-
-    UserProfile.find()
+    UserProfile.find({uid:{$ne: requestedUserId}})
         .select('displayName photoURL role')
         .exec()
         .then(userProfile => {
+            console.log("userProfile", userProfile)
             return res.status(200).send(userProfile)
         })
         .catch(err => {
@@ -82,13 +116,14 @@ exports.getUsersProfile = function (req, res, next) {
                     "success": false,
                     "status": 400,
                     "error": {
-                        "code": err.errors,
+                        "code": err,
                         "message": "Error in retrieving users profiles"
                     }
                 })
         })
-
 }
+
+
 
 exports.getUserProfileById = function (req, res, next) {
     console.log("getUserProfileById")
@@ -106,7 +141,7 @@ exports.getUserProfileById = function (req, res, next) {
                     "success": false,
                     "status": 400,
                     "error": {
-                        "code": err.errors,
+                        "code": err,
                         "message": "Error in retrieving user profile"
                     }
                 })
@@ -114,134 +149,401 @@ exports.getUserProfileById = function (req, res, next) {
 }
 
 
+exports.getPopulatedUserProfile =  function(req,res,next){
+    const requestedUserId = req.params.id;
+    UserProfile.findOne({uid:requestedUserId})
+                .populate({
+                    path:'teachers.teacher',
+                    model:'UserProfile',
+                    })
+                .exec()
+                .then( user => {
+                    UserProfile.populate(user,
+                        {
+                            path:'followers.follower',
+                            model:'UserProfile',
+                        },function(err,user){
+                            if(err){
+                                return res.status(400).send(err)
+                            }
+                            UserProfile.populate(user,
+                                {
+                                    path:'followed.followed',
+                                    model:'UserProfile',
+                                },function(err,user){
+                                    if(err){
+                                        return res.status(400).send(err)
+                                    }
+                                    return res.status(200).send(user)
+                                })
+                        })
+                })
+                .catch(err =>{
+                    return res.status(400).send(err)
+                })
+}
+
 
 exports.patchUser = function (req, res, next) {
     console.log("PATCH")
     const user = res.locals.user;
     const data = req.body;
-    const search_id = req.params.id
-    console.log('id :' + search_id);
     console.log("valure", req.body)
-    //Object.keys(data).forEach(e => console.log(` Activity DATA key=${e}  value=${data[e]}`));
-    //Object.keys(req.params).forEach(e => console.log(` req.params DATA key=${e}  value=${req.params[e]}`));
-    //Object.keys(req.body).forEach(e => console.log(` req.body DATA key=${e}  value=${req.body[e]}`));
 
-
-    UserProfile.findOne({ uid: search_id })
-        .exec()
-        .then(user => {
-            if (user.uid != search_id) {
-                console.log("created by ", user.uid);
-                console.log("hser ", search_id);
-                console.log("sono bloccato");
-                return res.status(403).send(
-                    {
-                        "action": "Patch User Profile",
-                        "success": false,
-                        "status": 403,
-                        "error": {
-                            "message": "Error in patch user profile: You are not the owner"
-                        }
-                    })
+    headers =  req.headers
+    checkIsAuthenticated(headers)
+        .then(isAuth=>{
+            if(isAuth === false){
+                return res.status(403).send("You are not authorized")
             }
-            user.set(data)
-            user.save()
-                .then(user => {
-                    return res.status(200).send(user)
-                })
-                .catch(err => {
-                    return res.status(400).send(
-                        {
-                            "action": "Patch User Profile",
-                            "success": false,
-                            "status": 400,
-                            "error": {
-                                "code": err.errors,
-                                "message": "Error in patch user profile"
-                            }
+            UserProfile.findOne({uid:isAuth.uid})
+                        .then(user =>{
+                            user.set(data)
+                            user.save(function(err, user){
+                                if(err){
+                                    return res.status(400).send(err)
+                                }
+                                else{
+                                    return res.status("200").send(user)
+                                }
+                            })
                         })
-                })
-
+                        .catch(err =>{
+                            return res.status(400).send(
+                                {
+                                    "action": "Patch User Profile",
+                                    "success": false,
+                                    "status": 400,
+                                    "error": {
+                                        "code": err,
+                                        "message": "Error in patch user profile"
+                                    }
+                                })
+                        })
         })
-        .catch(err => {
+        .catch(err =>{
             return res.status(400).send(
                 {
                     "action": "Patch User Profile",
                     "success": false,
                     "status": 400,
                     "error": {
-                        "code": err.errors,
+                        "code": err,
                         "message": "Error in patch user profile"
                     }
                 })
         })
+ 
 
 }
+
+
+
+exports.updateUserInfo = function (req, res, next) {
+    const search_id = req.params.id;
+    const {obj, typeOfAction} = req.body;
+    console.log("type Of Action ", typeOfAction)
+    console.log("obj", obj)
+    if(typeOfAction == "ADD_TEACHER"){
+        UserProfile.findById(search_id)
+                    .then(learner =>{
+                        console.log("teacher")
+                        learner.teachers.push(obj)
+                        learner.save(function(err,learner){
+                            if(err){
+                                return res.status(400).send(err)
+                            }
+                            return res.status(400).send(learner)
+                        })
+                    })
+                    .catch(err=>{
+                        return res.send(err)
+                    })
+    }
+    else if(typeOfAction == "ADD_LEARNER"){
+        UserProfile.findById(search_id)
+                    .then(teacher =>{
+                        console.log("teacher")
+                        teacher.learners.push(obj)
+                        teacher.save(function(err,teacher){
+                            if(err){
+                                return res.status(400).send(err)
+                            }
+                            return res.status(200).send(teacher)
+                        })
+                    })
+                    .catch(err=>{
+                        return res.send(err)
+                    })
+    }
+    else{
+        UserProfile.findById(search_id)
+        .then(user =>{
+                if(typeOfAction == "NEW_FOLLOWER"){
+                    user.followers.push(obj)
+                }
+                else if(typeOfAction == "NEW_FOLLOWED"){
+                    user.followed.push(obj)
+                }
+                    user.save(function(err, user){
+                        if(err){
+                            return res.status(400).send(err)
+                        }
+                        else{
+                            return res.status("200").send(user)
+                        }
+                    })
+                })
+                .catch(err =>{
+                    return res.send(err)
+                })
+
+    }
+   
+
+}
+
+
+exports.completeActivity = function(req,res,next){
+
+    const{activity, score, answers} = req.body;
+    headers = req.headers
+
+    checkIsAuthenticated(headers)
+        .then(isAuth =>{
+            if(isAuth === null){
+                return res.status(403).send("NOT-AUTHORIZED")
+            }
+            if(isAuth === "Teacher"){
+                return res.status(403).send("WRONG-ROLE")
+            }
+            else{
+                console.log("STIAMOFACENDO LA FUNZIONE GIUSTA??")
+
+               isAuth.activities_completed.push({
+                   "activity":activity,
+                   "score" : score,
+                   "answers":answers
+               })
+               isAuth.exp = isAuth.exp + 50
+
+                  
+               Promise.all([
+                gamification.computeAchievement(isAuth,isAuth.activities_completed.length, "Activity"),
+                gamification.computeLevelCreate(isAuth)
+            ]).then(values =>{
+                console.log(values)
+                let achievement = values[0]
+                let level = values[1]
+
+                if(achievement !== null){
+                    const obj = {
+                        "unlocked_time":Date.now(),
+                        "unlocked":true,
+                        "achievement":achievement
+                    }
+                    isAuth.achievements.push(obj)
+                    isAuth.exp = isAuth.exp + achievement.points
+                }
+                if(level !== null){
+                    isAuth.level.level = level
+                    isAuth.level.unlocked_time = Date.now()
+                }
+          
+                isAuth.save(function(err,elem){
+                    console.log("entri=??")
+
+                    if(err){
+                        res.status(400).send(err)
+                    }
+                    if(level && achievement){
+                        return res.status(200).send({"data":isAuth, "achievement":achievement,"level":level})
+                        
+                    }
+                    else if (level){
+                        return res.status(200).send({"data":isAuth,"level":level})
+                         
+
+                    }
+                    else if (achievement){
+                        return res.status(200).send({"data":isAuth, "achievement":achievement})
+                         
+
+                    }
+                    else{
+                        return res.status(200).send({"data":isAuth})
+                        
+                    
+                    }
+                }) 
+            })
+            .catch(err=>{
+                res.status(400).send(err)
+            })
+
+
+            }
+        })
+        .catch(err=>{
+            res.status(400).send(err)
+
+        })
+}
+
+
+exports.markAsFavouriteItem = function(req,res, next){
+    const {activity} = req.body
+    headers = req.headers
+
+    checkIsAuthenticated(headers)
+        .then(isAuth=>{
+            if(isAuth === false){
+                return res.status(403).send("NOT-AUTH")
+            }
+            isAuth.favourite_activities.push(activity)
+            isAuth.save(function(err,elem){
+                if(err){
+                    return res.status(400).send(err)
+                }
+                return res.status(200).send("OK")
+            })
+        })
+        .catch(err=>{
+            return res.status(400).send(err)
+        })
+}
+
+
 
 
 /*
 * @: ROUTE
 */
 exports.sendingFriendshipRequest = async function (req, res, next) {
+    const action = "Social"
+    const category = "Users"
+
     const requestedUserId = req.params.id;
     const user = res.locals.user;
-    const data = req.body;
     console.log("sender", requestedUserId)
-    console.log("reciever : ", data)
+    console.log("reciever : ", req.body)
 
-    UserProfile.findOne({ uid: requestedUserId })
-                .exec()
-                .then(sender =>{
-                    UserProfile.findById(data._id)
-                                .exec()
-                                .then(receiver =>{
-                                    console.log(sender)
-                                    console.log(receiver)
+    header = req.headers
+    checkIsAuthenticated(header)
+        .then(isAuth =>{
+            if(isAuth === false){
+                return res.status(403).send("Not Authenticated")
+            }
+            else{
+                const {receiverID, typeOfAction} = req.body;
 
+                UserProfile.findById(receiverID._id)
+                            .exec()
+                            .then(receiver=>{
+                                console.log("FOUNDRECEIVER", receiver)
+                                if(typeOfAction =="Follower"){
                                     var friendshipReceiverRequest = {
                                         'read': false,
                                         'request_accepted': false,
-                                        'follower_id': sender
+                                        'follower_id': isAuth
                                     }
-                        
+        
                                     var friendshipSenderRequest = {
                                         'request_accepted': false,
                                         'followed_id': receiver
                                     }
-
+        
                                     receiver.followers.push(friendshipReceiverRequest);
-                                    sender.followed.push(friendshipSenderRequest);
-                                    receiver.save()
-                                    sender.save()
-                                    return res.status(200).send()
-                                    
-                                })
-                                .catch( (err) => {
-                                    return res.status(422).send(
-                                        {
-                                            "action": "Send Following request ",
-                                            "success": false,
-                                            "status": 422,
-                                            "error": {
-                                                "code": err.errors,
-                                                "message": "Error in send user following request"
-                                            }
-                                        })
-                                })
-                })
-                .catch( (err) => {
-                    return res.status(422).send(
-                        {
-                            "action": "Send Following request ",
-                            "success": false,
-                            "status": 422,
-                            "error": {
-                                "code": err.errors,
-                                "message": "Error in send user following request"
-                            }
-                        })
-                })
+                                    isAuth.followed.push(friendshipSenderRequest);
+                                    receiver.save(function(err,receiver){
+                                        if(err){
+                                            return res.status(400).send(err)
+                                        }
+                                        else{
+                                            isAuth.save(function(err,sender){
+                                                if(err){
+                                                    return res.status(400).send(err)
+                                                }
+                                                return res.status(200).send({"data":"OK"})
+                                            })
+                                        
+                                        }
+                                    })
+                                }
+                                else if( typeOfAction == "Education"){
+                                    if(isAuth.role == "Teacher" && receiver.role =="Learner"){
 
+                                        var learnerRequest = {
+                                            'request_accepted': false,
+                                            'learner_id': receiver
+                                        }
+                                        var teacherRequest = {
+                                            'request_accepted': false,
+                                            'teacher_id': isAuth
+                                        }
+                    
+                                        isAuth.learner_list.push(learnerRequest)
+                                        isAuth.save()
+                    
+                                        receiver.teacher_list.push(teacherRequest)
+                                        receiver.save()
+                                        return res.status(200).send(sender)
+                                    }
+                                    else if(isAuth.role == "Learner" && receiver.role == "Teacher"){
+
+                                        var learnerRequest = {
+                                            'request_accepted': false,
+                                            'learner_id': isAuth
+                                        }
+                                        var teacherRequest = {
+                                            'request_accepted': false,
+                                            'teacher_id': receiver
+                                        }
+                    
+                                        receiver.learner_list.push(learnerRequest)
+                                        receiver.save()
+                    
+                                        isAuth.teacher_list.push(teacherRequest)
+                                        isAuth.save()
+                                        return res.status(200).send(sender)
+                                    }
+                                    else{
+                                        return res.status(400).send({error:"SAME-ROLE-RELATIONSHIP"})
+                                    }
+                                }
+                                else{
+                                    return res.status(400).send({error:"WRONG-TYPEOFACITON"})
+                                }
+
+                        
+
+                            })
+                            .catch((err) => {
+                                return res.status(422).send(
+                                    {
+                                        "action": "Send Following request ",
+                                        "success": false,
+                                        "status": 422,
+                                        "error": {
+                                            "code": err,
+                                            "message": "Error in send user following request"
+                                        }
+                                    })
+                            })
+                    }
+        })
+        .catch((err) => {
+            return res.status(422).send(
+                {
+                    "action": "Send Following request ",
+                    "success": false,
+                    "status": 422,
+                    "error": {
+                        "code": err,
+                        "message": "Error in send user following request"
+                    }
+                })
+        })
 
 }
 
@@ -252,76 +554,74 @@ exports.acceptRequest = function (req, res, next) {
     const data = req.body;
     console.log("data", data)
     UserProfile.findOne({ uid: requestedUserId })
-                .exec()
-                .then(foundUser =>{
-                        foundUser.followers.forEach(request => {
-                            if (request.follower_id == data.follower_id) {
-                                request.read = true;
-                                request.request_accepted = true;
-                                console.log("Accetta la richiesta")
-                            }
-                        });
-                        foundUser.save()
+        .exec()
+        .then(foundUser => {
+            foundUser.followers.forEach(request => {
+                if (request.follower_id == data.follower_id) {
+                    request.read = true;
+                    request.request_accepted = true;
+                    console.log("Accetta la richiesta")
+                }
+            });
+            foundUser.save()
 
-                        UserProfile.findById(data.follower_id)
-                                    .exec()
-                                    .then(foundFollower =>{
-                                        foundFollower.followed.forEach(request => {
-                                            console.log(request.followed_id._id)
-                                            console.log(foundUser._id)
-                        
-                                            if (request.followed_id.equals(foundUser._id)) {
-                                                request.request_accepted = true;
-                                                console.log("Ciaone")
-                                            }
-                                        })
-                                        foundFollower.save()
-                                                    .then(foundFollower =>{
-                                                        return res.status(200).send(foundFollower)
-                                                    })
-                                                    .catch(err =>{
-                                                        return res.status(422).send(
-                                                            {
-                                                                "action": "Accept Following request ",
-                                                                "success": false,
-                                                                "status": 422,
-                                                                "error": {
-                                                                    "code": err,
-                                                                    "message": "Error in accept following request"
-                                                                }
-                                                            })
-                                                    })
-                                          
-                                    })
-                                    .catch(err=>{
-                                        return res.status(422).send(
-                                            {
-                                                "action": "Accept Following request ",
-                                                "success": false,
-                                                "status": 422,
-                                                "error": {
-                                                    "code": err.errors,
-                                                    "message": "Error in accept following request"
-                                                }
-                                            })
-                                    })
-                                    
+            UserProfile.findById(data.follower_id)
+                .exec()
+                .then(foundFollower => {
+                    foundFollower.followed.forEach(request => {
+                        console.log(request.followed_id._id)
+                        console.log(foundUser._id)
+
+                        if (request.followed_id.equals(foundUser._id)) {
+                            request.request_accepted = true;
+                            console.log("Ciaone")
+                        }
+                    })
+                    foundFollower.save()
+                        .then(foundFollower => {
+                            return res.status(200).send(foundFollower)
+                        })
+                        .catch(err => {
+                            return res.status(422).send(
+                                {
+                                    "action": "Accept Following request ",
+                                    "success": false,
+                                    "status": 422,
+                                    "error": {
+                                        "code": err,
+                                        "message": "Error in accept following request"
+                                    }
+                                })
+                        })
+
                 })
-                .catch(err=>{
+                .catch(err => {
                     return res.status(422).send(
                         {
                             "action": "Accept Following request ",
                             "success": false,
                             "status": 422,
                             "error": {
-                                "code": err.errors,
+                                "code": err,
                                 "message": "Error in accept following request"
                             }
                         })
                 })
+
+        })
+        .catch(err => {
+            return res.status(422).send(
+                {
+                    "action": "Accept Following request ",
+                    "success": false,
+                    "status": 422,
+                    "error": {
+                        "code": err,
+                        "message": "Error in accept following request"
+                    }
+                })
+        })
 }
-
-
 
 exports.refuseRequest = function (req, res, next) {
     console.log("Refuse Request")
@@ -331,54 +631,40 @@ exports.refuseRequest = function (req, res, next) {
     console.log("data", data)
 
     UserProfile.findOne({ uid: requestedUserId })
+        .exec()
+        .then(foundUser => {
+            foundUser.followers.forEach(request => {
+                if (request.follower_id == data.follower_id) {
+                    foundUser.followers.pop(request);
+                }
+            });
+            foundUser.save()
+
+            UserProfile.findById(data.follower_id)
                 .exec()
-                .then(foundUser => {
-                    foundUser.followers.forEach(request => {
-                        if (request.follower_id == data.follower_id) {
-                            foundUser.followers.pop(request);
+                .then(foundFollower => {
+                    foundFollower.followed.forEach(request => {
+                        if (request.followed_id.equals(foundUser._id)) {
+                            foundFollower.followed.pop(request)
                         }
-                    });
-                    foundUser.save()
-
-                    UserProfile.findById(data.follower_id)
-                                .exec()
-                                .then(foundFollower => {
-                                    foundFollower.followed.forEach(request => {
-                                        if (request.followed_id.equals(foundUser._id)) {
-                                            foundFollower.followed.pop(request)
-                                        }
-                                    })
-                                    foundFollower.save()
-                                                .then(foundFollower=>{
-                                                    return res.status(200).send(foundFollower)
-                                                })
-                                                .catch(err => {
-                                                    return res.status(422).send(
-                                                        {
-                                                            "action": "Refuse Following request ",
-                                                            "success": false,
-                                                            "status": 422,
-                                                            "error": {
-                                                                "code": err,
-                                                                "message": "Error in refuse following request"
-                                                            }
-                                                        })
-                                                })
-
+                    })
+                    foundFollower.save()
+                        .then(foundFollower => {
+                            return res.status(200).send(foundFollower)
+                        })
+                        .catch(err => {
+                            return res.status(422).send(
+                                {
+                                    "action": "Refuse Following request ",
+                                    "success": false,
+                                    "status": 422,
+                                    "error": {
+                                        "code": err,
+                                        "message": "Error in refuse following request"
+                                    }
                                 })
-                                .catch(err => {
-                                    return res.status(422).send(
-                                        {
-                                            "action": "Refuse Following request ",
-                                            "success": false,
-                                            "status": 422,
-                                            "error": {
-                                                "code": err,
-                                                "message": "Error in refuse following request"
-                                            }
-                                        })
-                                })
-            
+                        })
+
                 })
                 .catch(err => {
                     return res.status(422).send(
@@ -393,6 +679,20 @@ exports.refuseRequest = function (req, res, next) {
                         })
                 })
 
+        })
+        .catch(err => {
+            return res.status(422).send(
+                {
+                    "action": "Refuse Following request ",
+                    "success": false,
+                    "status": 422,
+                    "error": {
+                        "code": err,
+                        "message": "Error in refuse following request"
+                    }
+                })
+        })
+
 }
 
 
@@ -404,44 +704,31 @@ exports.sendBeMyTeacherRequest = function (req, res, next) {
     console.log("futureFriensd : ", data)
 
     UserProfile.findOne({ uid: requestedUserId })
+        .exec()
+        .then(student => {
+            console.log(" Student", student);
+            UserProfile.findById(data._id)
                 .exec()
-                .then(student =>{
-                    console.log(" Student", student);
-                    UserProfile.findById(data._id)
-                                .exec()
-                                .then(teacher =>{
+                .then(teacher => {
 
-                                    var learnerRequest = {
-                                        'request_accepted': false,
-                                        'learner_id': student
-                                    }
-                                    var teacherRequest = {
-                                        'request_accepted': false,
-                                        'teacher_id': teacher
-                                    }
+                    var learnerRequest = {
+                        'request_accepted': false,
+                        'learner_id': student
+                    }
+                    var teacherRequest = {
+                        'request_accepted': false,
+                        'teacher_id': teacher
+                    }
 
-                                    teacher.learner_list.push(learnerRequest)
-                                    teacher.save()
-                                    
-                                    student.teacher_list.push(teacherRequest)
-                                    student.save()
-                                    return res.status(200).send()
-                                           
-                                })
-                                .catch(err=>{
-                                    return res.status(422).send(
-                                        {
-                                            "action": "Send Teacher request ",
-                                            "success": false,
-                                            "status": 422,
-                                            "error": {
-                                                "code": err.errors,
-                                                "message": "Error in send user teaching request"
-                                            }
-                                        })
-                                })
+                    teacher.learner_list.push(learnerRequest)
+                    teacher.save()
+
+                    student.teacher_list.push(teacherRequest)
+                    student.save()
+                    return res.status(200).send()
+
                 })
-                .catch(err=>{
+                .catch(err => {
                     return res.status(422).send(
                         {
                             "action": "Send Teacher request ",
@@ -452,7 +739,20 @@ exports.sendBeMyTeacherRequest = function (req, res, next) {
                                 "message": "Error in send user teaching request"
                             }
                         })
-                })   
+                })
+        })
+        .catch(err => {
+            return res.status(422).send(
+                {
+                    "action": "Send Teacher request ",
+                    "success": false,
+                    "status": 422,
+                    "error": {
+                        "code": err.errors,
+                        "message": "Error in send user teaching request"
+                    }
+                })
+        })
 
 }
 
@@ -475,44 +775,31 @@ exports.sendBeMyStudentRequest = function (req, res, next) {
 
 
     UserProfile.findOne({ uid: requestedUserId })
+        .exec()
+        .then(teacher => {
+            console.log(" Teacher", teacher);
+            UserProfile.findById(data._id)
                 .exec()
-                .then(teacher =>{
-                    console.log(" Teacher", teacher);
-                    UserProfile.findById(data._id)
-                                .exec()
-                                .then(student =>{
+                .then(student => {
 
-                                    var learnerRequest = {
-                                        'request_accepted': false,
-                                        'learner_id': student
-                                    }
-                                    var teacherRequest = {
-                                        'request_accepted': false,
-                                        'teacher_id': teacher
-                                    }
+                    var learnerRequest = {
+                        'request_accepted': false,
+                        'learner_id': student
+                    }
+                    var teacherRequest = {
+                        'request_accepted': false,
+                        'teacher_id': teacher
+                    }
 
-                                    teacher.learner_list.push(learnerRequest)
-                                    teacher.save()
-                                    
-                                    student.teacher_list.push(teacherRequest)
-                                    student.save()
-                                    return res.status(200).send(student)
-                                           
-                                })
-                                .catch(err=>{
-                                    return res.status(422).send(
-                                        {
-                                            "action": "Send Teacher request ",
-                                            "success": false,
-                                            "status": 422,
-                                            "error": {
-                                                "code": err.errors,
-                                                "message": "Error in send user teaching request"
-                                            }
-                                        })
-                                })
+                    teacher.learner_list.push(learnerRequest)
+                    teacher.save()
+
+                    student.teacher_list.push(teacherRequest)
+                    student.save()
+                    return res.status(200).send(student)
+
                 })
-                .catch(err=>{
+                .catch(err => {
                     return res.status(422).send(
                         {
                             "action": "Send Teacher request ",
@@ -523,7 +810,20 @@ exports.sendBeMyStudentRequest = function (req, res, next) {
                                 "message": "Error in send user teaching request"
                             }
                         })
-                })   
+                })
+        })
+        .catch(err => {
+            return res.status(422).send(
+                {
+                    "action": "Send Teacher request ",
+                    "success": false,
+                    "status": 422,
+                    "error": {
+                        "code": err.errors,
+                        "message": "Error in send user teaching request"
+                    }
+                })
+        })
 
 }
 
@@ -563,7 +863,7 @@ exports.permissionSettings = function (req, res, next) {
                 follower.permission.can_see_followed_list = data.permission.can_see_my_followed_list;
                 follower.permission.can_see_follower_list = data.permission.can_see_my_follower_list;
                 follower.permission.can_see_agenda = data.permission.can_see_agenda;
-                follower.permission.can_edit_agenda = data.permission.can_edit_agenda;
+              //  follower.permission.can_edit_agenda = data.permission.can_edit_agenda;
                 follower.permission.can_see_stats = data.permission.can_see_stats;
                 follower.permission.can_see_achievements = data.permission.can_see_achievements;
                 console.log("Cambia i permessi la richiesta")
@@ -591,7 +891,7 @@ exports.permissionSettings = function (req, res, next) {
                             element.permission.can_see_followed_list = data.permission.can_see_my_followed_list;
                             element.permission.can_see_follower_list = data.permission.can_see_my_follower_list;
                             element.permission.can_see_agenda = data.permission.can_see_agenda;
-                            element.permission.can_edit_agenda = data.permission.can_edit_agenda;
+                           // element.permission.can_edit_agenda = data.permission.can_edit_agenda;
                             element.permission.can_see_stats = data.permission.can_see_stats;
                             element.permission.can_see_achievements = data.permission.can_see_achievements;
                         }
@@ -889,3 +1189,29 @@ function notAuthorized(res) {
 
   */
 
+
+
+
+function checkIsAuthenticated(headers) {
+
+    return new Promise((resolve, reject) => {
+        firebase.auth().verifyIdToken(headers.authorization)
+            .then(function (decodedToken) {
+                let uid = decodedToken.uid
+                console.log("UDI", uid)
+                UserProfile.findOne({ uid: uid })
+                    .exec()
+                    .then(foundUser => {
+                        console.log(foundUser)
+                        resolve(foundUser)
+                    })
+                    .catch(err => {
+                        reject(err)
+                    })
+            })
+            .catch(err => {
+                reject(err)
+            })
+    })
+
+}

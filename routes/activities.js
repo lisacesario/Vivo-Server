@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const ActivityController = require('../controller/activities')
 
-
+const gamification = require('../controller/gamification')
 
 // GET /api/v1/users/profile/
 router.get('', ActivityController.getActivity);

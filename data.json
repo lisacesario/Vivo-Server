@@ -1,0 +1,258 @@
+{
+
+    "achievements":[
+      {
+        "name":"Primo elemento creato",
+        "action":"Create",
+        "required_point":1,
+        "message":"Congratulazioni, hai creato il tuo primo elemento! Continua così!",
+        "imgUrl":"/achievements/create_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Cinque elementi creati",
+        "action":"Create",
+        "required_point":5,
+        "message":"Congratulazioni, hai creato cinque elementi!",
+        "imgUrl":"/achievements/create_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Dieci elementi creati",
+        "action":"Create",
+        "required_point":10,
+        "message":"Congratulazioni, hai creato dieci elementi!",
+        "imgUrl":"/achievements/create_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Venti elementi creati",
+        "action":"Create",
+        "required_point":20,
+        "message":"Congratulazioni, hai creato venti elementi!",
+        "imgUrl":"/achievements/create_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Cinquanta elementi creati",
+        "action":"Create",
+        "required_point":50,
+        "message":"Congratulazioni, hai creato cinquanta elementi!",
+        "imgUrl":"/achievements/create_achievement.svg",
+        "points": 50
+      },
+      {
+        "name":"Cento elementi creati",
+        "action":"Create",
+        "required_point":100,
+        "message":"Congratulazioni, hai creato cento elementi!!!",
+        "imgUrl":"/achievements/create_achievement.svg",
+        "points": 100
+      },
+      {
+        "name":"Primo aggiornamento",
+        "action":"Update",
+        "required_point":1,
+        "message":"Congratulazioni, hai aggiornato per la prima volta un elemento! Continua così!",
+        "imgUrl":"/achievements/update_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Cinque aggiornamenti",
+        "action":"Update",
+        "required_point":5,
+        "message":"Congratulazioni, hai aggiornato cinque elementi!",
+        "imgUrl":"/achievements/update_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Dieci aggiornamenti",
+        "action":"Update",
+        "required_point":10,
+        "message":"Congratulazioni, hai aggiornato dieci elementi!",
+        "imgUrl":"/achievements/update_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Cinquanta aggiornamenti",
+        "action":"Update",
+        "required_point":50,
+        "message":"Congratulazioni, hai aggiornato cinquanta elementi!",
+        "imgUrl":"/achievements/update_achievement.svg",
+        "points": 50
+      },
+      {
+        "name":"Cento! aggiornamenti",
+        "action":"Update",
+        "required_point":100,
+        "message":"Congratulazioni, hai aggiornato cento elementi!",
+        "imgUrl":"/achievements/update_achievement.svg",
+        "points": 100
+      },
+      {
+        "name":"Primo eliminato",
+        "action":"Delete",
+        "required_point":1,
+        "message":"Congratulazioni, hai eliminato per la prima volta un elemento!",
+        "imgUrl":"/achievements/delete_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Cinque eliminati",
+        "action":"Delete",
+        "required_point":5,
+        "message":"Congratulazioni, hai eliminato ben cinque elementi!",
+        "imgUrl":"/achievements/delete_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Dieci eliminati",
+        "action":"Delete",
+        "required_point":10,
+        "message":"Congratulazioni, hai eliminato ben dieci elementi!",
+        "imgUrl":"/achievements/delete_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Venti eliminati",
+        "action":"Delete",
+        "required_point":20,
+        "message":"Congratulazioni, hai eliminato ben venti elementi!",
+        "imgUrl":"/achievements/delete_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Cinquanta eliminati",
+        "action":"Delete",
+        "required_point":50,
+        "message":"Congratulazioni, hai eliminato ben cinquanta elementi!",
+        "imgUrl":"/achievements/delete_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Cento eliminati",
+        "action":"Delete",
+        "required_point":5,
+        "message":"Congratulazioni, hai eliminato ben cento elementi!",
+        "imgUrl":"/achievements/delete_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Primo rinforzo",
+        "action":"Social",
+        "required_point":1,
+        "message":"Congratulazioni, hai inviato il tuo primo rinforzo!",
+        "imgUrl":"/achievements/social_reward_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Cinque rinforzi",
+        "action":"Social",
+        "required_point":5,
+        "message":"Congratulazioni, hai inviato cinque rinforzi!",
+        "imgUrl":"/achievements/social_reward_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Dieci rinforzi",
+        "action":"Social",
+        "required_point":10,
+        "message":"Congratulazioni, hai inviato dieci rinforzi!",
+        "imgUrl":"/achievements/social_reward_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Venti rinforzi",
+        "action":"Social",
+        "required_point":20,
+        "message":"Congratulazioni, hai inviato venti rinforzi!",
+        "imgUrl":"/achievements/social_reward_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Cinquanta rinforzi",
+        "action":"Social",
+        "required_point":50,
+        "message":"Congratulazioni, hai inviato cinquanta rinforzi!",
+        "imgUrl":"/achievements/social_reward_achievement.svg",
+        "points": 20
+      },
+      {
+        "name":"Cento rinforzi",
+        "action":"Social",
+        "required_point":100,
+        "message":"Congratulazioni, hai inviato cento rinforzi!",
+        "imgUrl":"/achievements/social_reward_achievement.svg",
+        "points": 20
+      }
+    ],
+    "levels":[
+      {
+        "name":"Bianco",
+        "position":0,
+        "imgUrl":"/levels/white.svg",
+        "description":"Ti sei appena interfacciato al mondo vivo. ",
+        "startingPoint":0,
+        "endPoint": 100,
+        "role": "Teacher"
+      },
+      {
+        "name":"Giallo",
+        "position":1,
+        "imgUrl":"/levels/yellow.svg",
+        "description":"Hai preso un po' di confidenza con la piattaforma Vivo, continua a creare nuove attività!",
+        "startingPoint":101,
+        "endPoint": 300,
+        "role": "Teacher"
+      },
+      {
+        "name":"Arancione",
+        "position":2,
+        "imgUrl":"/levels/orange.svg",
+        "description":"Ti destreggi agevolmente nella piattaforma Vivo",
+        "startingPoint":301,
+        "endPoint": 500,
+        "role": "Teacher"
+      },
+      {
+        "name":"Verde",
+        "position":3,
+        "imgUrl":"/levels/green.svg",
+        "description":"Ti destreggi agevolmente nella piattaforma Vivo",
+        "startingPoint":501,
+        "endPoint": 800,
+        "role": "Teacher"
+      },
+      {
+        "name":"Blu",
+        "position":4,
+        "imgUrl":"/levels/blu.svg",
+        "description":"Ti destreggi agevolmente nella piattaforma Vivo",
+        "startingPoint":801,
+        "endPoint": 1200,
+        "role": "Teacher"
+      },
+      {
+        "name":"Marrone",
+        "position":5,
+        "imgUrl":"/levels/brown.svg",
+        "description":"Ti destreggi agevolmente nella piattaforma Vivo",
+        "startingPoint":1201,
+        "endPoint": 1500,
+        "role": "Teacher"
+      },
+      {
+        "name":"Nero",
+        "position":6,
+        "imgUrl":"/levels/black.svg",
+        "description":"Il mondo VIVO non ha più segreti per te, padroneggi la piattaforma.",
+        "startingPoint":1501,
+        "endPoint": 2000,
+        "role": "Teacher"
+      }
+ 
+    ]
+
+  }
+  
+

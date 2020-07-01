@@ -12,11 +12,11 @@ const StepSchema = new Schema({
         type:String,
         required:false,
     },
-    imgURL: {
+    imgUrl: {
         type: String,
         required: false,
     },
-    imgSymURL: {
+    imgSym: {
         type: String,
         required: false,
     },

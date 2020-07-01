@@ -18,6 +18,11 @@ const QuizSchema = new Schema({
             required: true
         }    
     }],*/
+   /* answers:[{  
+            text: {type:String, required:true},
+            correct: {type:Boolean, required:false},
+            value: {type:Number, required:false}
+    }],*/
     option_1:{
         type:String,
         required:true

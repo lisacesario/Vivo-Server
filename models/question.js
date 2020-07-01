@@ -2,27 +2,29 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 
-const ToolSchema = new Schema({
+const QuestionSchema = new Schema({
 
-    name: {
+    question: {
         type: String,
         required: true
     },
-    description : {
+    answers:[
+        { 
+            _id:false, 
+            text: {type:String, required:true},
+            correct: {type:Boolean, required:false},
+            value: {type:Number, required:false}
+    }],
+    environment : {
         type:String,
         required:false,
     },
-    imgUrl: {
-        type: String,
-        required: false,
-    },
-    warning: {
+    imgURL:{
         type: String,
         required: false,
     },
     shared:{
         type: Boolean,
-        required: false,
         default:false
     },
     activities:[{
@@ -43,7 +45,7 @@ const ToolSchema = new Schema({
 
 
 
-var Tool = mongoose.model('Tool', ToolSchema);
+var Question = mongoose.model('Question', QuestionSchema);
 
-module.exports = { Tool };
+module.exports = { Question };
 

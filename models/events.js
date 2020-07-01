@@ -31,10 +31,6 @@ const EventSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'BaseActivity',
     },
-    done: {
-        type: Boolean,
-        default: false
-    },
     added_by: {
         type: Schema.Types.ObjectId,
         ref: 'UserProfile',
@@ -54,7 +50,7 @@ const EventSchema = new Schema({
         },
         execution_date: {
             type: Date,
-            default: false
+            required: false
         },
     }
 
