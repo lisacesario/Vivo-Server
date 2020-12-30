@@ -4,6 +4,9 @@ const bodyparser = require('body-parser');
 const cors = require('cors')
 const config = require('./config/dev');
 const FakeDB = require('./FakeDB')
+const  http   = require('http');
+
+const formatMessage = require('./controller/messages')
 //const firebase = require('firebase');
 /*****
  * 
@@ -87,6 +90,8 @@ const messagesRoutes = require('./routes/messages');
 app.use('/api/v1/messages', messagesRoutes);
 
 const questionRoutes = require('./routes/questions');
+const { promises } = require('fs');
+const { reject } = require('async');
 app.use('/api/v1/questions', questionRoutes);
 /*
 const levelsRoutes = require('./routes/admin-tool/level');
@@ -102,7 +107,116 @@ app.use('/api/v1/admin-tools/', adminRoutes);
 
 const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, function(){
-    console.log('i am running')
-});
+// Server Setup
+var server = http.createServer(app)
+server.listen(PORT, function(){
+    console.log('listening in http://localhost:' +  PORT)
+})
+
+
+// get username and room from  URL
+//const { username, room }
+
+// Socket Setup
+const vivoBot = 'VivoBot';
+
+var io = require('socket.io')(server)
+
+var users = []
+
+io.on('connection', (socket)=>{
+    console.log("user has connected")
+
+
+    socket.on('isReady',(loggedInUser)=>{
+        console.log(loggedInUser.name + 'joins Vivo')
+        users.push({
+            socket,
+            loggedInUser
+        })
+        console.log(users)
+    })
+
+   
+    socket.on('joinRoom', ({username, room}) =>{
+        const user = userJoin(socket.id, username, room)
+        socket.join(user.room)
+    })
+
+    
+
+
+   /* socket.on('join:room', function(chatId){
+        console.log('join room: ', chatId)
+        socket.join(chatId)
+    })
+
+    socket.on('send:chatmessages', function(data){
+       var newMessage = new ChatMessage();
+       newMessage.chat = data.chatId;
+       newMessage.message = data.message;
+       newMessage.from = data.from;
+
+       message.save((err,msg)=>{
+           io.to(msg.chat).emit('new-message', msg)
+       })
+    })
+
+   
+    socket.on('disconnect', function(){
+        console.log("user disconnected")
+       // io.emit('user-changed',{user: socket.username, event:'left'})
+    });
+
+
+     // Join room
+     socket.on('join', (params, callback)=>{
+        console.log(params.user + "join to" + params.room)
+        socket.join(params.room);       
+        callback()
+    })
+
+    // Send Message To Particular Room
+    socket.on("chat-message", function(message){
+        /* let index = users.findIndex(user=>{
+            return user.username === data.username
+        })
+        console.log('message: ' + data.message)
+       users[index].socket.emit("newMessage", {
+            message: data.message
+        })* /
+        console.log(message)
+       io.to(message.room).emit('newMessage',{
+            message:message.message,
+            room:message.room,
+            user:message.user
+        })
+        //io.emit('newMessage', {msg:message.message, user:socket.username})
+
+
+    })
+    
+    socket.on('online', function(username){
+        console.log( username + 'joins the chat')
+        users.push({
+            socket,
+            username
+        })
+        console.log(users)
+    })
+/*
+    socket.on('online', function(userDetils ){
+
+    })
+    socket.on('set-name', (name)=>{
+        socket.username = name
+        io.emit('user-changed', {user:name, event:'joined'});
+    })
+
+    socket.on('send-message', (message)=>{
+        io.emit('message', {msg:message.text, user:socket.name})
+    })*/
+})
+
+
 

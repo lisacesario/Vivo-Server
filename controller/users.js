@@ -14,8 +14,6 @@ const {Level} = require('../models/gaming/level')
 const gamification = require('../controller/gamification')
 
 const logs = require('../controller/log');
-const { isatty } = require('tty');
-const { type } = require('os');
 
 exports.createUser = function (req, res, next) {
     console.log("Create User")
