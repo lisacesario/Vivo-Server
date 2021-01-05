@@ -97,14 +97,11 @@ exports.getUser = function (req, res, next) {
 
 
 exports.getUsersProfile = function (req, res, next) {
-    console.log("Get tutti i profili Utenti")
     const requestedUserId = req.params.id;
-    console.log("bu:", requestedUserId)
     UserProfile.find({uid:{$ne: requestedUserId}})
         .select('displayName photoURL role')
         .exec()
         .then(userProfile => {
-            console.log("userProfile", userProfile)
             return res.status(200).send(userProfile)
         })
         .catch(err => {
@@ -126,7 +123,6 @@ exports.getUsersProfile = function (req, res, next) {
 exports.getUserProfileById = function (req, res, next) {
     console.log("getUserProfileById")
     const requestedUserId = req.params.id;
-    //console.log("bu" , requestedUserId)
     UserProfile.findById(requestedUserId)
         .exec()
         .then(user => {

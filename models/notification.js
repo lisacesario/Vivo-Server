@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 
 const NotificationSchema = new Schema({
-    timedate : {
+    timestamp : {
         type: Date,
         required: false
     },
@@ -18,9 +18,18 @@ const NotificationSchema = new Schema({
     uid_receiver:{
         type: String,
         required: true
+    },
+    text:{
+        type:String,
+        required: false
+    },
+    read:{
+        type:String,
+        required: false,
+        default: false
     }
 
 })
 
-var Notification = mongoose.model('Notification', NotificationSchema)
-module.exports = {Notification}
+var NotificationVivo = mongoose.model('NotificationVivo', NotificationSchema)
+module.exports = {NotificationVivo}

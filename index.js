@@ -90,9 +90,12 @@ const messagesRoutes = require('./routes/messages');
 app.use('/api/v1/messages', messagesRoutes);
 
 const questionRoutes = require('./routes/questions');
-const { promises } = require('fs');
-const { reject } = require('async');
+
+const { Notification } = require('./models/notification');
 app.use('/api/v1/questions', questionRoutes);
+
+const notificationRoutes = require('./routes/notifications')
+app.use('/api/v1/notification', notificationRoutes)
 /*
 const levelsRoutes = require('./routes/admin-tool/level');
 app.use('/api/v1/admin-tools/levels', levelsRoutes);
@@ -120,22 +123,84 @@ server.listen(PORT, function(){
 // Socket Setup
 const vivoBot = 'VivoBot';
 
+const { NotificationVivo } = require('./models/notification');
+
 var io = require('socket.io')(server)
 
-var users = []
+/* 
+    Users is an array composed by:
+    - socket 
+    - uid
+    - displayName
+*/
+
+
+var usersConnected = []
 
 io.on('connection', (socket)=>{
-    console.log("user has connected")
+
+    const socketID = socket.handshake.query 
+    console.log("id: ", socketID.token)
+    socket.join(socketID.token)
+
+    socket.on('online', function(uid){
+        console.log( uid + 'joins the chat')
+        usersConnected = usersConnected.filter(x => {return x.uid != uid})
+        usersConnected.push({
+            'socket': socket,
+            'uid':uid
+        })
+        console.log(usersConnected)
+    });
+
+    socket.on('notification', (data)=>{
+        var notification = new NotificationVivo({
+            'timestamp' :  data.timestamp,
+            'type' : data.type,
+            'uid_sender': data.uid_sender,
+            'uid_receiver': data.uid_receiver,
+            'text' : data.text,
+            'read': false
+
+        });
+
+        notification.save((err,notification)=>{
+            console.log("Salvata", notification.uid_receiver)
+            //io.emit('new-notification', notification)
+            usersConnected.forEach(x => {
+                console.log("x: " + x + "socket: " + x.socket +"uid: " + x.uid)
+                if(x.uid == notification.uid_receiver){
+                    console.log(x.uid == notification.uid_receiver)
+                    io.to(x.socket.id).emit('new:notification', notification)
+                    return 
+                }
+            })
+       })
+    })
 
 
-    socket.on('isReady',(loggedInUser)=>{
-        console.log(loggedInUser.name + 'joins Vivo')
+
+/*
+    socket.on('online',(loggedInUser)=>{
+        console.log(loggedInUser.displayName + ' joins Vivo')
         users.push({
-            socket,
-            loggedInUser
+            'socket': socket,
+            'uid': loggedInUser.uid,
+            'displayName': loggedInUser.displayName,
         })
         console.log(users)
     })
+
+    socket.on('offline', (loggedInUser) => {
+        console.log(loggedInUser.displayName + " will be off Vivo soon")
+        this.users = users.filter( x => {return x.uid != loggedInUser.uid})  
+    })
+  /*  socket.on('offline', function(){
+    
+        console.log("user " + socket.loggedInUser.displayName + " disconnected")
+       // io.emit('user-changed',{user: socket.username, event:'left'})
+    });
+     * /
 
    
     socket.on('joinRoom', ({username, room}) =>{
@@ -143,8 +208,60 @@ io.on('connection', (socket)=>{
         socket.join(user.room)
     })
 
-    
+    socket.on('activitycompleted', ({activity, sender, receiver, text})=>{
+        var notification = new Notification()
+        notification.timedate = new Date()
+        notification.type = "ACTIVITY_COMPLETED"
+        notification.uid_sender = sender 
+        notification.uid_receiver = receiver
+        notification.text = text
 
+        notification.save((err,elem)=>{
+            if(err){
+                console.log(err)
+            }
+            let index = users.findIndex(user=>{
+                return user.uid === receiver.uid
+            })
+            if(index){
+                io.to(users[index].socket).emit('notification', elem)
+            }
+        })
+    })
+    
+    socket.on('friendshipRequestNew', ({friendshipReq})=>{
+        var notification = new Notification()
+        notification.timedate = new Date()
+        notification.type = "FRIENDSHIP_REQUEST_NEW"
+        notification.uid_sender = sender 
+        notification.uid_receiver = receiver
+        notification.text = text
+
+        notification.save((err,elem)=>{
+            if(err){
+                console.log(err)
+            }
+            let index = users.findIndex(user=>{
+                return user.uid === receiver.uid
+            })
+            if(index){
+                io.to(users[index].socket).emit('notification', elem)
+            }
+        })
+    })
+
+
+    socket.on('notiication:friendshipRequestAccepted', ({friendshipReq})=>{
+        /*
+         -> aggiorno l'agenda 
+        * /
+    })
+
+    socket.on('notiication:friendshipRequestDeleted', ({friendshipReq})=>{
+        /*
+         -> aggiorno l'agenda 
+        * /
+    })
 
    /* socket.on('join:room', function(chatId){
         console.log('join room: ', chatId)
