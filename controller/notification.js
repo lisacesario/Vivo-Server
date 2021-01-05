@@ -13,7 +13,7 @@ exports.getNotificationsById = function(req,res, next){
                 return res.status(403).send("Not auth")
             }
             else{
-                NotificationVivo.find({uid_receiver : isAuth.uid})
+                NotificationVivo.find({uid_receiver : isAuth._id})
                     .exec()
                     .then(notifications =>{
                         console.log("nodification", notifications)

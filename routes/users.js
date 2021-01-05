@@ -45,29 +45,9 @@ router.get('/events/:id', EventController.getEventById)
 
 //router.patch('/:id/gamification/character', UserController.addEventToAgenda);
 
+router.patch('/social/:id', UserController.UpdateSocialNetwork)
 
-// PATCH /api/v1/users/friends-of/id
-router.patch('/friends-of/:id', UserController.sendingFriendshipRequest);
-
-// PATCH /api/v1/users/friends-of/id/accept
-router.patch(`/friends-of/:id/accept`, UserController.acceptRequest)
-
-// PATCH /api/v1/users/friends-of/id/refuse
-router.patch(`/friends-of/:id/refuse`, UserController.refuseRequest)
-
-// PATCH /api/v1/users/friends-of/id/permission
 router.patch(`/friends-of/:id/permission`, UserController.permissionSettings)
-
-
-
-router.patch('/teacher-of/:id', UserController.sendBeMyTeacherRequest);
-router.patch('/teacher-of/:id/accept', UserController.acceptBeMyTeacherRequest);
-router.patch('/teacher-of/:id/refuse', UserController.refuseBeMyTeacherRequest);
-
-router.patch('/student-of/:id', UserController.sendBeMyStudentRequest);
-router.patch('/student-of/:id/accept', UserController.acceptBeMyStudentRequest);
-router.patch('/student-of/:id/refuse', UserController.refuseBeMyStudentRequest);
-
 
 // GAMIFICATION STUFF
 router.get('/achievements/:id', UserController.getAchievementById);

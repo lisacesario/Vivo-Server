@@ -37,8 +37,8 @@ const UserProfileSchema = new Schema({
     },
     followers:[{
         _id: false,
-        read: { type: Boolean, default: false },
-        request_accepted: { type: Boolean, default: false },
+        read: { type: Boolean, required: false },
+        request_accepted: { type: Boolean, required: false },
         date: { type: Date, default: Date.now },
         follower: {
             type: Schema.Types.ObjectId,
@@ -47,8 +47,8 @@ const UserProfileSchema = new Schema({
     }],
     followed:[{
         _id: false,
-        read: { type: Boolean, default: false },
-        request_accepted: { type: Boolean, default: false },
+        read: { type: Boolean, required: false },
+        request_accepted: { type: Boolean, required: false },
         date: { type: Date, default: Date.now },
         followed: {
             type: Schema.Types.ObjectId,
@@ -64,45 +64,6 @@ const UserProfileSchema = new Schema({
         can_see_stats: { type: Boolean, default: false },
         can_see_achievements: { type: Boolean, default: false },
     },
-    followers_old: [{
-        _id: false,
-        read: { type: Boolean, default: false },
-        request_accepted: { type: Boolean, default: false },
-        date: { type: Date, default: Date.now },
-        follower_id: {
-            type: Schema.Types.ObjectId,
-            ref: 'UserProfile'
-        },
-        permission: {
-            can_write: { type: Boolean, default: false },
-            can_see_bio_info: { type: Boolean, default: false },
-            can_see_follower_list: { type: Boolean, default: false },
-            can_see_followed_list: { type: Boolean, default: false },
-            can_see_agenda : { type: Boolean, default: false },
-            can_see_stats: { type: Boolean, default: false },
-            can_see_achievements: { type: Boolean, default: false },
-
-        }
-    }],
-    followed_old: [{
-        _id: false,
-        request_accepted: { type: Boolean, default: false },
-        date: { type: Date, default: Date.now },
-        followed_id: {
-            type: Schema.Types.ObjectId,
-            ref: 'UserProfile'
-        },
-        permission: {
-            can_write: { type: Boolean, default: false },
-            can_see_bio_info: { type: Boolean, default: false },
-            can_see_follower_list: { type: Boolean, default: false },
-            can_see_followed_list: { type: Boolean, default: false },
-            can_see_agenda : { type: Boolean, default: false },
-            can_see_stats: { type: Boolean, default: false },
-            can_see_achievements: { type: Boolean, default: false },
-
-        }
-    }],
     activities_i_like: [{
         type: Schema.Types.ObjectId,
         ref: 'BaseActivity',
@@ -168,8 +129,8 @@ const TeacherProfileSchema = new Schema({
     }],
     learners: [{
         _id : false,
-        read : {type: Boolean, default:false},
-        request_accepted : {type: Boolean, default:false},
+        read : {type: Boolean, required:false},
+        request_accepted : {type: Boolean, required:false},
         learner : {
             type: Schema.Types.ObjectId,
             ref: 'Learner',
@@ -207,8 +168,8 @@ const LearnerProfileSchema = new Schema({
     }],
     teachers: [{
         _id : false,
-        read : {type: Boolean, default:false},
-        request_accepted : {type: Boolean, default:false},
+        read : {type: Boolean, required:false},
+        request_accepted : {type: Boolean, required:false},
         teacher : {
             type: Schema.Types.ObjectId,
             ref: 'Teacher',
