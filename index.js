@@ -166,9 +166,9 @@ io.on('connection', (socket)=>{
 
         notification.save((err,notification)=>{
             console.log("Salvata", notification.uid_receiver)
-            //io.emit('new-notification', notification)
             usersConnected.forEach(x => {
                 console.log("x: " + x + "socket: " + x.socket +"uid: " + x.uid)
+                // Send only if receiver is connected
                 if(x.uid == notification.uid_receiver){
                     console.log(x.uid == notification.uid_receiver)
                     io.to(x.socket.id).emit('new:notification', notification)

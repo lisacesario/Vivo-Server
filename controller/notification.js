@@ -26,7 +26,30 @@ exports.getNotificationsById = function(req,res, next){
         })    
 }
 
+exports.markNotificationAsRead = function(req,res,next){
+    NotificationVivo.findById(req.params.id).exec()
+        .then(notification=>{
+            notification.read = true
+            notification.save(function(err){
+                if(err){
+                    return res.status(400).send(err)
+                }
+                return res.status(200).send(notification)
+            })
+        })
+}
 
+exports.deleteNotificationById = function(req,res,next){
+    NotificationVivo.findById(req.params.id).exec()
+        .then(notification=>{
+            notification.remove(function(err){
+                if(err){
+                    return res.status(400).send(err)
+                }
+                return res.status(200).send({"message": "notifica eliminata"})
+            })
+    })
+}
 
 
 
