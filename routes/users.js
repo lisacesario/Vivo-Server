@@ -19,7 +19,7 @@ router.get('/profile/less/:id', UserController.getUsersProfile);
 
 router.get('/profile/agenda/:id', UserController.populateAgenda)
 
-router.get('/profile/populated/:id', UserController.getPopulatedUserProfile);
+router.get('/profile/populated/:id', UserController.populateUser);
 
 // GET /api/v1/users/profile/
 router.get('/profile/:id', UserController.getUserProfileById);

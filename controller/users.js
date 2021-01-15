@@ -144,6 +144,39 @@ exports.getUserProfileById = function (req, res, next) {
 }
 
 
+exports.populateUser = function(req,res, next){
+    const requestedUserId = req.params.id;
+    UserProfile.findOne({uid:requestedUserId})
+                .populate({
+                    path:'teachers.teacher',
+                    model:'UserProfile',
+                    })
+                .populate({
+                    path:'followers.follower',
+                    model:'UserProfile',
+                    })
+                .populate( {
+                    path:'followed.followed',
+                    model:'UserProfile',
+                })
+                .populate({
+                    path:'achievements.achievement',
+                    model:'Achievement',
+                })
+                .populate({
+                    path:'level.level',
+                    model:'Level',
+                })
+                .exec()
+                .then((user)=>{
+                    return res.status(200).send(user)
+                })
+                .catch((err)=>{
+                    return res.status(400).send(err)
+                })
+}
+
+
 exports.getPopulatedUserProfile =  function(req,res,next){
     const requestedUserId = req.params.id;
     UserProfile.findOne({uid:requestedUserId})
@@ -151,6 +184,7 @@ exports.getPopulatedUserProfile =  function(req,res,next){
                     path:'teachers.teacher',
                     model:'UserProfile',
                     })
+
                 .exec()
                 .then( user => {
                     UserProfile.populate(user,
