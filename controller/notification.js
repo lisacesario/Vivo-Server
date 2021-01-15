@@ -6,7 +6,7 @@ const { UserProfile } = require('../models/user_profile');
 exports.getNotificationsById = function(req,res, next){
     
     headers = req.headers;
-    console.log("headers", headers)
+    //console.log("headers", headers)
     checkIsAuthenticated(headers)
         .then(isAuth =>{
             if(isAuth === false){
@@ -16,7 +16,7 @@ exports.getNotificationsById = function(req,res, next){
                 NotificationVivo.find({uid_receiver : isAuth._id})
                     .exec()
                     .then(notifications =>{
-                        console.log("nodification", notifications)
+                        //console.log("nodification", notifications)
                         return res.status(200).send(notifications)
                     })
                     .catch(err =>{
@@ -59,11 +59,11 @@ function checkIsAuthenticated(headers) {
         firebase.auth().verifyIdToken(headers.authorization)
             .then(function (decodedToken) {
                 let uid = decodedToken.uid
-                // console.log("UDI :", uid)
+                // //console.log("UDI :", uid)
                 UserProfile.findOne({ uid: uid })
                     .exec()
                     .then(foundUser => {
-                        console.log(foundUser)
+                        //console.log(foundUser)
                         resolve(foundUser)
                     })
                     .catch(err => {

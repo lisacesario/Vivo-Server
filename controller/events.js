@@ -132,21 +132,24 @@ exports.createEvent = function (req, res, next) {
 
 }
 
-exports.updateEvent = function (req, res, next) {
-    headers = req.headers
-    checkIsAuthenticated(headers)
-        .then((isAuth) => {
-            if (isAuth === false) {
-                return res.status(403).send("You are not authorized")
-            }
-            else {
-
-            }
-        })
-        .catch(err => {
+exports.completeEvent = function (req, res, next) {
+    console.log("EVENTOOOOOOOOOOOOOOO")
+    Event.findById(req.params.id).exec( function(err,event){
+        if(err){
             return res.status(400).send(err)
+        }
+        event.executed.done = true
+        event.executed.execution_date = new Date()
+        event.save(function(err,event){
+            if(err){
+                return res.status(400).send(err)
+            }
+            return res.status(200).send(event)
         })
+    })
 }
+
+
 
 
 

@@ -16,9 +16,9 @@ const gamification = require('../controller/gamification')
 const logs = require('../controller/log');
 
 exports.createUser = function (req, res, next) {
-    console.log("Create User")
+    //console.log("Create User")
     const { uid, email, role, photoURL, displayName } = req.body;
-    console.log("User Profile ", uid, email, role, photoURL, displayName);
+    //console.log("User Profile ", uid, email, role, photoURL, displayName);
     const userProfile = new UserProfile({ uid, email, role, photoURL, displayName })
     UserProfile.create(userProfile, function (error, newProfile) {
         if (error) {
@@ -73,7 +73,7 @@ exports.getLevelById = function(req,res,next){
 
 
 exports.getUser = function (req, res, next) {
-    console.log("Get auth user")
+    //console.log("Get auth user")
     const requestedUserId = req.params.id;
     UserProfile.findOne({ uid: requestedUserId })
         .select('-uid -email')
@@ -121,9 +121,9 @@ exports.getUsersProfile = function (req, res, next) {
 
 
 exports.getUserProfileById = function (req, res, next) {
-    console.log("getUserProfileById")
+    //console.log("getUserProfileById")
     const requestedUserId = req.params.id;
-    //console.log("bu" , requestedUserId)
+    ////console.log("bu" , requestedUserId)
     UserProfile.findById(requestedUserId)
         .exec()
         .then(user => {
@@ -180,10 +180,10 @@ exports.getPopulatedUserProfile =  function(req,res,next){
 
 
 exports.patchUser = function (req, res, next) {
-    console.log("PATCH")
+    //console.log("PATCH")
     const user = res.locals.user;
     const data = req.body;
-    console.log("valure", req.body)
+    //console.log("valure", req.body)
 
     headers =  req.headers
     checkIsAuthenticated(headers)
@@ -237,12 +237,12 @@ exports.patchUser = function (req, res, next) {
 exports.updateUserInfo = function (req, res, next) {
     const search_id = req.params.id;
     const {obj, typeOfAction} = req.body;
-    console.log("type Of Action ", typeOfAction)
-    console.log("obj", obj)
+    //console.log("type Of Action ", typeOfAction)
+    //console.log("obj", obj)
     if(typeOfAction == "ADD_TEACHER"){
         UserProfile.findById(search_id)
                     .then(learner =>{
-                        console.log("teacher")
+                        //console.log("teacher")
                         learner.teachers.push(obj)
                         learner.save(function(err,learner){
                             if(err){
@@ -258,7 +258,7 @@ exports.updateUserInfo = function (req, res, next) {
     else if(typeOfAction == "ADD_LEARNER"){
         UserProfile.findById(search_id)
                     .then(teacher =>{
-                        console.log("teacher")
+                        //console.log("teacher")
                         teacher.learners.push(obj)
                         teacher.save(function(err,teacher){
                             if(err){
@@ -313,7 +313,7 @@ exports.completeActivity = function(req,res,next){
                 return res.status(403).send("WRONG-ROLE")
             }
             else{
-                console.log("STIAMOFACENDO LA FUNZIONE GIUSTA??")
+                //console.log("STIAMOFACENDO LA FUNZIONE GIUSTA??")
 
                isAuth.activities_completed.push({
                    "activity":activity,
@@ -327,7 +327,7 @@ exports.completeActivity = function(req,res,next){
                 gamification.computeAchievement(isAuth,isAuth.activities_completed.length, "Activity"),
                 gamification.computeLevelCreate(isAuth)
             ]).then(values =>{
-                console.log(values)
+                //console.log(values)
                 let achievement = values[0]
                 let level = values[1]
 
@@ -346,7 +346,7 @@ exports.completeActivity = function(req,res,next){
                 }
           
                 isAuth.save(function(err,elem){
-                    console.log("entri=??")
+                    //console.log("entri=??")
 
                     if(err){
                         res.status(400).send(err)
@@ -414,7 +414,7 @@ exports.permissionSettings = function (req, res, next) {
 
     const requestedUserId = req.params.id;
     const data = req.body;
-    console.log("data", data)
+    //console.log("data", data)
     UserProfile.findOne({ uid: requestedUserId }).populate().exec(function (err, foundUser) {
         if (err) {
             return res.status(400).send(
@@ -428,7 +428,7 @@ exports.permissionSettings = function (req, res, next) {
                     }
                 })
         }
-        console.log("Elementi Trovato", foundUser);
+        //console.log("Elementi Trovato", foundUser);
         foundUser.followers.forEach(follower => {
             if (follower.follower_id == data.follower_id) {
                 follower.permission.can_write = data.permission.can_write_me;
@@ -439,7 +439,7 @@ exports.permissionSettings = function (req, res, next) {
               //  follower.permission.can_edit_agenda = data.permission.can_edit_agenda;
                 follower.permission.can_see_stats = data.permission.can_see_stats;
                 follower.permission.can_see_achievements = data.permission.can_see_achievements;
-                console.log("Cambia i permessi la richiesta")
+                //console.log("Cambia i permessi la richiesta")
             }
         });
         foundUser.save().then(
@@ -494,14 +494,47 @@ exports.permissionSettings = function (req, res, next) {
 }
 
 
+exports.populateAgenda = function (req,res,next){
+    console.log("POPULATED")
+    const requestedUserId = req.params.id;
+    LearnerProfile.findById(requestedUserId)
+        .select('agenda')
+        .populate({
+            path:'agenda',
+            populate:{
+                path:'activity',
+                model:"BaseActivity"
+            }
+        })
+        .exec()
+        .then(user => {
+            console.log("agenda ", user)
+            return res.status(200).send(user)
+        })
+        .catch(err => {
+            return res.status(400).send(
+                {
+                    "action": "Get User Profile",
+                    "success": false,
+                    "status": 400,
+                    "error": {
+                        "code": err.errors,
+                        "message": "Error in retrieving user profile"
+                    },
+                })
+        })
+}
+
+
+
 exports.addEventToAgenda = function (req, res, next) {
-    console.log("Add event to agenda")
+    //console.log("Add event to agenda")
     const user = res.locals.user;
     const data = req.body;
     const search_id = req.params.id
-    console.log('activity_id :' + search_id);
-    console.log('user', user)
-    console.log("data", req.body)
+    //console.log('activity_id :' + search_id);
+    //console.log('user', user)
+    //console.log("data", req.body)
 
     const { day, start_time, end_time, repeat_weekly, repeat_daily, repeat_monthly, activity, added_by, added_for } = req.body;
 
@@ -516,18 +549,18 @@ exports.addEventToAgenda = function (req, res, next) {
 
     Event.create(new_event, function (err, newEvent) {
         if (err) {
-            console.log(err);
+            //console.log(err);
         }
         BaseActivity.findOne(activity, function (err, foundActivity) {
             if (err) {
-                console.log(err);
+                //console.log(err);
             }
             newEvent.activity = foundActivity
         }).then(
             (foundActivity) => {
                 UserProfile.findOne({ uid: added_by }, function (err, foundUser) {
                     if (err) {
-                        console.log(err);
+                        //console.log(err);
                     }
                     newEvent.added_by = foundUser
                     foundUser.events.push(newEvent);
@@ -535,7 +568,7 @@ exports.addEventToAgenda = function (req, res, next) {
                         (foundUser) => {
                             UserProfile.findOne({ _id: added_for }, function (err, foundStudent) {
                                 if (err) {
-                                    console.log(err);
+                                    //console.log(err);
                                 }
                                 newEvent.added_for = foundStudent
                                 foundStudent.agenda.push(newEvent);
@@ -545,30 +578,30 @@ exports.addEventToAgenda = function (req, res, next) {
                                         return res.status(200).send({ "message": "evento aggiunto" })
                                     },
                                     (err) => {
-                                        console.log("Errore", err)
+                                        //console.log("Errore", err)
                                     }
                                 )
                             })
                         },
                         (err) => {
-                            console.log("Errore", err)
+                            //console.log("Errore", err)
                         }
 
                     );
                 })
             },
             (err) => {
-                console.log("Errore", err)
+                //console.log("Errore", err)
             }
         )
     })
 }
 
 exports.UpdateSocialNetwork = function(req,res,next){
-    console.log('UpdateSockalNetwork')
+    //console.log('UpdateSockalNetwork')
     const requestedUserId = req.params.id;
     const {action, user} = req.body;
-    console.log("action: ", action)
+    //console.log("action: ", action)
     UserProfile.findById(requestedUserId).exec()
         .then(userToBeUpdated=>{
 
@@ -633,7 +666,7 @@ exports.UpdateSocialNetwork = function(req,res,next){
                     }
                 })
                 .catch(err =>{
-                    console.log(err)
+                    //console.log(err)
                 })
             }
         })
@@ -663,7 +696,7 @@ exports.auth = function(req,res, next){
 
             firebase.auth().signInWithEmailAndPassword(email, password).then(
                 (elemento)=>{
-                    console.log("Login completato con successo",elemento)
+                    //console.log("Login completato con successo",elemento)
                     // return JWT Token
                     const token= jwt.sign({
                         userId: user.id,
@@ -692,14 +725,14 @@ exports.auth = function(req,res, next){
 
 
 exports.getUser = function(req,res,next){
-    console.log("req :", req.params);
-    console.log("res :", res.locals.user);
+    //console.log("req :", req.params);
+    //console.log("res :", res.locals.user);
 
     const requestedUserId = req.params.id;
     const user = res.locals.user;
 
-    console.log("req user: ",requestedUserId);
-    console.log("user: ", user)
+    //console.log("req user: ",requestedUserId);
+    //console.log("user: ", user)
 
     if( requestedUserId === user.id ){
         // Display all information
@@ -754,7 +787,7 @@ exports.register = function(req,res, next){
         })
             .then(
                 (elemento)=>{
-                    console.log(elemento.uid);
+                    //console.log(elemento.uid);
                     uid = elemento.uid
                     const user = new UserProfile({
                         uid,
@@ -849,11 +882,11 @@ function checkIsAuthenticated(headers) {
         firebase.auth().verifyIdToken(headers.authorization)
             .then(function (decodedToken) {
                 let uid = decodedToken.uid
-                console.log("UDI", uid)
+                //console.log("UDI", uid)
                 UserProfile.findOne({ uid: uid })
                     .exec()
                     .then(foundUser => {
-                        console.log(foundUser)
+                        //console.log(foundUser)
                         resolve(foundUser)
                     })
                     .catch(err => {

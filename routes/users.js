@@ -17,6 +17,8 @@ router.post('/register', UserController.register);
 // GET /api/v1/users/profile/
 router.get('/profile/less/:id', UserController.getUsersProfile);
 
+router.get('/profile/agenda/:id', UserController.populateAgenda)
+
 router.get('/profile/populated/:id', UserController.getPopulatedUserProfile);
 
 // GET /api/v1/users/profile/
@@ -32,10 +34,13 @@ router.patch('/complete-activity', UserController.completeActivity);
 router.patch('/:id', UserController.patchUser)
 
 
+
 router.post('/:id/events/new', EventController.createEvent)
-router.patch('/:id/events/update', EventController.updateEvent)
+router.patch('/events/complete/:id', EventController.completeEvent)
+//router.patch('/:id/events/update', EventController.updateEvent)
 router.delete('/events/:id/delete', EventController.deleteEvent)
 router.get('/events/:id', EventController.getEventById)
+
 
 //router.post('/:id/agenda/add-to', UserController.addEventToAgenda);
 //router.patch('/:id/agenda/update', UserController.addEventToAgenda);
