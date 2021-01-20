@@ -43,7 +43,7 @@ mongoose.connect(config.DB_URI_ASW,{ useNewUrlParser: true, useUnifiedTopology: 
  
  // init firebase
  
-const admin = require("firebase-admin");
+const admin = require("firebase-admin"); 
 
 var serviceAccount = require("./config/serviceAccountKey.json");
 var VivoDB_URL = "https://inclusivelearning-wecaremore0.firebaseio.com"
