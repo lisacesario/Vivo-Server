@@ -16,12 +16,12 @@ const formatMessage = require('./controller/messages')
  */
 
 mongoose.connect(config.DB_URI_ASW,{ useNewUrlParser: true, useUnifiedTopology: true }).then(()=>{
-    /*
-    const fakeDB = new FakeDB();
+    
+   /* const fakeDB = new FakeDB();
      fakeDB.seedDB().catch(error=>{ 
          console.log(error); 
-     })
-     */
+     })*/
+     
  }).catch(err => console.log(err));
  mongoose.set('useCreateIndex', true);
  mongoose.set('debug', true);
@@ -51,9 +51,12 @@ var VivoDB_URL = "https://inclusivelearning-wecaremore0.firebaseio.com"
 var eduServiceAccount = require("./config/vivoEduServiceAccount.json");
 var eduDB_URL = "https://vivo-edu.firebaseio.com"
 
+
+var weceremoreVivo = require("./config/wecaremore-vivo-firebase-adminsdk.json");
+
 admin.initializeApp({
-  credential: admin.credential.cert(eduServiceAccount),
-  databaseURL: "https://vivo-edu.firebaseio.com"
+  credential: admin.credential.cert(weceremoreVivo),
+  databaseURL: "https://wecaremore-vivo.firebaseio.com"
 });
 
 exports.userIsAuth = function(req, res, next) {
