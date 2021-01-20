@@ -134,6 +134,11 @@ const { NotificationVivo } = require('./models/notification');
 
 var io = require('socket.io')(server)
 
+io.configure(function () { 
+    io.set("transports", ["xhr-polling"]); 
+    io.set("polling duration", 10); 
+  });
+  
 /* 
     Users is an array composed by:
     - socket 
