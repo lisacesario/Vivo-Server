@@ -52,7 +52,7 @@ var eduServiceAccount = require("./config/vivoEduServiceAccount.json");
 var eduDB_URL = "https://vivo-edu.firebaseio.com"
 
 
-var weceremoreVivo = require("./config/wecaremore-vivo-firebase-adminsdk.json");
+var weceremoreVivo = require("./config/wecaremoreVivoFirebaseAdminsdk.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(weceremoreVivo),
