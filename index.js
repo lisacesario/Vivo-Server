@@ -96,6 +96,10 @@ app.use('/api/v1/questions', questionRoutes);
 
 const notificationRoutes = require('./routes/notifications')
 app.use('/api/v1/notification', notificationRoutes)
+
+const achievementsRoutes = require('./routes/achievements')
+app.use('/api/v1/achievements',achievementsRoutes )
+
 /*
 const levelsRoutes = require('./routes/admin-tool/level');
 app.use('/api/v1/admin-tools/levels', levelsRoutes);

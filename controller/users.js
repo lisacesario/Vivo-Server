@@ -167,6 +167,10 @@ exports.populateUser = function(req,res, next){
                     path:'level.level',
                     model:'Level',
                 })
+                .populate({
+                    path:'agenda',
+                    model:'Event',
+                })
                 .exec()
                 .then((user)=>{
                     return res.status(200).send(user)

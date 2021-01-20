@@ -5,173 +5,203 @@
         "name":"Primo elemento creato",
         "action":"Create",
         "required_point":1,
+        "role":"Teacher",
         "message":"Congratulazioni, hai creato il tuo primo elemento! Continua così!",
-        "imgUrl":"/achievements/create_achievement.svg",
+        "imgUrl":"/achievements/new-1.svg",
         "points": 20
       },
       {
         "name":"Cinque elementi creati",
         "action":"Create",
         "required_point":5,
+        "role":"Teacher",
         "message":"Congratulazioni, hai creato cinque elementi!",
-        "imgUrl":"/achievements/create_achievement.svg",
+        "imgUrl":"/achievements/new-2.svg",
         "points": 20
       },
       {
         "name":"Dieci elementi creati",
         "action":"Create",
         "required_point":10,
+        "role":"Teacher",
         "message":"Congratulazioni, hai creato dieci elementi!",
-        "imgUrl":"/achievements/create_achievement.svg",
+        "imgUrl":"/achievements/new-3.svg",
         "points": 20
       },
       {
         "name":"Venti elementi creati",
         "action":"Create",
         "required_point":20,
+        "role":"Teacher",
         "message":"Congratulazioni, hai creato venti elementi!",
-        "imgUrl":"/achievements/create_achievement.svg",
+        "imgUrl":"/achievements/new-4.svg",
         "points": 20
       },
       {
         "name":"Cinquanta elementi creati",
         "action":"Create",
         "required_point":50,
+        "role":"Teacher",
         "message":"Congratulazioni, hai creato cinquanta elementi!",
-        "imgUrl":"/achievements/create_achievement.svg",
+        "imgUrl":"/achievements/new-5.svg",
         "points": 50
       },
       {
         "name":"Cento elementi creati",
         "action":"Create",
         "required_point":100,
+        "role":"Teacher",
         "message":"Congratulazioni, hai creato cento elementi!!!",
-        "imgUrl":"/achievements/create_achievement.svg",
+        "imgUrl":"/achievements/new-6.svg",
         "points": 100
       },
       {
         "name":"Primo aggiornamento",
         "action":"Update",
         "required_point":1,
+        "role":"Teacher",
         "message":"Congratulazioni, hai aggiornato per la prima volta un elemento! Continua così!",
-        "imgUrl":"/achievements/update_achievement.svg",
+        "imgUrl":"/achievements/edit-1.svg",
         "points": 20
       },
       {
         "name":"Cinque aggiornamenti",
         "action":"Update",
         "required_point":5,
+        "role":"Teacher",
         "message":"Congratulazioni, hai aggiornato cinque elementi!",
-        "imgUrl":"/achievements/update_achievement.svg",
+        "imgUrl":"/achievements/edit-2.svg",
         "points": 20
       },
       {
         "name":"Dieci aggiornamenti",
         "action":"Update",
         "required_point":10,
+        "role":"Teacher",
         "message":"Congratulazioni, hai aggiornato dieci elementi!",
-        "imgUrl":"/achievements/update_achievement.svg",
+        "imgUrl":"/achievements/edit-3.svg",
+        "points": 20
+      },
+      {
+        "name":"Cinquanta aggiornamenti",
+        "action":"Update",
+        "required_point":20,
+        "role":"Teacher",
+        "message":"Congratulazioni, hai aggiornato cinquanta elementi!",
+        "imgUrl":"/achievements/edit-4.svg",
         "points": 20
       },
       {
         "name":"Cinquanta aggiornamenti",
         "action":"Update",
         "required_point":50,
+        "role":"Teacher",
         "message":"Congratulazioni, hai aggiornato cinquanta elementi!",
-        "imgUrl":"/achievements/update_achievement.svg",
+        "imgUrl":"/achievements/edit-5.svg",
         "points": 50
       },
       {
         "name":"Cento! aggiornamenti",
         "action":"Update",
         "required_point":100,
+        "role":"Teacher",
         "message":"Congratulazioni, hai aggiornato cento elementi!",
-        "imgUrl":"/achievements/update_achievement.svg",
+        "imgUrl":"/achievements/edit-6.svg",
         "points": 100
       },
       {
         "name":"Primo eliminato",
         "action":"Delete",
         "required_point":1,
+        "role":"Teacher",
         "message":"Congratulazioni, hai eliminato per la prima volta un elemento!",
-        "imgUrl":"/achievements/delete_achievement.svg",
+        "imgUrl":"/achievements/delete-1.svg",
         "points": 20
       },
       {
         "name":"Cinque eliminati",
         "action":"Delete",
         "required_point":5,
+        "role":"Teacher",
         "message":"Congratulazioni, hai eliminato ben cinque elementi!",
-        "imgUrl":"/achievements/delete_achievement.svg",
+        "imgUrl":"/achievements/delete-2.svg",
         "points": 20
       },
       {
         "name":"Dieci eliminati",
         "action":"Delete",
         "required_point":10,
+        "role":"Teacher",
         "message":"Congratulazioni, hai eliminato ben dieci elementi!",
-        "imgUrl":"/achievements/delete_achievement.svg",
+        "imgUrl":"/achievements/delete-3.svg",
         "points": 20
       },
       {
         "name":"Venti eliminati",
         "action":"Delete",
         "required_point":20,
+        "role":"Teacher",
         "message":"Congratulazioni, hai eliminato ben venti elementi!",
-        "imgUrl":"/achievements/delete_achievement.svg",
+        "imgUrl":"/achievements/delete-4.svg",
         "points": 20
       },
       {
         "name":"Cinquanta eliminati",
         "action":"Delete",
         "required_point":50,
+        "role":"Teacher",
         "message":"Congratulazioni, hai eliminato ben cinquanta elementi!",
-        "imgUrl":"/achievements/delete_achievement.svg",
+        "imgUrl":"/achievements/delete-5.svg",
         "points": 20
       },
       {
         "name":"Cento eliminati",
         "action":"Delete",
         "required_point":5,
+        "role":"Teacher",
         "message":"Congratulazioni, hai eliminato ben cento elementi!",
-        "imgUrl":"/achievements/delete_achievement.svg",
+        "imgUrl":"/achievements/delete-6.svg",
         "points": 20
       },
       {
         "name":"Primo rinforzo",
-        "action":"Social",
+        "action":"Reward",
         "required_point":1,
+        "role":"Teacher",
         "message":"Congratulazioni, hai inviato il tuo primo rinforzo!",
         "imgUrl":"/achievements/social_reward_achievement.svg",
         "points": 20
       },
       {
         "name":"Cinque rinforzi",
-        "action":"Social",
+        "action":"Reward",
         "required_point":5,
+        "role":"Teacher",
         "message":"Congratulazioni, hai inviato cinque rinforzi!",
         "imgUrl":"/achievements/social_reward_achievement.svg",
         "points": 20
       },
       {
         "name":"Dieci rinforzi",
-        "action":"Social",
+        "action":"Reward",
         "required_point":10,
+        "role":"Teacher",
         "message":"Congratulazioni, hai inviato dieci rinforzi!",
         "imgUrl":"/achievements/social_reward_achievement.svg",
         "points": 20
       },
       {
         "name":"Venti rinforzi",
-        "action":"Social",
+        "action":"Reward",
         "required_point":20,
+        "role":"Teacher",
         "message":"Congratulazioni, hai inviato venti rinforzi!",
         "imgUrl":"/achievements/social_reward_achievement.svg",
         "points": 20
       },
       {
         "name":"Cinquanta rinforzi",
-        "action":"Social",
+        "action":"Reward",
         "required_point":50,
         "message":"Congratulazioni, hai inviato cinquanta rinforzi!",
         "imgUrl":"/achievements/social_reward_achievement.svg",
@@ -179,8 +209,9 @@
       },
       {
         "name":"Cento rinforzi",
-        "action":"Social",
+        "action":"Reward",
         "required_point":100,
+        "role":"Teacher",
         "message":"Congratulazioni, hai inviato cento rinforzi!",
         "imgUrl":"/achievements/social_reward_achievement.svg",
         "points": 20
@@ -189,49 +220,55 @@
         "name":"Un attività completata",
         "action":"Activity",
         "required_point":1,
+        "role":"Learner",
         "message":"Congratulazioni, hai completato la tua prima attività",
-        "imgUrl":"/achievements/activity_completed_achievement.svg",
+        "imgUrl":"/achievements/activity-1.svg",
         "points": 20
       },
       {
         "name":"Cinque attività completate",
         "action":"Activity",
         "required_point":5,
+        "role":"Learner",
         "message":"Congratulazioni, hai completato cinque attività",
-        "imgUrl":"/achievements/activity_completed_achievement.svg",
+        "imgUrl":"/achievements/activity-2.svg",
         "points": 20
       },
       {
         "name":"Dieci attività completate",
         "action":"Activity",
         "required_point":10,
+        "role":"Learner",
         "message":"Congratulazioni, hai completato dieci attività",
-        "imgUrl":"/achievements/activity_completed_achievement.svg",
+        "imgUrl":"/achievements/activity-3.svg",
         "points": 20
       },
       {
         "name":"Venti attività completate",
         "action":"Activity",
         "required_point":20,
+        "role":"Learner",
         "message":"Congratulazioni, hai completato venti attività",
-        "imgUrl":"/achievements/activity_completed_achievement.svg",
+        "imgUrl":"/achievements/activity-4.svg",
         "points": 20
       },
       {
         "name":"Cinquanta attività completate",
         "action":"Activity",
         "required_point":50,
+        "role":"Learner",
         "message":"Congratulazioni, hai completato  cinquanta attività !",
-        "imgUrl":"/achievements/activity_completed_achievement.svg",
-        "points": 20
+        "imgUrl":"/achievements/activity-5.svg",
+        "points": 50
       },
       {
         "name":"Cento attività completate",
         "action":"Activity",
         "required_point":100,
+        "role":"Learner",
         "message":"Congratulazioni, hai completato cento attività!",
-        "imgUrl":"/achievements/activity_completed_achievement.svg",
-        "points": 20
+        "imgUrl":"/achievements/activity-6.svg",
+        "points": 100
       }
     ]
 }
