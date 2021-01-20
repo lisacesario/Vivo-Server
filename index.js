@@ -132,13 +132,12 @@ const vivoBotSetupCode = 'VivoBot';
 
 const { NotificationVivo } = require('./models/notification');
 
-var io = require('socket.io')(server)
+var io = require('socket.io')(server, {
+    pingInterval: 10000,
+    pingTimeout: 5000,
+    cookie: false
+})
 
-io.configure(function () { 
-    io.set("transports", ["xhr-polling"]); 
-    io.set("polling duration", 10); 
-  });
-  
 /* 
     Users is an array composed by:
     - socket 
