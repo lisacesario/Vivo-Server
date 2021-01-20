@@ -43,8 +43,6 @@ const BaseActivitySchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'UserProfile'
     },
-    
-
 
 }, options);
 

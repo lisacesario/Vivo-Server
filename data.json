@@ -3,7 +3,7 @@
       {
         "name":"Bianco",
         "position":0,
-        "imgUrl":"/levels/white.svg",
+        "imgUrl":"/levels/Bianco.svg",
         "description":"Ti sei appena interfacciato al mondo vivo. ",
         "startingPoint":0,
         "endPoint": 100,
@@ -12,7 +12,7 @@
       {
         "name":"Giallo",
         "position":1,
-        "imgUrl":"/levels/yellow.svg",
+        "imgUrl":"/levels/Giallo.svg",
         "description":"Hai preso un po' di confidenza con la piattaforma Vivo, continua a creare nuove attività!",
         "startingPoint":101,
         "endPoint": 300,
@@ -21,7 +21,7 @@
       {
         "name":"Arancione",
         "position":2,
-        "imgUrl":"/levels/orange.svg",
+        "imgUrl":"/levels/Arancio.svg",
         "description":"Ti destreggi agevolmente nella piattaforma Vivo",
         "startingPoint":301,
         "endPoint": 500,
@@ -30,7 +30,7 @@
       {
         "name":"Verde",
         "position":3,
-        "imgUrl":"/levels/green.svg",
+        "imgUrl":"/levels/Verde.svg",
         "description":"Ti destreggi agevolmente nella piattaforma Vivo",
         "startingPoint":501,
         "endPoint": 800,
@@ -39,7 +39,7 @@
       {
         "name":"Blu",
         "position":4,
-        "imgUrl":"/levels/blu.svg",
+        "imgUrl":"/levels/Blu.svg",
         "description":"Ti destreggi agevolmente nella piattaforma Vivo",
         "startingPoint":801,
         "endPoint": 1200,
@@ -48,7 +48,7 @@
       {
         "name":"Marrone",
         "position":5,
-        "imgUrl":"/levels/brown.svg",
+        "imgUrl":"/levels/Marrone.svg",
         "description":"Ti destreggi agevolmente nella piattaforma Vivo",
         "startingPoint":1201,
         "endPoint": 1500,
@@ -57,7 +57,7 @@
       {
         "name":"Nero",
         "position":6,
-        "imgUrl":"/levels/black.svg",
+        "imgUrl":"/levels/Nero.svg",
         "description":"Il mondo VIVO non ha più segreti per te, padroneggi la piattaforma.",
         "startingPoint":1501,
         "endPoint": 2000,

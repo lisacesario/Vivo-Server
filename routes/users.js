@@ -17,7 +17,9 @@ router.post('/register', UserController.register);
 // GET /api/v1/users/profile/
 router.get('/profile/less/:id', UserController.getUsersProfile);
 
-router.get('/profile/populated/:id', UserController.getPopulatedUserProfile);
+router.get('/profile/agenda/:id', UserController.populateAgenda)
+
+router.get('/profile/populated/:id', UserController.populateUser);
 
 // GET /api/v1/users/profile/
 router.get('/profile/:id', UserController.getUserProfileById);
@@ -32,10 +34,13 @@ router.patch('/complete-activity', UserController.completeActivity);
 router.patch('/:id', UserController.patchUser)
 
 
+
 router.post('/:id/events/new', EventController.createEvent)
-router.patch('/:id/events/update', EventController.updateEvent)
+router.patch('/events/complete/:id', EventController.completeEvent)
+//router.patch('/:id/events/update', EventController.updateEvent)
 router.delete('/events/:id/delete', EventController.deleteEvent)
 router.get('/events/:id', EventController.getEventById)
+
 
 //router.post('/:id/agenda/add-to', UserController.addEventToAgenda);
 //router.patch('/:id/agenda/update', UserController.addEventToAgenda);
@@ -45,29 +50,9 @@ router.get('/events/:id', EventController.getEventById)
 
 //router.patch('/:id/gamification/character', UserController.addEventToAgenda);
 
+router.patch('/social/:id', UserController.UpdateSocialNetwork)
 
-// PATCH /api/v1/users/friends-of/id
-router.patch('/friends-of/:id', UserController.sendingFriendshipRequest);
-
-// PATCH /api/v1/users/friends-of/id/accept
-router.patch(`/friends-of/:id/accept`, UserController.acceptRequest)
-
-// PATCH /api/v1/users/friends-of/id/refuse
-router.patch(`/friends-of/:id/refuse`, UserController.refuseRequest)
-
-// PATCH /api/v1/users/friends-of/id/permission
 router.patch(`/friends-of/:id/permission`, UserController.permissionSettings)
-
-
-
-router.patch('/teacher-of/:id', UserController.sendBeMyTeacherRequest);
-router.patch('/teacher-of/:id/accept', UserController.acceptBeMyTeacherRequest);
-router.patch('/teacher-of/:id/refuse', UserController.refuseBeMyTeacherRequest);
-
-router.patch('/student-of/:id', UserController.sendBeMyStudentRequest);
-router.patch('/student-of/:id/accept', UserController.acceptBeMyStudentRequest);
-router.patch('/student-of/:id/refuse', UserController.refuseBeMyStudentRequest);
-
 
 // GAMIFICATION STUFF
 router.get('/achievements/:id', UserController.getAchievementById);

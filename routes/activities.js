@@ -10,6 +10,9 @@ router.get('', ActivityController.getActivity);
 // GET /api/v1/users/profile/
 router.get('/:id', ActivityController.getActivityByID);
 
+router.get('/populated/:id', ActivityController.getPopulatedActivity);
+
+
 // POST /api/v1/users/create
 router.post('/create', ActivityController.createActivity);
 
