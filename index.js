@@ -128,7 +128,7 @@ server.listen(PORT, function(){
 //const { username, room }
 
 // Socket Setup
-const vivoBot = 'VivoBot';
+const vivoBotSetupCode = 'VivoBot';
 
 const { NotificationVivo } = require('./models/notification');
 
