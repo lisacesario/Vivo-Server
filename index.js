@@ -132,7 +132,7 @@ const vivoBotSetupCode = 'VivoBot';
 
 const { NotificationVivo } = require('./models/notification');
 
-var io = require('socket.io').listen(server, {
+var io = require('socket.io')(server, {
     transports:['websocket', 'polling', 'xhr-polling', 'jsonp-polling'],
     serveClient:true,
     pingInterval: 10000,
