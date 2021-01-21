@@ -133,7 +133,8 @@ const vivoBotSetupCode = 'VivoBot';
 const { NotificationVivo } = require('./models/notification');
 
 var io = require('socket.io')(server, {
-    transports:['websocket'],
+    transports:['websocket', 'polling'],
+    serveClient:true,
     pingInterval: 10000,
     pingTimeout: 5000,
     cookie: false
