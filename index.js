@@ -139,8 +139,7 @@ var io = require('socket.io')(server, {
     pingTimeout: 5000,
     cookie: false
 })
-
-// io.set('origins', '*:*');
+io.set('origins', '*:*');
 // io.set('match origin protocol', true)
 
 
