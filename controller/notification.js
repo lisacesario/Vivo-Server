@@ -37,6 +37,9 @@ exports.markNotificationAsRead = function(req,res,next){
                 return res.status(200).send(notification)
             })
         })
+        .catch(err =>{
+            return res.status(400).send(err)
+        })
 }
 
 exports.deleteNotificationById = function(req,res,next){
@@ -48,6 +51,8 @@ exports.deleteNotificationById = function(req,res,next){
                 }
                 return res.status(200).send({"message": "notifica eliminata"})
             })
+    }).catch(err =>{
+        return res.status(400).send(err)
     })
 }
 

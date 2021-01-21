@@ -133,13 +133,23 @@ const vivoBotSetupCode = 'VivoBot';
 const { NotificationVivo } = require('./models/notification');
 
 var io = require('socket.io')(server, {
+    cookie:false,
+    origins:'*:*',
+    pingInterval: 25000,
+    pingTimeout: 5000,
+    serveClient:true,
+    transports:['websocket', 'polling']
+})
+
+/*
+var io = require('socket.io')(server, {
     transports:['websocket', 'polling', 'xhr-polling', 'jsonp-polling'],
     serveClient:true,
     pingInterval: 10000,
     pingTimeout: 5000,
     cookie: false
 })
-io.set('origins', '*:*');
+io.set('origins', '*:*'); */
 // io.set('match origin protocol', true)
 
 
