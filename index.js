@@ -139,6 +139,10 @@ var io = require('socket.io')(server, {
     cookie: false
 })
 
+io.set('origins', '*:*');
+io.set('match origin protocol', true)
+
+
 /* 
     Users is an array composed by:
     - socket 
