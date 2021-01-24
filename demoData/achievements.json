@@ -7,7 +7,7 @@
         "required_point":1,
         "role":"Teacher",
         "message":"Congratulazioni, hai creato il tuo primo elemento! Continua così!",
-        "imgUrl":"/achievements/new-1.svg",
+        "imgUrl":"assets/achievements/new-1.svg",
         "points": 20
       },
       {
@@ -16,7 +16,7 @@
         "required_point":5,
         "role":"Teacher",
         "message":"Congratulazioni, hai creato cinque elementi!",
-        "imgUrl":"/achievements/new-2.svg",
+        "imgUrl":"assets/achievements/new-2.svg",
         "points": 20
       },
       {
@@ -25,7 +25,7 @@
         "required_point":10,
         "role":"Teacher",
         "message":"Congratulazioni, hai creato dieci elementi!",
-        "imgUrl":"/achievements/new-3.svg",
+        "imgUrl":"assets/achievements/new-3.svg",
         "points": 20
       },
       {
@@ -34,7 +34,7 @@
         "required_point":20,
         "role":"Teacher",
         "message":"Congratulazioni, hai creato venti elementi!",
-        "imgUrl":"/achievements/new-4.svg",
+        "imgUrl":"assets/achievements/new-4.svg",
         "points": 20
       },
       {
@@ -43,7 +43,7 @@
         "required_point":50,
         "role":"Teacher",
         "message":"Congratulazioni, hai creato cinquanta elementi!",
-        "imgUrl":"/achievements/new-5.svg",
+        "imgUrl":"assets/achievements/new-5.svg",
         "points": 50
       },
       {
@@ -52,7 +52,7 @@
         "required_point":100,
         "role":"Teacher",
         "message":"Congratulazioni, hai creato cento elementi!!!",
-        "imgUrl":"/achievements/new-6.svg",
+        "imgUrl":"assets/achievements/new-6.svg",
         "points": 100
       },
       {
@@ -61,7 +61,7 @@
         "required_point":1,
         "role":"Teacher",
         "message":"Congratulazioni, hai aggiornato per la prima volta un elemento! Continua così!",
-        "imgUrl":"/achievements/edit-1.svg",
+        "imgUrl":"assets/achievements/edit-1.svg",
         "points": 20
       },
       {
@@ -70,7 +70,7 @@
         "required_point":5,
         "role":"Teacher",
         "message":"Congratulazioni, hai aggiornato cinque elementi!",
-        "imgUrl":"/achievements/edit-2.svg",
+        "imgUrl":"assets/achievements/edit-2.svg",
         "points": 20
       },
       {
@@ -79,7 +79,7 @@
         "required_point":10,
         "role":"Teacher",
         "message":"Congratulazioni, hai aggiornato dieci elementi!",
-        "imgUrl":"/achievements/edit-3.svg",
+        "imgUrl":"assets/achievements/edit-3.svg",
         "points": 20
       },
       {
@@ -88,7 +88,7 @@
         "required_point":20,
         "role":"Teacher",
         "message":"Congratulazioni, hai aggiornato cinquanta elementi!",
-        "imgUrl":"/achievements/edit-4.svg",
+        "imgUrl":"assets/achievements/edit-4.svg",
         "points": 20
       },
       {
@@ -97,7 +97,7 @@
         "required_point":50,
         "role":"Teacher",
         "message":"Congratulazioni, hai aggiornato cinquanta elementi!",
-        "imgUrl":"/achievements/edit-5.svg",
+        "imgUrl":"assets/achievements/edit-5.svg",
         "points": 50
       },
       {
@@ -106,7 +106,7 @@
         "required_point":100,
         "role":"Teacher",
         "message":"Congratulazioni, hai aggiornato cento elementi!",
-        "imgUrl":"/achievements/edit-6.svg",
+        "imgUrl":"assets/achievements/edit-6.svg",
         "points": 100
       },
       {
@@ -115,7 +115,7 @@
         "required_point":1,
         "role":"Teacher",
         "message":"Congratulazioni, hai eliminato per la prima volta un elemento!",
-        "imgUrl":"/achievements/delete-1.svg",
+        "imgUrl":"assets/achievements/delete-1.svg",
         "points": 20
       },
       {
@@ -124,7 +124,7 @@
         "required_point":5,
         "role":"Teacher",
         "message":"Congratulazioni, hai eliminato ben cinque elementi!",
-        "imgUrl":"/achievements/delete-2.svg",
+        "imgUrl":"assets/achievements/delete-2.svg",
         "points": 20
       },
       {
@@ -133,7 +133,7 @@
         "required_point":10,
         "role":"Teacher",
         "message":"Congratulazioni, hai eliminato ben dieci elementi!",
-        "imgUrl":"/achievements/delete-3.svg",
+        "imgUrl":"assets/achievements/delete-3.svg",
         "points": 20
       },
       {
@@ -142,7 +142,7 @@
         "required_point":20,
         "role":"Teacher",
         "message":"Congratulazioni, hai eliminato ben venti elementi!",
-        "imgUrl":"/achievements/delete-4.svg",
+        "imgUrl":"assets/achievements/delete-4.svg",
         "points": 20
       },
       {
@@ -151,7 +151,7 @@
         "required_point":50,
         "role":"Teacher",
         "message":"Congratulazioni, hai eliminato ben cinquanta elementi!",
-        "imgUrl":"/achievements/delete-5.svg",
+        "imgUrl":"assets/achievements/delete-5.svg",
         "points": 20
       },
       {
@@ -160,7 +160,7 @@
         "required_point":5,
         "role":"Teacher",
         "message":"Congratulazioni, hai eliminato ben cento elementi!",
-        "imgUrl":"/achievements/delete-6.svg",
+        "imgUrl":"assets/achievements/delete-6.svg",
         "points": 20
       },
       {
@@ -169,7 +169,7 @@
         "required_point":1,
         "role":"Teacher",
         "message":"Congratulazioni, hai inviato il tuo primo rinforzo!",
-        "imgUrl":"/achievements/social_reward_achievement.svg",
+        "imgUrl":"assets/achievements/social_reward_achievement.svg",
         "points": 20
       },
       {
@@ -178,7 +178,7 @@
         "required_point":5,
         "role":"Teacher",
         "message":"Congratulazioni, hai inviato cinque rinforzi!",
-        "imgUrl":"/achievements/social_reward_achievement.svg",
+        "imgUrl":"assets/achievements/social_reward_achievement.svg",
         "points": 20
       },
       {
@@ -187,7 +187,7 @@
         "required_point":10,
         "role":"Teacher",
         "message":"Congratulazioni, hai inviato dieci rinforzi!",
-        "imgUrl":"/achievements/social_reward_achievement.svg",
+        "imgUrl":"assets/achievements/social_reward_achievement.svg",
         "points": 20
       },
       {
@@ -196,15 +196,16 @@
         "required_point":20,
         "role":"Teacher",
         "message":"Congratulazioni, hai inviato venti rinforzi!",
-        "imgUrl":"/achievements/social_reward_achievement.svg",
+        "imgUrl":"assets/achievements/social_reward_achievement.svg",
         "points": 20
       },
       {
         "name":"Cinquanta rinforzi",
         "action":"Reward",
+        "role": "Teacher",
         "required_point":50,
         "message":"Congratulazioni, hai inviato cinquanta rinforzi!",
-        "imgUrl":"/achievements/social_reward_achievement.svg",
+        "imgUrl":"assets/achievements/social_reward_achievement.svg",
         "points": 20
       },
       {
@@ -213,7 +214,7 @@
         "required_point":100,
         "role":"Teacher",
         "message":"Congratulazioni, hai inviato cento rinforzi!",
-        "imgUrl":"/achievements/social_reward_achievement.svg",
+        "imgUrl":"assets/achievements/social_reward_achievement.svg",
         "points": 20
       },
       {
@@ -222,7 +223,7 @@
         "required_point":1,
         "role":"Learner",
         "message":"Congratulazioni, hai completato la tua prima attività",
-        "imgUrl":"/achievements/activity-1.svg",
+        "imgUrl":"assets/achievements/activity-1.svg",
         "points": 20
       },
       {
@@ -231,7 +232,7 @@
         "required_point":5,
         "role":"Learner",
         "message":"Congratulazioni, hai completato cinque attività",
-        "imgUrl":"/achievements/activity-2.svg",
+        "imgUrl":"assets/achievements/activity-2.svg",
         "points": 20
       },
       {
@@ -240,7 +241,7 @@
         "required_point":10,
         "role":"Learner",
         "message":"Congratulazioni, hai completato dieci attività",
-        "imgUrl":"/achievements/activity-3.svg",
+        "imgUrl":"assets/achievements/activity-3.svg",
         "points": 20
       },
       {
@@ -249,7 +250,7 @@
         "required_point":20,
         "role":"Learner",
         "message":"Congratulazioni, hai completato venti attività",
-        "imgUrl":"/achievements/activity-4.svg",
+        "imgUrl":"assets/achievements/activity-4.svg",
         "points": 20
       },
       {
@@ -258,7 +259,7 @@
         "required_point":50,
         "role":"Learner",
         "message":"Congratulazioni, hai completato  cinquanta attività !",
-        "imgUrl":"/achievements/activity-5.svg",
+        "imgUrl":"assets/achievements/activity-5.svg",
         "points": 50
       },
       {
@@ -267,7 +268,7 @@
         "required_point":100,
         "role":"Learner",
         "message":"Congratulazioni, hai completato cento attività!",
-        "imgUrl":"/achievements/activity-6.svg",
+        "imgUrl":"assets/achievements/activity-6.svg",
         "points": 100
       }
     ]

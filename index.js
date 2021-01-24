@@ -16,8 +16,8 @@ const formatMessage = require('./controller/messages')
  */
 
 mongoose.connect(config.DB_URI_ASW,{ useNewUrlParser: true, useUnifiedTopology: true }).then(()=>{
-    
-   /* const fakeDB = new FakeDB();
+    /*
+    const fakeDB = new FakeDB();
      fakeDB.seedDB().catch(error=>{ 
          console.log(error); 
      })*/
@@ -135,7 +135,7 @@ const { NotificationVivo } = require('./models/notification');
 var io = require('socket.io')(server, {
     cookie:false,
     origins:'*:*',
-    pingInterval: 25000,
+    pingInterval: 250000,
     pingTimeout: 5000,
     serveClient:true,
     transports:['websocket', 'polling']

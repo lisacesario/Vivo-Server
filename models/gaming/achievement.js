@@ -26,6 +26,10 @@ const AchievementSchema = new Schema({
     points:{
         type:Number, 
         required:true
+    },
+    role:{
+        type:String, 
+        required:true
     }
 })
 

@@ -24,7 +24,7 @@ const NotificationSchema = new Schema({
         required: false
     },
     read:{
-        type:String,
+        type:Boolean,
         required: false,
         default: false
     }

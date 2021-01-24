@@ -57,14 +57,14 @@
         {   
             "name":"Asciugamano",
             "description":"un semplice asciugamano",
-            "imgUrl":"/assets/demoData/asciugamano.jpeg",
+            "imgUrl":"/assets/demoData/asciugamano.png",
             "warning":"nessuno",
             "shared":true
         },
         {   
             "name":"Sapone liquido per mani",
             "description":"Sapone liquido per mani",
-            "imgUrl":"/assets/demoData/sapone.jpeg",
+            "imgUrl":"/assets/demoData/sapone.png",
             "warning":"nessuno",
             "shared":true
         }
@@ -73,96 +73,96 @@
         {   
             "name":"Apri il rubinetto",
             "description":"Apri il rubinetto dell'acqua",
-            "imgUrl":"/assets/demoData/apri_rubinetto.jpeg",
-            "imgSym":"/assets/demoData/apri_rubinetto_sym.jpeg",
+            "imgUrl":"/assets/demoData/apri_rubinetto.png",
+            "imgSym":"/assets/demoData/apri_rubinetto_sym.png",
             "subject":"cura-se",
             "shared":true
         },
         {   
             "name":"Bagna le mani",
             "description":"Bagna per bene le mani con l'acqua",
-            "imgUrl":"/assets/demoData/bagna_mani.jpeg",
-            "imgSym":"/assets/demoData/bagna_mani_sym.jpeg",
+            "imgUrl":"/assets/demoData/bagna_mani.png",
+            "imgSym":"/assets/demoData/bagna_mani_sym.png",
             "subject":"cura-se",
             "shared":true
         },
         {   
             "name":"Prendi il sapone",
             "description":"Applica una quantità di sapone sufficiente per coprire per bene la superficie delle mani",
-            "imgUrl":"/assets/demoData/usa_sapone.jpeg",
-            "imgSym":"/assets/demoData/usa_sapone_sym.jpeg",
+            "imgUrl":"/assets/demoData/usa_sapone.png",
+            "imgSym":"/assets/demoData/usa_sapone_sym.png",
             "subject":"cura-se",
             "shared":true
         },
         {   
             "name":"Frizione ",
             "description":"Strofina bene le mani palmo contro palmo",
-            "imgUrl":"/assets/demoData/friziona.jpeg",
-            "imgSym":"/assets/demoData/friziona_sym.jpeg",
+            "imgUrl":"/assets/demoData/friziona.png",
+            "imgSym":"/assets/demoData/friziona_sym.png",
             "subject":"cura-se",
             "shared":true
         },
         {   
             "name":"Intreccia dita ",
             "description":"Metti il palmo della mano destra sopra il dorso della mano sinistra. Intraccia le dita e sfrega ",
-            "imgUrl":"/assets/demoData/intreccia.jpeg",
-            "imgSym":"/assets/demoData/intreccia_sym.jpeg",
+            "imgUrl":"/assets/demoData/intreccia.png",
+            "imgSym":"/assets/demoData/intreccia_sym.png",
             "subject":"cura-se",
             "shared":true
             },
         {   
             "name":"Palmo contro Palmo",
             "description":"Metti le mani palmo contro palmo e intreccia le dita tra loro",
-            "imgUrl":"/assets/demoData/palmopalmo.jpeg",
-            "imgSym":"/assets/demoData/palmopalmo_sym.jpeg",
+            "imgUrl":"/assets/demoData/palmopalmo.png",
+            "imgSym":"/assets/demoData/palmopalmo_sym.png",
             "subject":"cura-se",
             "shared":true
         },
         {   
             "name":"Dorso delle dita",
             "description":"Dorso delle dita contro il palmo opposto tenendo le dita strette tra loro",
-            "imgUrl":"/assets/demoData/dorso.jpeg",
-            "imgSym":"/assets/demoData/dorso_sym.jpeg",
+            "imgUrl":"/assets/demoData/dorso.png",
+            "imgSym":"/assets/demoData/dorso_sym.png",
             "subject":"cura-se",
             "shared":true
         },
         {   
             "name":"Frizione pollice",
             "description":"Frizione rotazionale del pollice sinistro stretto nel palmo destro e viceversa",
-            "imgUrl":"/assets/demoData/frizione_pollice.jpeg",
-            "imgSym":"/assets/demoData/frizione_pollice_sym.jpeg",
+            "imgUrl":"/assets/demoData/frizione_pollice.png",
+            "imgSym":"/assets/demoData/frizione_pollice_sym.png",
             "subject":"cura-se",
             "shared":true
         },
         {   
             "name":"Frizione avanti e indietro",
             "description":"frizione rotazionale, in avanti ed indietro con le dita della mano destra strette tra loro nel palmo sinistro e viceversa",
-            "imgUrl":"/assets/demoData/frizione_rotazionale.jpeg",
-            "imgSym":"/assets/demoData/frizione_rotazionale_sym.jpeg",
+            "imgUrl":"/assets/demoData/frizione_rotazionale.png",
+            "imgSym":"/assets/demoData/frizione_rotazionale_sym.png",
             "subject":"cura-se",
             "shared":true
         },
         {   
             "name":"Risciacqua",
             "description":"Risciacqua le mani sotto l'acqua. Non deve rimanere nessuna traccia di sapone.",
-            "imgUrl":"/assets/demoData/risciacqua.jpeg",
-            "imgSym":"/assets/demoData/risciacqua_sym.jpeg",
+            "imgUrl":"/assets/demoData/risciacqua.png",
+            "imgSym":"/assets/demoData/risciacqua_sym.png",
             "subject":"cura-se",
             "shared":true
         },
         {   
             "name":"Asciugati le mani",
             "description":"Prendi l'asciugamano e asciugati per bene le mani.",
-            "imgUrl":"/assets/demoData/asciuga.jpeg",
-            "imgSym":"/assets/demoData/asciuga_sym.jpeg",
+            "imgUrl":"/assets/demoData/asciuga.png",
+            "imgSym":"/assets/demoData/asciuga_sym.png",
             "subject":"cura-se",
             "shared":true
         },
         {   
             "name":"Chiudi il rubinetto",
             "description":"Chiudi il rubinetto",
-            "imgUrl":"/assets/demoData/chiudi.jpeg",
-            "imgSym":"/assets/demoData/chiudi_sym.jpeg",
+            "imgUrl":"/assets/demoData/chiudi.png",
+            "imgSym":"/assets/demoData/chiudi_sym.png",
             "subject":"cura-se",
             "shared":true
         }

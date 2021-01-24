@@ -1,1 +1,1 @@
-web: nodemon index.js
+web: DEBUG=* nodemon index.js
