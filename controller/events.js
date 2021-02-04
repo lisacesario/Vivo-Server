@@ -173,9 +173,7 @@ exports.deleteEvent = function (req, res, next) {
                         if(err){
                             return res.status(422).send("You are not the owner")
                         }
-                        isAuth.events.pull(foundEvent)
-                        isAuth.save()
-
+                
                         UserProfile.findById(foundEvent.added_for, function(err,foundUser){
                             if(err){
 

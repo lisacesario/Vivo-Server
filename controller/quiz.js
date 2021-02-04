@@ -156,7 +156,6 @@ exports.updateQuiz = function (req, res, next) {
                                 return res.status(200).json(foundElement);
                             }
             
-                            //return res.json({"activity" : foundActivity});
             
                         });
                     }
