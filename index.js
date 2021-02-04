@@ -7,13 +7,6 @@ const FakeDB = require('./FakeDB')
 const  http   = require('http');
 
 const formatMessage = require('./controller/messages')
-//const firebase = require('firebase');
-/*****
- * 
- * 
- * 
- * just for test commit
- */
 
 mongoose.connect(config.DB_URI_ASW,{ useNewUrlParser: true, useUnifiedTopology: true }).then(()=>{
     /*
@@ -41,15 +34,8 @@ mongoose.connect(config.DB_URI_ASW,{ useNewUrlParser: true, useUnifiedTopology: 
  
 
  
- // init firebase
  
 const admin = require("firebase-admin"); 
-
-var serviceAccount = require("./config/serviceAccountKey.json");
-var VivoDB_URL = "https://inclusivelearning-wecaremore0.firebaseio.com"
-
-var eduServiceAccount = require("./config/vivoEduServiceAccount.json");
-var eduDB_URL = "https://vivo-edu.firebaseio.com"
 
 
 var weceremoreVivo = require("./config/wecaremoreVivoFirebaseAdminsdk.json");
@@ -103,17 +89,6 @@ app.use('/api/v1/notification', notificationRoutes)
 const achievementsRoutes = require('./routes/achievements')
 app.use('/api/v1/achievements',achievementsRoutes )
 
-/*
-const levelsRoutes = require('./routes/admin-tool/level');
-app.use('/api/v1/admin-tools/levels', levelsRoutes);
-
-
-const achievementsRoutes = require('./routes/admin-tool/achievements');
-app.use('/api/v1/admin-tools/achievements', achievementsRoutes);
-
-const adminRoutes = require('./routes/admin-tool/admin-features');
-app.use('/api/v1/admin-tools/', adminRoutes);
-*/
 
 const PORT = process.env.PORT || 3001;
 
@@ -122,10 +97,6 @@ var server = http.createServer(app)
 server.listen(PORT, function(){
     console.log('listening in http://localhost:' +  PORT)
 })
-
-
-// get username and room from  URL
-//const { username, room }
 
 // Socket Setup
 const vivoBotSetupCode = 'VivoBot';
@@ -141,17 +112,6 @@ var io = require('socket.io')(server, {
     transports:['websocket', 'polling']
 })
 
-/*
-var io = require('socket.io')(server, {
-    transports:['websocket', 'polling', 'xhr-polling', 'jsonp-polling'],
-    serveClient:true,
-    pingInterval: 10000,
-    pingTimeout: 5000,
-    cookie: false
-})
-io.set('origins', '*:*'); */
-// io.set('match origin protocol', true)
-
 
 /* 
     Users is an array composed by:
@@ -160,7 +120,6 @@ io.set('origins', '*:*'); */
     - displayName
 */
 
-// commit schifo
 var usersConnected = []
 
 io.on('connection', (socket)=>{
@@ -203,162 +162,6 @@ io.on('connection', (socket)=>{
             })
        })
     })
-
-
-
-/*
-    socket.on('online',(loggedInUser)=>{
-        console.log(loggedInUser.displayName + ' joins Vivo')
-        users.push({
-            'socket': socket,
-            'uid': loggedInUser.uid,
-            'displayName': loggedInUser.displayName,
-        })
-        console.log(users)
-    })
-
-    socket.on('offline', (loggedInUser) => {
-        console.log(loggedInUser.displayName + " will be off Vivo soon")
-        this.users = users.filter( x => {return x.uid != loggedInUser.uid})  
-    })
-  /*  socket.on('offline', function(){
-    
-        console.log("user " + socket.loggedInUser.displayName + " disconnected")
-       // io.emit('user-changed',{user: socket.username, event:'left'})
-    });
-     * /
-
-   
-    socket.on('joinRoom', ({username, room}) =>{
-        const user = userJoin(socket.id, username, room)
-        socket.join(user.room)
-    })
-
-    socket.on('activitycompleted', ({activity, sender, receiver, text})=>{
-        var notification = new Notification()
-        notification.timedate = new Date()
-        notification.type = "ACTIVITY_COMPLETED"
-        notification.uid_sender = sender 
-        notification.uid_receiver = receiver
-        notification.text = text
-
-        notification.save((err,elem)=>{
-            if(err){
-                console.log(err)
-            }
-            let index = users.findIndex(user=>{
-                return user.uid === receiver.uid
-            })
-            if(index){
-                io.to(users[index].socket).emit('notification', elem)
-            }
-        })
-    })
-    
-    socket.on('friendshipRequestNew', ({friendshipReq})=>{
-        var notification = new Notification()
-        notification.timedate = new Date()
-        notification.type = "FRIENDSHIP_REQUEST_NEW"
-        notification.uid_sender = sender 
-        notification.uid_receiver = receiver
-        notification.text = text
-
-        notification.save((err,elem)=>{
-            if(err){
-                console.log(err)
-            }
-            let index = users.findIndex(user=>{
-                return user.uid === receiver.uid
-            })
-            if(index){
-                io.to(users[index].socket).emit('notification', elem)
-            }
-        })
-    })
-
-
-    socket.on('notiication:friendshipRequestAccepted', ({friendshipReq})=>{
-        /*
-         -> aggiorno l'agenda 
-        * /
-    })
-
-    socket.on('notiication:friendshipRequestDeleted', ({friendshipReq})=>{
-        /*
-         -> aggiorno l'agenda 
-        * /
-    })
-
-   /* socket.on('join:room', function(chatId){
-        console.log('join room: ', chatId)
-        socket.join(chatId)
-    })
-
-    socket.on('send:chatmessages', function(data){
-       var newMessage = new ChatMessage();
-       newMessage.chat = data.chatId;
-       newMessage.message = data.message;
-       newMessage.from = data.from;
-
-       message.save((err,msg)=>{
-           io.to(msg.chat).emit('new-message', msg)
-       })
-    })
-
-   
-    socket.on('disconnect', function(){
-        console.log("user disconnected")
-       // io.emit('user-changed',{user: socket.username, event:'left'})
-    });
-
-
-     // Join room
-     socket.on('join', (params, callback)=>{
-        console.log(params.user + "join to" + params.room)
-        socket.join(params.room);       
-        callback()
-    })
-
-    // Send Message To Particular Room
-    socket.on("chat-message", function(message){
-        /* let index = users.findIndex(user=>{
-            return user.username === data.username
-        })
-        console.log('message: ' + data.message)
-       users[index].socket.emit("newMessage", {
-            message: data.message
-        })* /
-        console.log(message)
-       io.to(message.room).emit('newMessage',{
-            message:message.message,
-            room:message.room,
-            user:message.user
-        })
-        //io.emit('newMessage', {msg:message.message, user:socket.username})
-
-
-    })
-    
-    socket.on('online', function(username){
-        console.log( username + 'joins the chat')
-        users.push({
-            socket,
-            username
-        })
-        console.log(users)
-    })
-/*
-    socket.on('online', function(userDetils ){
-
-    })
-    socket.on('set-name', (name)=>{
-        socket.username = name
-        io.emit('user-changed', {user:name, event:'joined'});
-    })
-
-    socket.on('send-message', (message)=>{
-        io.emit('message', {msg:message.text, user:socket.name})
-    })*/
 })
 
 

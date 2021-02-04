@@ -38,7 +38,6 @@ exports.createEvent = function (req, res, next) {
     const category = "Agenda Events"
 
     const { day, start_time, end_time, repeat_weekly, repeat_daily, repeat_monthly, activityB, added_by, added_for, added_at } = req.body;
-    //console.log(req.file);
 
     console.log(req.body);
 
@@ -188,11 +187,7 @@ exports.deleteEvent = function (req, res, next) {
                                 return res.status(200).send("Deleted")
                             }
                         )
-                        /*.then(()=>{
-                            console.log("Crea il mio Log")
-                            message = "Event with ID " + foundEvent.id + "was deleted"
-                            logs.createLog(action, category, isAuth, message)
-                        })*/
+
                     })
                 })
             }

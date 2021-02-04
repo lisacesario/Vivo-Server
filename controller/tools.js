@@ -9,12 +9,10 @@ const logs = require('../controller/log');
 const gamification = require('../controller/gamification')
 
 
-// da modificare col parametro shared
 exports.getTools = function (req, res, next) {
-    //console.log("GET TOOL ")
     Tool.find({}, function (err, foundElement) {
         if (err) {
-            //console.log(err);
+            return res.status(400).send(err)
         }
         return res.json(foundElement);
     })
@@ -22,9 +20,7 @@ exports.getTools = function (req, res, next) {
 
 
 exports.getToolsById = function (req, res, next) {
-    //console.log("GET TOOL BY ID")
     const toolID = req.params.id
-    // //console.log(toolID)
     Tool.findById(toolID, function (err, foundElement) {
         if (err) {
             return res.status(422).send({ errors: normalizeErrors(err.errors) });
@@ -34,17 +30,12 @@ exports.getToolsById = function (req, res, next) {
 }
 
 exports.createTool = function (req, res, next) {
-    // const action = "Create"
-    //const category = "Tools"
-    const { name, imgUrl, description, shared, activities, warning } = req.body;
-    ////console.log(req.file);
 
-    //console.log("my body", req.body);
+    const { name, imgUrl, description, shared, activities, warning } = req.body;
 
     headers = req.headers;
     checkIsAuthenticated(headers)
         .then((isAuth) => {
-            //console.log("is Auth;", isAuth)
             if (isAuth === false) {
                 return res.status(403).send("You are not authorized")
             }
@@ -71,7 +62,6 @@ exports.createTool = function (req, res, next) {
                         gamification.computeAchievementForCreate(isAuth),
                         gamification.computeLevelCreate(isAuth)
                     ]).then(values => {
-                        //console.log(values)
                         let achievement = values[0]
                         let level = values[1]
 
@@ -90,7 +80,6 @@ exports.createTool = function (req, res, next) {
                         }
 
                         isAuth.save(function (err, elem) {
-                            //console.log("QUIDNI?=??")
 
                             if (err) {
                                 res.status(400).send(err)
@@ -116,7 +105,6 @@ exports.createTool = function (req, res, next) {
                             }
                         })
                     }).catch(err => {
-                        //console.log(err)
                         return res.send(err)
                     })
 
@@ -149,17 +137,10 @@ exports.updateTool = function (req, res, next) {
     const user = res.locals.user;
     const data = req.body;
     const search_id = req.params.id
-    //console.log('id :' + search_id);
-    //console.log('user', user)
-    //console.log("valure", req.body)
-    //Object.keys(data).forEach(e => //console.log(` Activity DATA key=${e}  value=${data[e]}`));
-    //Object.keys(req.params).forEach(e => //console.log(` req.params DATA key=${e}  value=${req.params[e]}`));
-    //Object.keys(req.body).forEach(e => //console.log(` req.body DATA key=${e}  value=${req.body[e]}`));
 
     headers = req.headers;
     checkIsAuthenticated(headers)
         .then((isAuth) => {
-            //console.log("is Auth;", isAuth)
             if (isAuth === false) {
                 return res.status(403).send("You are not authorized")
             }
@@ -174,7 +155,6 @@ exports.updateTool = function (req, res, next) {
                     foundElement.set(data);
                     foundElement.save(function (err) {
                         if (err) {
-                            //console.log("sono solo  qui ");
 
                             return res.status(422).send({ errors: [{ title: 'Error in save  activity', detail: err.errors }] });
                         }
@@ -184,7 +164,6 @@ exports.updateTool = function (req, res, next) {
                             gamification.computeAchievement(isAuth, isAuth.game_counter.update_counter, "Update"),
                             gamification.computeLevelCreate(isAuth)
                         ]).then(values => {
-                            //console.log(values)
                             let achievement = values[0]
                             let level = values[1]
 
@@ -203,7 +182,6 @@ exports.updateTool = function (req, res, next) {
                             }
 
                             isAuth.save(function (err, elem) {
-                                //console.log("entri=??")
 
                                 if (err) {
                                     res.status(400).send(err)
@@ -229,7 +207,6 @@ exports.updateTool = function (req, res, next) {
                                 }
                             })
                         }).catch(err => {
-                            //console.log(err)
                             return res.send(err)
                         })
 
@@ -251,12 +228,9 @@ exports.deleteTool = function (req, res, next) {
     const action = "Delete"
     const category = "Tools"
 
-    //console.log("AUTH", req.headers)
-    //console.log("ID ", req.params.id)
     headers = req.headers;
     checkIsAuthenticated(headers)
         .then((isAuth) => {
-            //console.log("is Auth: ", isAuth)
             if (isAuth === false) {
                 return res.status(403).send("You are not authorized")
             }
@@ -264,7 +238,7 @@ exports.deleteTool = function (req, res, next) {
                 Tool.findById(req.params.id,
                     function (err, foundElement) {
                         if (err) {
-                            //console.log(err);
+                            return res.status(400).send(err)
                         }
 
                         if (foundElement.created_by != isAuth.id) {
@@ -272,7 +246,6 @@ exports.deleteTool = function (req, res, next) {
                         }
                         foundElement.remove(function (err) {
                             if (err) {
-                                // Delete from teachers
                                 return res.status(422).send({ errors: [{ title: 'Error Remove', detail: 'there was an error removing' }] });
 
                             }
@@ -285,10 +258,7 @@ exports.deleteTool = function (req, res, next) {
                                     foundActivity.save()
                                 })
                             });
-                            //                         message = foundElement._id + " Was Deleted successfully"
-                            //                         logs.createLog(action, category, isAuth, message)
-                            //                        var counter = isAuth.game_counter.delete_counter + 1
-
+    
                             isAuth.game_counter.delete_counter = isAuth.game_counter.delete_counter + 1
 
                             Promise.all([
@@ -358,18 +328,12 @@ exports.addToolToActivity = function (req, res, next) {
     const action = "Add"
     const category = "Tools"
 
-    ////console.log("AUTH", req.headers)
-    ////console.log("PATCH")
-    // const user = res.locals.user;
     const data = req.body;
     const search_id = req.params.id
-    ////console.log('activity_id :' + search_id);
-    //////console.log('user', user)
-    ////console.log("data", req.body)
+
     headers = req.headers;
     checkIsAuthenticated(headers)
         .then((isAuth) => {
-            //console.log("is Auth;", isAuth)
             if (isAuth === false) {
                 return res.status(403).send("You are not authorized")
             }
@@ -377,7 +341,6 @@ exports.addToolToActivity = function (req, res, next) {
 
                 SelfManagementActivity.findById(search_id).exec()
                     .then(foundElement => {
-                        //console.log("Found Element: \n", foundElement);
                         if (foundElement.created_by != isAuth.id) {
                             return res.status(403).send({
                                 "action": "Add Quiz to Activity",
@@ -390,13 +353,11 @@ exports.addToolToActivity = function (req, res, next) {
                         }
                         Tool.findById(data._id).exec()
                             .then(tool => {
-                                //console.log(tool)
                                 tool.activities.push(foundElement);
                                 tool.save()
 
                                 foundElement.tools.push(tool);
                                 foundElement.save()
-                                //console.log("FoundActivity saved")
                                 message = "Tool " + tool._id + " was added to " + foundElement._id
                                 logs.createLog(action, category, isAuth, message)
                                 return res.status(200).send(foundElement)
@@ -430,7 +391,7 @@ exports.addToolToActivity = function (req, res, next) {
 
         })
         .catch(err => {
-            //console.log(err)
+            return res.status(400).send(err)
         })
 
 
@@ -442,13 +403,9 @@ exports.addToolToActivity = function (req, res, next) {
 exports.removeToolFromActivity = function (req, res, next) {
     const action = "Remove"
     const category = "Tools"
-    //console.log("Remove Tool from Activity")
     const user = res.locals.user;
     const data = req.body;
     const search_id = req.params.id
-    //console.log('activity_id :' + search_id);
-    //console.log('user', user)
-    //console.log("data", req.body)
 
     headers = req.headers;
     checkIsAuthenticated(headers)
@@ -460,23 +417,17 @@ exports.removeToolFromActivity = function (req, res, next) {
                 SelfManagementActivity.findById(search_id).populate().exec(function (err, foundElement) {
 
                     if (err) {
-                        //console.log("sono bloccato in quetsto errore");
-                        //console.log("i miei errori sono qui:", err.errors);
-                        return res.status(422).send({ errors: normalizeErrors(err.errors) });
+                            return res.status(422).send({ errors: normalizeErrors(err.errors) });
                     }
-                    //console.log("Found Element: /n", foundElement);
                     Tool.findById(data._id)
                         .exec(function (err, foundTool) {
                             if (err) {
-                                //console.log("sono bloccato in quetsto errore");
-                                //console.log("i miei errori sono qui:", err.errors);
-                                return res.status(422).send({ errors: normalizeErrors(err.errors) });
+                                    return res.status(422).send({ errors: normalizeErrors(err.errors) });
                             }
                             else {
 
                                 foundTool.activities.pop(foundElement);
                                 foundTool.save()
-                                //console.log("pop")
                                 foundElement.tools.pop(foundTool);
                                 foundElement.save()
                                 message = "Tool " + foundTool._id + " was removed from " + foundElement._id
@@ -503,11 +454,9 @@ function checkIsAuthenticated(headers) {
         firebase.auth().verifyIdToken(headers.authorization)
             .then(function (decodedToken) {
                 let uid = decodedToken.uid
-                //console.log("UDI", uid)
                 UserProfile.findOne({ uid: uid })
                     .exec()
                     .then(foundUser => {
-                        //console.log("found user:", foundUser)
                         resolve(foundUser)
                     })
                     .catch(err => {

@@ -10,7 +10,6 @@ const gamification = require('../controller/gamification')
 const logs = require('../controller/log');
 
 
-// da modificare col parametro shared
 exports.getQuestion = function (req, res, next) {
     Question.find({}, function (err, foundQuiz) {
         if (err) {
@@ -45,8 +44,6 @@ exports.getQuestionById = function (req, res, next) {
 
 
 exports.createQuiz = function (req, res, next) {
-    // const action = "Create"
-    //const category = "Question"
 
     const { question, imgUrl, environment, shared } = req.body;
     console.log(req.body);
@@ -159,10 +156,6 @@ exports.updateQuestion = function (req, res, next) {
     console.log('id :' + search_id);
     console.log('user', user)
     console.log("valure", req.body)
-    //Object.keys(data).forEach(e => console.log(` Activity DATA key=${e}  value=${data[e]}`));
-    //Object.keys(req.params).forEach(e => console.log(` req.params DATA key=${e}  value=${req.params[e]}`));
-    //Object.keys(req.body).forEach(e => console.log(` req.body DATA key=${e}  value=${req.body[e]}`));
-
     headers = req.headers
     checkIsAuthenticated(headers)
         .then((isAuth) => {
@@ -266,7 +259,6 @@ exports.updateQuestion = function (req, res, next) {
                                     return res.send(err)
                                 })
 
-                                //return res.json({"activity" : foundActivity});
 
                             });
                         }
@@ -356,8 +348,6 @@ exports.handleAnswers = function (req, res, next) {
 
                                 }
 
-                                //return res.json({"activity" : foundActivity});
-
                             });
                         }
 
@@ -412,7 +402,6 @@ exports.deleteQuestion = function (req, res, next) {
 
                         foundQuiz.remove(function (err) {
                             if (err) {
-                                // Delete from teachers
                                 return res.status(422).send({
                                     "action": "Delete Quiz by ID ",
                                     "success": false,
@@ -440,10 +429,7 @@ exports.deleteQuestion = function (req, res, next) {
                                     foundActivity.save()
                                 })
                             });
-
-                            //                            message = foundQuiz._id + " Was Deleted successfully"
-                            //                            logs.createLog(action, category, isAuth, message)
-                            isAuth.game_counter.delete_counter = isAuth.game_counter.delete_counter + 1
+                      isAuth.game_counter.delete_counter = isAuth.game_counter.delete_counter + 1
 
                             Promise.all([
                                 gamification.computeAchievement(isAuth, isAuth.game_counter.delete_counter, "Delete"),
@@ -519,11 +505,9 @@ exports.deleteQuestion = function (req, res, next) {
 exports.addQuestionToActivity = function (req, res, next) {
     console.log("AUTH", req.headers)
     console.log("PATCH")
-    // const user = res.locals.user;
     const data = req.body;
     const search_id = req.params.id
     console.log('activity_id :' + search_id);
-    //console.log('user', user)
     console.log("data", req.body)
     headers = req.headers;
     checkIsAuthenticated(headers)

@@ -12,19 +12,16 @@ const logs = require('../controller/log');
 
 // da modificare col parametro shared
 exports.getStep = function (req, res, next) {
-    //console.log("GET QUIZ")
     Step.find({}, function (err, foundStep) {
         if (err) {
-            //console.log(err);
+            return res.status(400).send(err)
         }
         return res.json(foundStep);
     })
 }
 
 exports.getStepById = function (req, res, next) {
-    //console.log("GET BY ID QUIZ")
     const stepID = req.params.id
-    //console.log(stepID)
     Step.findById(stepID)
         .exec()
         .then(foundStep => {
@@ -50,15 +47,10 @@ exports.createStep = function (req, res, next) {
     const category = "Step"
 
     const { name, description, shared, imgUrl, imgSym, created_by, activities, subject } = req.body;
-    ////console.log(req.file);
-
-    //console.log(req.body);
-
 
     headers = req.headers;
     checkIsAuthenticated(headers)
         .then((isAuth) => {
-            //console.log("is Auth;", isAuth)
             if (isAuth === false) {
                 return res.status(403).send("You are not authorized")
             }
@@ -87,7 +79,6 @@ exports.createStep = function (req, res, next) {
                         gamification.computeAchievementForCreate(isAuth),
                         gamification.computeLevelCreate(isAuth)
                     ]).then(values => {
-                        //console.log(values)
                         let achievement = values[0]
                         let level = values[1]
 
@@ -160,17 +151,9 @@ exports.updateStep = function (req, res, next) {
     const action = "Update"
     const category = "Step"
 
-    //console.log("PATCH")
     const user = res.locals.user;
     const data = req.body;
     const search_id = req.params.id
-    //console.log('id :' + search_id);
-    //console.log('user', user)
-    //console.log("valure", req.body)
-    //Object.keys(data).forEach(e => //console.log(` Activity DATA key=${e}  value=${data[e]}`));
-    //Object.keys(req.params).forEach(e => //console.log(` req.params DATA key=${e}  value=${req.params[e]}`));
-    //Object.keys(req.body).forEach(e => //console.log(` req.body DATA key=${e}  value=${req.body[e]}`));
-
     headers = req.headers;
     checkIsAuthenticated(headers)
         .then((isAuth) => {
@@ -537,19 +520,14 @@ exports.addStepToActivity = function (req, res, next) {
 exports.removeStepFromActivity = function (req, res, next) {
     const action = "Remove"
     const category = "Step"
-    ////console.log("Remove step from Activity")
     const user = res.locals.user;
     const data = req.body;
     const search_id = req.params.id
-    //console.log('activity_id :' + search_id);
-    //console.log('user', user)
-    //console.log("data", req.body)
 
 
     headers = req.headers;
     checkIsAuthenticated(headers)
         .then((isAuth) => {
-            //console.log("is Auth;", isAuth)
             if (isAuth === false) {
                 return res.status(403).send("You are not authorized")
             }
@@ -578,7 +556,6 @@ exports.removeStepFromActivity = function (req, res, next) {
                             }
                         })
                     }
-                    //console.log("Found Element: /n", activity);
                     Step.findById(data._id)
                         .exec(function (err, step) {
                             if (err) {
@@ -595,9 +572,7 @@ exports.removeStepFromActivity = function (req, res, next) {
                             else {
                                 step.activities.pop(activity);
                                 step.save()
-                                //console.log("pop")
-                                //console.log("Steps ", activity.steps)
-                                activity.steps.forEach(element => {
+                                 activity.steps.forEach(element => {
                                     if (element.step == step.id) {
                                         //console.log("poppi")
                                         activity.steps.pop(element)
@@ -611,8 +586,6 @@ exports.removeStepFromActivity = function (req, res, next) {
                                         return res.status(200).send(activity)
                                     }
                                 })
-                                //message = "Step " + step._id + " was removed from " + activity._id
-                                //logs.createLog(action, category, isAuth, message)
 
                             }
 
@@ -636,19 +609,14 @@ exports.removeStepFromActivity = function (req, res, next) {
 
 
 exports.changeOrder = function (req, res, next) {
-    //console.log("Change order of Step from Activity")
     const user = res.locals.user;
     const data = req.body;
     const search_id = req.params.id
-    // //console.log('activity_id :' + search_id);
-    ////console.log('user', user)
-    //console.log("data", req.body)
 
 
     headers = req.headers;
     checkIsAuthenticated(headers)
         .then((isAuth) => {
-            // //console.log("is Auth;", isAuth)
             if (isAuth === false) {
                 return res.status(403).send("You are not authorized")
             }
@@ -678,7 +646,6 @@ exports.changeOrder = function (req, res, next) {
                         })
                     }
 
-                    //console.log("Previous", activity.steps)
                     activity.steps.forEach(current_step => {
                         data.forEach(actual_step => {
                             if (current_step.step == actual_step.step._id) {
@@ -688,7 +655,6 @@ exports.changeOrder = function (req, res, next) {
                             }
                         })
                     });
-                    //console.log("After", activity.steps)
 
                     activity.save(function(err,activity){
                         if(err){
@@ -723,11 +689,9 @@ function checkIsAuthenticated(headers) {
         firebase.auth().verifyIdToken(headers.authorization)
             .then(function (decodedToken) {
                 let uid = decodedToken.uid
-                // //console.log("UDI :", uid)
                 UserProfile.findOne({ uid: uid })
                     .exec()
                     .then(foundUser => {
-                        //console.log(foundUser)
                         resolve(foundUser)
                     })
                     .catch(err => {

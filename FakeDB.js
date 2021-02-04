@@ -33,9 +33,7 @@ class FakeDB {
     pushDataToDb() {
         console.log(" Achievements : ", this.achievements);
         console.log("   Levels : ", this.levels);
-       // const user = new User(this.users[0]);
-       // const user2 = new User(this.users[1]);
-    
+
         this.achievements.forEach( (achievement) => {
 
             const newAchievement = new Achievement(achievement);
@@ -48,10 +46,6 @@ class FakeDB {
               newLevel.save()
           })
 
-         /* this.users.forEach((user)=>{
-              const newUser = new UserProfile(user);
-              newUser.save()
-          })*/
 
           this.tools.forEach((tool)=>{
               const newTool = new Tool(tool)
@@ -68,9 +62,6 @@ class FakeDB {
               newQuestion.save()
           })
         
-    
-        //user.save().catch(error=>{console.log(error); });
-        // user2.save().catch(error=>{console.log(error); });
     }
     
     async seedDB() {

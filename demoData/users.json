@@ -1,10 +1,120 @@
-{
-    "users":[
-        {
-            "displayName":"Demo",
-            "email":"demo@demo.com",
-            "photoURL":"/assets/demoData/profile.svg",
-            "role":"Teacher"
-        }
+    [
+      {
+        "uid": "TypEPbbQiGhVxw6yqRfAD6fAGcn2",
+        "email": "mario.rossi@studio.unibo.it",
+        "photoURL": "assets/avatars/bot-2.svg",
+        "displayName":"Mario Rossi",
+        "role":"Teacher",
+        "exp": 700,
+        "level": {
+            "level": "600d966caf9213bfdc74a150",
+            "unlocked_time": {
+              "$date": "2021-01-29T14:26:14.063Z"
+            }
+          },
+        "achievements": [
+            {
+              "unlocked": true,
+              "unlocked_time": {
+                "$date": "2021-01-24T16:26:29.488Z"
+              },
+              "achievement":  "600d966caf9213bfdc74a12f"
+            },
+            {
+              "unlocked": true,
+              "unlocked_time": {
+                "$date": "2021-01-29T14:23:32.126Z"
+              },
+              "achievement": "600d966caf9213bfdc74a130"
+            },
+            {
+              "unlocked": true,
+              "unlocked_time": {
+                "$date": "2021-01-29T14:30:06.837Z"
+              },
+              "achievement":  "600d966caf9213bfdc74a131"
+            },
+            {
+              "unlocked": true,
+              "unlocked_time": {
+                "$date": "2021-01-29T14:38:11.796Z"
+              },
+              "achievement":"600d966caf9213bfdc74a13b"
+            },
+            {
+              "unlocked": true,
+              "unlocked_time": {
+                "$date": "2021-01-29T14:40:53.897Z"
+              },
+              "achievement": "600d966caf9213bfdc74a135"
+            },
+            {
+              "unlocked": true,
+              "unlocked_time": {
+                "$date": "2021-01-30T09:15:56.202Z"
+              },
+              "achievement": "600d966caf9213bfdc74a136"
+        
+            }
+        ],
+        "followed":[],
+        "followers":[],
+        "learners":[]
+      },
+      {
+        "uid": "TypEPbbQiGhVxw6yqRfAD6fAGc22",
+        "email": "pinco.pallino@studio.unibo.it",
+        "photoURL": "assets/avatars/bot-3.svg",
+        "displayName":"Pinco Pallino",
+        "role":"Teacher",
+        "exp": 490,
+        "level": {
+            "level": "600d966caf9213bfdc74a14f",
+            "unlocked_time": {
+              "$date": "2021-01-29T14:26:14.063Z"
+            }
+          },
+        "achievements": [
+            {
+              "unlocked": true,
+              "unlocked_time": {
+                "$date": "2021-01-29T14:23:32.126Z"
+              },
+              "achievement": "600d966caf9213bfdc74a130"
+            },
+            {
+              "unlocked": true,
+              "unlocked_time": {
+                "$date": "2021-01-29T14:30:06.837Z"
+              },
+              "achievement":  "600d966caf9213bfdc74a131"
+            },
+            {
+              "unlocked": true,
+              "unlocked_time": {
+                "$date": "2021-01-29T14:38:11.796Z"
+              },
+              "achievement":"600d966caf9213bfdc74a13b"
+            },
+            {
+              "unlocked": true,
+              "unlocked_time": {
+                "$date": "2021-01-29T14:40:53.897Z"
+              },
+              "achievement": "600d966caf9213bfdc74a135"
+            },
+            {
+              "unlocked": true,
+              "unlocked_time": {
+                "$date": "2021-01-30T09:15:56.202Z"
+              },
+              "achievement": "600d966caf9213bfdc74a136"
+        
+            }
+        ],
+        "followed":[],
+        "followers":[],
+        "learners":[]
+      }
+      
     ]
-}

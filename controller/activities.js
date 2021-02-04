@@ -205,13 +205,9 @@ exports.updateActivity = function (req, res, next) {
     const action = "Update"
     const category = "Activity"
 
-    //console.log("PATCH")
     const user = res.locals.user;
     const data = req.body;
     const search_id = req.params.id
-    //console.log('id :' + search_id);
-    //console.log('user', user)
-    //console.log("valure", req.body)
 
     headers = req.headers
     checkIsAuthenticated(headers)
@@ -221,10 +217,7 @@ exports.updateActivity = function (req, res, next) {
             }
             else {
                 BaseActivity.findById(req.params.id).exec(function (err, foundElement) {
-                    ////console.log("FOUND ELEMENT:  ", foundElement)
                     if (err) {
-                        //console.log("sono bloccato in quetsto errore");
-                        //console.log("i miei errori sono qui:", err.errors);
                         return res.status(422).send({ errors: normalizeErrors(err.errors) });
                     }
                     else {
@@ -232,7 +225,6 @@ exports.updateActivity = function (req, res, next) {
                         foundElement.set(data);
                         foundElement.save(function (err) {
                             if (err) {
-                                //console.log("sono solo  qui ");
                                 return res.status(422).send({ errors: [{ title: 'Error in save  activity', detail: err.errors }] });
                             }
                             isAuth.game_counter.update_counter = isAuth.game_counter.update_counter + 1
@@ -241,7 +233,6 @@ exports.updateActivity = function (req, res, next) {
                                 gamification.computeAchievement(isAuth, isAuth.game_counter.update_counter, "Update"),
                                 gamification.computeLevelCreate(isAuth)
                             ]).then(values => {
-                                //console.log(values)
                                 let achievement = values[0]
                                 let level = values[1]
 
@@ -260,7 +251,6 @@ exports.updateActivity = function (req, res, next) {
                                 }
 
                                 isAuth.save(function (err, elem) {
-                                    //console.log("entri=??")
 
                                     if (err) {
                                         res.status(400).send(err)
@@ -286,8 +276,7 @@ exports.updateActivity = function (req, res, next) {
                                     }
                                 })
                             }).catch(err => {
-                                //console.log(err)
-                                return res.send(err)
+                                return res.status(400).send(err)
                             })
                         });
                     }
@@ -325,7 +314,8 @@ exports.deleteActivity = function (req, res, next) {
                 BaseActivity.findById(req.params.id)
                     .exec(function (err, foundActivity) {
                         if (err) {
-                            //console.log(err);
+                            return res.status(400).send(err)
+
                         }
 
                         if (foundActivity.created_by != isAuth.id) {
@@ -335,7 +325,7 @@ exports.deleteActivity = function (req, res, next) {
 
                         foundActivity.remove(function (err) {
                             if (err) {
-                                // Delete from teachers
+                             
                                 return res.status(422).send({ errors: [{ title: 'Error Remove', detail: 'there was an error removing' }] });
 
                             }
@@ -345,7 +335,6 @@ exports.deleteActivity = function (req, res, next) {
                                 gamification.computeAchievement(isAuth, isAuth.game_counter.delete_counter, "Delete"),
                                 gamification.computeLevelCreate(isAuth)
                             ]).then(values => {
-                                //console.log(values)
                                 let achievement = values[0]
                                 let level = values[1]
 
@@ -390,7 +379,6 @@ exports.deleteActivity = function (req, res, next) {
                                     }
                                 })
                             }).catch(err => {
-                                //console.log(err)
                                 return res.send(err)
                             })
 
@@ -420,11 +408,9 @@ function checkIsAuthenticated(headers) {
         firebase.auth().verifyIdToken(headers.authorization)
             .then(function (decodedToken) {
                 let uid = decodedToken.uid
-                // //console.log("UDI :", uid)
                 UserProfile.findOne({ uid: uid })
                     .exec()
                     .then(foundUser => {
-                        //console.log(foundUser)
                         resolve(foundUser)
                     })
                     .catch(err => {

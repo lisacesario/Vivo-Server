@@ -16,9 +16,7 @@ const gamification = require('../controller/gamification')
 const logs = require('../controller/log');
 
 exports.createUser = function (req, res, next) {
-    //console.log("Create User")
     const { uid, email, role, photoURL, displayName } = req.body;
-    //console.log("User Profile ", uid, email, role, photoURL, displayName);
     const userProfile = new UserProfile({ uid, email, role, photoURL, displayName })
     UserProfile.create(userProfile, function (error, newProfile) {
         if (error) {
@@ -73,7 +71,6 @@ exports.getLevelById = function(req,res,next){
 
 
 exports.getUser = function (req, res, next) {
-    //console.log("Get auth user")
     const requestedUserId = req.params.id;
     UserProfile.findOne({ uid: requestedUserId })
         .select('-uid -email')
@@ -121,9 +118,7 @@ exports.getUsersProfile = function (req, res, next) {
 
 
 exports.getUserProfileById = function (req, res, next) {
-    //console.log("getUserProfileById")
     const requestedUserId = req.params.id;
-    ////console.log("bu" , requestedUserId)
     UserProfile.findById(requestedUserId)
         .exec()
         .then(user => {
@@ -218,10 +213,8 @@ exports.getPopulatedUserProfile =  function(req,res,next){
 
 
 exports.patchUser = function (req, res, next) {
-    //console.log("PATCH")
     const user = res.locals.user;
     const data = req.body;
-    //console.log("valure", req.body)
 
     headers =  req.headers
     checkIsAuthenticated(headers)
@@ -275,8 +268,7 @@ exports.patchUser = function (req, res, next) {
 exports.updateUserInfo = function (req, res, next) {
     const search_id = req.params.id;
     const {obj, typeOfAction} = req.body;
-    //console.log("type Of Action ", typeOfAction)
-    //console.log("obj", obj)
+
     if(typeOfAction == "ADD_TEACHER"){
         UserProfile.findById(search_id)
                     .then(learner =>{
@@ -351,8 +343,6 @@ exports.completeActivity = function(req,res,next){
                 return res.status(403).send("WRONG-ROLE")
             }
             else{
-                //console.log("STIAMOFACENDO LA FUNZIONE GIUSTA??")
-
                isAuth.activities_completed.push({
                    "activity":activity,
                    "score" : score,
@@ -365,7 +355,6 @@ exports.completeActivity = function(req,res,next){
                 gamification.computeAchievement(isAuth,isAuth.activities_completed.length, "Activity"),
                 gamification.computeLevelCreate(isAuth)
             ]).then(values =>{
-                //console.log(values)
                 let achievement = values[0]
                 let level = values[1]
 
@@ -384,7 +373,6 @@ exports.completeActivity = function(req,res,next){
                 }
           
                 isAuth.save(function(err,elem){
-                    //console.log("entri=??")
 
                     if(err){
                         res.status(400).send(err)
@@ -452,7 +440,6 @@ exports.permissionSettings = function (req, res, next) {
 
     const requestedUserId = req.params.id;
     const data = req.body;
-    //console.log("data", data)
     UserProfile.findOne({ uid: requestedUserId }).populate().exec(function (err, foundUser) {
         if (err) {
             return res.status(400).send(
@@ -466,7 +453,6 @@ exports.permissionSettings = function (req, res, next) {
                     }
                 })
         }
-        //console.log("Elementi Trovato", foundUser);
         foundUser.followers.forEach(follower => {
             if (follower.follower_id == data.follower_id) {
                 follower.permission.can_write = data.permission.can_write_me;
@@ -474,10 +460,8 @@ exports.permissionSettings = function (req, res, next) {
                 follower.permission.can_see_followed_list = data.permission.can_see_my_followed_list;
                 follower.permission.can_see_follower_list = data.permission.can_see_my_follower_list;
                 follower.permission.can_see_agenda = data.permission.can_see_agenda;
-              //  follower.permission.can_edit_agenda = data.permission.can_edit_agenda;
                 follower.permission.can_see_stats = data.permission.can_see_stats;
                 follower.permission.can_see_achievements = data.permission.can_see_achievements;
-                //console.log("Cambia i permessi la richiesta")
             }
         });
         foundUser.save().then(
@@ -502,7 +486,6 @@ exports.permissionSettings = function (req, res, next) {
                             element.permission.can_see_followed_list = data.permission.can_see_my_followed_list;
                             element.permission.can_see_follower_list = data.permission.can_see_my_follower_list;
                             element.permission.can_see_agenda = data.permission.can_see_agenda;
-                           // element.permission.can_edit_agenda = data.permission.can_edit_agenda;
                             element.permission.can_see_stats = data.permission.can_see_stats;
                             element.permission.can_see_achievements = data.permission.can_see_achievements;
                         }
@@ -566,13 +549,10 @@ exports.populateAgenda = function (req,res,next){
 
 
 exports.addEventToAgenda = function (req, res, next) {
-    //console.log("Add event to agenda")
     const user = res.locals.user;
     const data = req.body;
     const search_id = req.params.id
-    //console.log('activity_id :' + search_id);
-    //console.log('user', user)
-    //console.log("data", req.body)
+
 
     const { day, start_time, end_time, repeat_weekly, repeat_daily, repeat_monthly, activity, added_by, added_for } = req.body;
 
@@ -587,18 +567,20 @@ exports.addEventToAgenda = function (req, res, next) {
 
     Event.create(new_event, function (err, newEvent) {
         if (err) {
-            //console.log(err);
+            return res.status(400).send(err)
         }
         BaseActivity.findOne(activity, function (err, foundActivity) {
             if (err) {
-                //console.log(err);
+                return res.status(400).send(err)
+
             }
             newEvent.activity = foundActivity
         }).then(
             (foundActivity) => {
                 UserProfile.findOne({ uid: added_by }, function (err, foundUser) {
                     if (err) {
-                        //console.log(err);
+                        return res.status(400).send(err)
+
                     }
                     newEvent.added_by = foundUser
                     foundUser.events.push(newEvent);
@@ -606,7 +588,8 @@ exports.addEventToAgenda = function (req, res, next) {
                         (foundUser) => {
                             UserProfile.findOne({ _id: added_for }, function (err, foundStudent) {
                                 if (err) {
-                                    //console.log(err);
+                                    return res.status(400).send(err)
+
                                 }
                                 newEvent.added_for = foundStudent
                                 foundStudent.agenda.push(newEvent);
@@ -616,30 +599,31 @@ exports.addEventToAgenda = function (req, res, next) {
                                         return res.status(200).send({ "message": "evento aggiunto" })
                                     },
                                     (err) => {
-                                        //console.log("Errore", err)
+                                        return res.status(400).send(err)
+
                                     }
                                 )
                             })
                         },
                         (err) => {
-                            //console.log("Errore", err)
+                            return res.status(400).send(err)
+
                         }
 
                     );
                 })
             },
             (err) => {
-                //console.log("Errore", err)
+                return res.status(400).send(err)
+
             }
         )
     })
 }
 
 exports.UpdateSocialNetwork = function(req,res,next){
-    //console.log('UpdateSockalNetwork')
     const requestedUserId = req.params.id;
     const {action, user} = req.body;
-    //console.log("action: ", action)
     UserProfile.findById(requestedUserId).exec()
         .then(userToBeUpdated=>{
 
@@ -704,7 +688,8 @@ exports.UpdateSocialNetwork = function(req,res,next){
                     }
                 })
                 .catch(err =>{
-                    //console.log(err)
+                    return res.status(400).send(err)
+
                 })
             }
         })
@@ -714,205 +699,6 @@ exports.UpdateSocialNetwork = function(req,res,next){
         })
 }
 
-/*
-exports.auth = function(req,res, next){
-    const {email, password} = req.body;
-
-    if(!password || !email){
-        return res.status(422).send({ title: "Data Missing!", detail:"Provide Email and Passowrd"});
-    }
-
-    UserProfile.findOne({email}, function(err,user){
-        if (err){
-            return res.status(422).send({ errors: err.errors });
-
-        }
-        if(!user){
-            return res.status(422).send({ title: "AUTH ERROR", detail:"user doesn't exist"});
-        }
-        if(user.hasSamePassword(password)){
-
-            firebase.auth().signInWithEmailAndPassword(email, password).then(
-                (elemento)=>{
-                    //console.log("Login completato con successo",elemento)
-                    // return JWT Token
-                    const token= jwt.sign({
-                        userId: user.id,
-                        displayName : user.displayName || "Utente appena registrato"
-                    }, config.SECRET, { expiresIn: '1h' });
-
-                    return res.json(token);
-                }
-            )
-            .catch(function(error) {
-                // Handle Errors here.
-                var errorCode = error.code;
-                var errorMessage = error.message;
-                return res.status(errorCode).sent({title:"AUTH ERROR", detail:"errorMessage"})
-              });
-        }
-        else{
-            return res.status(422).send({ title: "AUTH ERROR", detail:"wrong email or password"});
-
-        }
-
-
-    });
-}
-
-
-
-exports.getUser = function(req,res,next){
-    //console.log("req :", req.params);
-    //console.log("res :", res.locals.user);
-
-    const requestedUserId = req.params.id;
-    const user = res.locals.user;
-
-    //console.log("req user: ",requestedUserId);
-    //console.log("user: ", user)
-
-    if( requestedUserId === user.id ){
-        // Display all information
-        UserProfile.findById(requestedUserId, function(err, foundUser){
-            if(err){
-                // da riscrivere
-                return  res.status(422).send({ title: "Data Missing!", detail:"Provide Email and Passowrd"});
-            }
-            return res.json(foundUser);
-        })
-    }
-    else{
-        // restrict some data
-        UserProfile.findById(requestedUserId)
-            .populate('-email -password')
-            .exec(function(err,foundUser){
-                if(err){
-                    // da riscrivere
-                    return  res.status(422).send({ title: "Data Missing!", detail:err.errors});
-                }
-                return res.json(foundUser);
-            })
-    }
-}
-
-
-exports.register = function(req,res, next){
-    const {displayName, email, password, passwordConfirmation, role} = req.body;
-
-    if(!password || !email){
-        return res.status(422).send({ title: "Data Missing!", detail:"Provide Email and Passowrd"});
-    }
-    if(password !== passwordConfirmation){
-        return res.status(422).send({ title: "Invalid  password!", detail:"password is not the same as confirmation "});
-    }
-
-    UserProfile.findOne({email: email}, function (err, existingUser){
-        if (err){
-            return res.status(422).send({ title: "no idea of the erorr", detail:err});
-
-        }
-        if (existingUser){
-            return res.status(422).send({ title: "User with this email already exists  !", detail:"dettaglio "});
-        }
-    });
-
-    firebase.auth().createUser({
-        email : email,
-        password: password,
-        displayName:displayName,
-        role: role
-        })
-            .then(
-                (elemento)=>{
-                    //console.log(elemento.uid);
-                    uid = elemento.uid
-                    const user = new UserProfile({
-                        uid,
-                        displayName,
-                        email,
-                        password,
-                        role
-                    });
-                    user.save(function(err){
-                        if(err){
-                            return res.status(422).send({ title: "Errore nella creazione  !", detail: err.message});
-                        }
-                        return res.json({'registered': true});
-                    })
-                }
-            )
-            .then({
-
-            })
-            .catch(function(error) {
-                // Handle Errors here.
-                var errorCode = error.code;
-                var errorMessage = error.message;
-                return res.status(errorCode).send(errorMessage);
-            });
-
-}
-
-function sendEmailVerification(email){
-    firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings)
-        .then(function() {
-            // The link was successfully sent. Inform the user.
-            // Save the email locally so you don't need to ask the user for it again
-            // if they open the link on the same device.
-            window.localStorage.setItem('emailForSignIn', email);
-        })
-        .catch(function(error) {
-            // Some error occurred, you can inspect the code: error.code
-        });
-        }
-
-exports.authMiddleware = function(req, res, next) {
-    const token = req.headers.authorization;
-
-    if (token) {
-      const user = parseToken(token);
-
-      UserProfile.findById(user.userId, function(err, user) {
-        if (err) {
-          return res.status(422).send({errors: normalizeErrors(err.errors)});
-        }
-
-        if (user) {
-          res.locals.user = user;
-          next();
-        } else {
-          return notAuthorized(res);
-        }
-      })
-    } else {
-      return notAuthorized(res);
-    }
-  }
-
-
-exports.logout = function(req,res,next){
-    firebase.auth().signOut().then(function() {
-        // Sign-out successful.
-        return res.json({'message': "Logout Successfull"});
-      }).catch(function(error) {
-        // An error happened.
-      });
-}
-
-
-function parseToken(token){
-    return  jwt.verify(token.split(' ')[1], config.SECRET);
-}
-
-function notAuthorized(res) {
-    return res.status(401).send({errors: [{title: 'Not authorized!', detail: 'You need to login to get access!'}]});
-  }
-
-  */
-
-
-
 
 function checkIsAuthenticated(headers) {
 
@@ -920,11 +706,9 @@ function checkIsAuthenticated(headers) {
         firebase.auth().verifyIdToken(headers.authorization)
             .then(function (decodedToken) {
                 let uid = decodedToken.uid
-                //console.log("UDI", uid)
                 UserProfile.findOne({ uid: uid })
                     .exec()
                     .then(foundUser => {
-                        //console.log(foundUser)
                         resolve(foundUser)
                     })
                     .catch(err => {

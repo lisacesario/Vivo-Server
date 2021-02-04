@@ -4,10 +4,8 @@ const router = express.Router();
 const GroupController = require('../controller/group')
 
 
-// GET /api/v1/users/profile/
 router.get('/:id', GroupController.getGroupById);
 
-// POST /api/v1/users/create
 router.post('/create', GroupController.createGroup);
 
 router.delete('/:id', GroupController.deleteGroup);

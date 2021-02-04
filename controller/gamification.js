@@ -29,9 +29,7 @@ module.exports = {
                         Level.findOne({ 'position': (current_level.position + 1) }).exec()
                             .then(newLevel => {
                                 console.log("nuovo livello", newLevel)
-                               // user.level.level = newLevel;
-                                ///user.level.unlocked_time = Date.now()
-                                resolve(newLevel)
+                                 resolve(newLevel)
                             })
                             .catch(err => {
                                 console.log(err)
