@@ -1,0 +1,211 @@
+[
+    {   
+        "name":"Apri il rubinetto",
+        "description":"Apri il rubinetto dell'acqua",
+        "imgUrl":"/assets/demoData/lavare_mani/aprirubinetto.png",
+        "imgSym":"/assets/demoData/lavare_mani/aprirubinetto.png",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Bagna le mani",
+        "description":"Bagna per bene le mani con l'acqua",
+        "imgUrl":"/assets/demoData/lavare_mani/bagna_mani.png",
+        "imgSym":"/assets/demoData/lavare_mani/bagna_mani_sym.png",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Prendi il sapone",
+        "description":"Applica una quantità di sapone sufficiente per coprire per bene la superficie delle mani",
+        "imgUrl":"/assets/demoData/lavare_mani/usa_sapone_sym.png",
+        "imgSym":"/assets/demoData/lavare_mani/usa_sapone_sym.png",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Frizione mani",
+        "description":"Strofina bene le mani palmo contro palmo",
+        "imgUrl":"/assets/demoData/lavare_mani/friziona_sym.png",
+        "imgSym":"/assets/demoData/lavare_mani/friziona_sym.png",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Intreccia dita",
+        "description":"Metti il palmo della mano destra sopra il dorso della mano sinistra. Intraccia le dita e sfrega ",
+        "imgUrl":"/assets/demoData/lavare_mani/intreccia_sym.png",
+        "imgSym":"/assets/demoData/lavare_mani/intreccia_sym.png",
+        "subject":"cura-se",
+        "shared":true
+        },
+    {   
+        "name":"Palmo contro Palmo",
+        "description":"Metti le mani palmo contro palmo e intreccia le dita tra loro",
+        "imgUrl":"/assets/demoData/lavare_mani/palmopalmo_sym.png",
+        "imgSym":"/assets/demoData/lavare_mani/palmopalmo_sym.png",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Dorso delle dita",
+        "description":"Dorso delle dita contro il palmo opposto tenendo le dita strette tra loro",
+        "imgUrl":"/assets/demoData/lavare_mani/dorso_sym.png",
+        "imgSym":"/assets/demoData/lavare_mani/dorso_sym.png",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Frizione pollice",
+        "description":"Frizione rotazionale del pollice sinistro stretto nel palmo destro e viceversa",
+        "imgUrl":"/assets/demoData/lavare_mani/frizione_pollice_sym.png",
+        "imgSym":"/assets/demoData/lavare_mani/frizione_pollice_sym.png",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Frizione avanti e indietro",
+        "description":"frizione rotazionale, in avanti ed indietro con le dita della mano destra strette tra loro nel palmo sinistro e viceversa",
+        "imgUrl":"/assets/demoData/lavare_mani/frizione_rotazionale_sym.png",
+        "imgSym":"/assets/demoData/lavare_mani/frizione_rotazionale_sym.png",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Risciacqua",
+        "description":"Risciacqua le mani sotto l'acqua. Non deve rimanere nessuna traccia di sapone.",
+        "imgUrl":"/assets/demoData/lavare_mani/risciacqua_sym.png",
+        "imgSym":"/assets/demoData/lavare_mani/risciacqua_sym.png",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Asciugati le mani",
+        "description":"Prendi l'asciugamano e asciugati per bene le mani.",
+        "imgUrl":"/assets/demoData/lavare_mani/asciuga_sym.png",
+        "imgSym":"/assets/demoData/lavare_mani/asciuga_sym.png",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Chiudi il rubinetto",
+        "description":"Chiudi il rubinetto",
+        "imgUrl":"/assets/demoData/lavare_mani/chiudi_sym.png",
+        "imgSym":"/assets/demoData/lavare_mani/chiudi_sym.png",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Vai in bagno",
+        "description":"Vai in bagno a darti una rinfrescata",
+        "imgUrl":"/assets/demoData/uscire_casa/bagno.jpeg",
+        "imgSym":"/assets/demoData/uscire_casa/bagno.jpeg",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Vestiti",
+        "description":"Scegli i vestiti che ti piacciono ed indossali",
+        "imgUrl":"/assets/demoData/uscire_casa/vestiti.jpeg",
+        "imgSym":"/assets/demoData/uscire_casa/vestiti.jpeg",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Colazione",
+        "description":"Prepara la tua colazione",
+        "imgUrl":"/assets/demoData/uscire_casa/colazione.jpeg",
+        "imgSym":"/assets/demoData/uscire_casa/colazione.jpeg",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Lavati i denti",
+        "description":"Lavati i denti",
+        "imgUrl":"/assets/demoData/uscire_casa/spazzolinodentifricio.jpeg",
+        "imgSym":"/assets/demoData/uscire_casa/spazzolinodentifricio.jpeg",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Prendi il gel ",
+        "description":"Prendi il gel e mettilo dentro allo zaino ",
+        "imgUrl":"/assets/demoData/uscire_casa/gelzaino.jpeg",
+        "imgSym":"/assets/demoData/uscire_casa/gelzaino.jpeg",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Chiudi lo zaino  ",
+        "description":"Chiudi lo zaino",
+        "imgUrl":"/assets/demoData/uscire_casa/chiudizaino.jpeg",
+        "imgSym":"/assets/demoData/uscire_casa/chiudizaino.jpeg",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Chiudi la cerniera davanti",
+        "description":"Mi raccomando, la cerniera davanti",
+        "imgUrl":"/assets/demoData/uscire_casa/chiudicerniera.jpeg",
+        "imgSym":"/assets/demoData/uscire_casa/chiudicerniera.jpeg",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Chiavi nello zaino",
+        "description":"Prendi le chiavi e mettile nella tasca davanti dello zaino.",
+        "imgUrl":"/assets/demoData/uscire_casa/chiudicerniera.jpeg",
+        "imgSym":"/assets/demoData/uscire_casa/chiudicerniera.jpeg",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Accendi la macchina",
+        "description":"Accendi la macchinetta del caffè premendo il tasto verde",
+        "imgUrl":"/assets/demoData/prepara_caffe/accendi.jpeg",
+        "imgSym":"/assets/demoData/prepara_caffe/luceverde.jpeg",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Inserisci capsula ",
+        "description":"Quando la luce verde smette di lampeggiare, prendi la capsula ed inseriscila nello spazio apposito.",
+        "imgUrl":"/assets/demoData/prepara_caffe/inseriscicapsula.jpeg",
+        "imgSym":"/assets/demoData/prepara_caffe/inseriscicapsula.jpeg",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Chiudi macchinetta ",
+        "description":"Chiudi la macchinetta del caffè spingendo la leva verso il basso.",
+        "imgUrl":"/assets/demoData/prepara_caffe/chiudimacchinetta2.jpeg",
+        "imgSym":"/assets/demoData/prepara_caffe/chiudimacchinetta2.jpeg",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Metti la tazzina",
+        "description":"Posiziona la tazzina sotto il buco di fuoriuscita del caffè",
+        "imgUrl":"/assets/demoData/prepara_caffe/mettilatazzina.jpeg",
+        "imgSym":"/assets/demoData/prepara_caffe/mettilatazzina.jpeg",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Premi il tasto verde",
+        "description":"Premi il tasto verde e aspetta. ",
+        "imgUrl":"/assets/demoData/prepara_caffe/premi.jpeg",
+        "imgSym":"/assets/demoData/prepara_caffe/premi.jpeg",
+        "subject":"cura-se",
+        "shared":true
+    },
+    {   
+        "name":"Caffe è pronto ",
+        "description":" Aspetta che la macchina finisca di erogare il caffè. Ora puoi berlo!",
+        "imgUrl":"/assets/demoData/prepara_caffe/premi.jpeg",
+        "imgSym":"/assets/demoData/prepara_caffe/premi.jpeg",
+        "subject":"cura-se",
+        "shared":true
+    }
+    
+]

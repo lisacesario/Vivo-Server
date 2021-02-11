@@ -1,0 +1,65 @@
+[
+    {   
+        "name":"Asciugamano",
+        "description":"un semplice asciugamano",
+        "imgUrl":"/assets/demoData/lavare_mani/asciugamano.png",
+        "warning":"nessuno",
+        "shared":true
+    },
+    {   
+        "name":"Sapone liquido per mani",
+        "description":"Sapone liquido per mani",
+        "imgUrl":"/assets/demoData/lavare_mani/sapone.jpeg",
+        "warning":"nessuno",
+        "shared":true
+    },
+    {   
+        "name":"Capsula caffè",
+        "description":"Capsula compatibile con macchina Nespresso",
+        "imgUrl":"/assets/demoData/prepara_caffe/capsula.jpeg",
+        "warning":"nessuno",
+        "shared":true
+    },
+    {   
+        "name":"Tazzina",
+        "description":"Tazzina del caffè",
+        "imgUrl":"/assets/demoData/prepara_caffè/tazzina.jpeg",
+        "warning":"nessuno",
+        "shared":true
+    },
+    {   
+        "name":"Macchina Caffè",
+        "description":"Macchina del caffè",
+        "imgUrl":"/assets/demoData/prepara_caffè/macchina.jpeg",
+        "warning":"nessuno",
+        "shared":true
+    },
+    {   
+        "name":"Gel",
+        "description":"Gel igienizzante per le mani",
+        "imgUrl":"/assets/demoData/uscire_casa/gel.jpeg",
+        "warning":"nessuno",
+        "shared":true
+    },
+    {   
+        "name":"Zaino",
+        "description":"Zaino",
+        "imgUrl":"/assets/demoData/uscire_casa/zaino.jpeg",
+        "warning":"nessuno",
+        "shared":true
+    },
+    {   
+        "name":"Mascherina",
+        "description":"Mascherina",
+        "imgUrl":"/assets/demoData/uscire_casa/mascherina.jpeg",
+        "warning":"nessuno",
+        "shared":true
+    },
+    {   
+        "name":"Chiavi",
+        "description":"Chiavi di casa",
+        "imgUrl":"/assets/demoData/uscire_casa/chiavi.jpeg",
+        "warning":"nessuno",
+        "shared":true
+    }
+]
